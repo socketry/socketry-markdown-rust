@@ -7,6 +7,7 @@ use crate::util::{
     encode::encode,
     gfm_tagfilter::gfm_tagfilter,
     infer::{gfm_table_align, list_loose},
+    inline_code_info,
     normalize_identifier::normalize_identifier,
     sanitize_uri::{sanitize, sanitize_with_protocols},
     skip,
@@ -82,6 +83,8 @@ struct CompileContext<'a> {
     bytes: &'a [u8],
     /// Configuration.
     options: &'a CompileOptions,
+    /// Whether inline code language prefixes are enabled.
+    inline_code_info: bool,
     // Fields used by handlers to track the things they need to track to
     // compile markdown.
     /// Rank of heading (atx).
@@ -138,6 +141,7 @@ impl<'a> CompileContext<'a> {
         bytes: &'a [u8],
         options: &'a CompileOptions,
         line_ending: LineEnding,
+        parse_inline_code_info: bool,
     ) -> CompileContext<'a> {
         CompileContext {
             events,
@@ -165,6 +169,7 @@ impl<'a> CompileContext<'a> {
             buffers: vec![String::new()],
             index: 0,
             options,
+            inline_code_info: parse_inline_code_info,
         }
     }
 
@@ -204,7 +209,12 @@ impl<'a> CompileContext<'a> {
 }
 
 /// Turn events and bytes into a string of HTML.
-pub fn compile(events: &[Event], bytes: &[u8], options: &CompileOptions) -> String {
+pub fn compile(
+    events: &[Event],
+    bytes: &[u8],
+    options: &CompileOptions,
+    parse_inline_code_info: bool,
+) -> String {
     let mut index = 0;
     let mut line_ending_inferred = None;
 
@@ -228,7 +238,13 @@ pub fn compile(events: &[Event], bytes: &[u8], options: &CompileOptions) -> Stri
     let line_ending_default =
         line_ending_inferred.unwrap_or_else(|| options.default_line_ending.clone());
 
-    let mut context = CompileContext::new(events, bytes, options, line_ending_default);
+    let mut context = CompileContext::new(
+        events,
+        bytes,
+        options,
+        line_ending_default,
+        parse_inline_code_info,
+    );
     let mut definition_indices = vec![];
     let mut index = 0;
     let mut definition_inside = false;
@@ -478,9 +494,33 @@ fn on_enter_raw_flow(context: &mut CompileContext) {
 /// Handle [`Enter`][Kind::Enter]:{[`CodeText`][Name::CodeText],[`MathText`][Name::MathText]}.
 fn on_enter_raw_text(context: &mut CompileContext) {
     context.raw_text_inside = true;
+    let prefix = if context.inline_code_info && context.events[context.index].name == Name::CodeText
+    {
+        inline_code_info::before(context.bytes, context.events[context.index].point.index)
+            .map(|(start, info)| (start, info.to_string()))
+    } else {
+        None
+    };
+
+    if let Some((start, info)) = &prefix {
+        let suffix = format!("{}:", info);
+        let buffer = context
+            .buffers
+            .last_mut()
+            .expect("at least one output buffer");
+        if buffer.ends_with(&suffix) {
+            let end = buffer.len();
+            buffer.truncate(end - (context.events[context.index].point.index - start));
+        }
+    }
+
     if !context.image_alt_inside {
         context.push("<code");
-        if context.events[context.index].name == Name::MathText {
+        if let Some((_, info)) = &prefix {
+            context.push(" class=\"language-");
+            context.push(info);
+            context.push("\"");
+        } else if context.events[context.index].name == Name::MathText {
             context.push(" class=\"language-math math-inline\"");
         }
         context.push(">");

@@ -131,6 +131,7 @@ pub fn to_html_with_options(value: &str, options: &Options) -> Result<String, me
         &events,
         parse_state.bytes,
         &options.compile,
+        options.parse.inline_code_info,
     ))
 }
 
