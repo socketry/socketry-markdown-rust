@@ -1,0 +1,9 @@
+[package]
+name = "socketry-markdown-project"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+bake = { package = "socketry-bake", version = "0.2.1" }
+bake-license = "0.1.0"

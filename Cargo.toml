@@ -42,7 +42,11 @@ rust-version = "1.56"
 version = "1.0.0"
 
 [workspace]
-members = ["generate"]
+members = ["generate", "bake"]
+resolver = "2"
+
+[workspace.metadata.bake]
+manifest = "bake/Cargo.toml"
 
 [workspace.dependencies]
 pretty_assertions = "1"
