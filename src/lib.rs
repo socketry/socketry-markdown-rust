@@ -11,6 +11,8 @@
 //!   constructs (GFM, MDX, and the like)
 //! * [`to_mdast()`][]
 //!   — turn markdown into a syntax tree
+//! * [`Renderer`][]
+//!   — render AST nodes and fragments with a user-defined renderer
 //!
 //! ## Features
 //!
@@ -39,6 +41,7 @@ mod construct;
 mod event;
 mod parser;
 mod resolve;
+pub mod renderer;
 mod state;
 mod subtokenize;
 mod to_html;
@@ -70,6 +73,7 @@ pub use util::mdx::{
 };
 
 pub use configuration::{CompileOptions, Constructs, Options, ParseOptions};
+pub use renderer::Renderer;
 
 use alloc::string::String;
 

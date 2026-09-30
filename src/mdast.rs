@@ -633,6 +633,14 @@ impl Node {
         })
     }
 
+    /// Render this node with a user-provided renderer.
+    pub fn render_with<R: crate::renderer::Renderer>(
+        &self,
+        renderer: &mut R,
+    ) -> String {
+        renderer.render(self)
+    }
+
     /// Replace a heading and the section below it in this node's children.
     ///
     /// `heading_index` is the direct-child index of the heading. When

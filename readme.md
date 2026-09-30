@@ -245,8 +245,10 @@ let duplicate = fragment.clone();
 assert_eq!(duplicate.text_content(), "Intro");
 ```
 
-HTML compilation currently takes Markdown source text (`to_html(&str)`); there
-is no function that renders a mutated AST node or fragment directly.
+The built-in HTML compiler takes Markdown source text (`to_html(&str)`). To
+render a mutated AST node or fragment, implement `renderer::Renderer` and pass
+it to `Node::render_with()`. The custom renderer owns its output and escaping
+rules; the crate does not provide a built-in HTML renderer for AST nodes.
 
 See the [crate docs][docs] for more info.
 
