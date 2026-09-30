@@ -127,12 +127,12 @@ pub fn to_html(value: &str) -> String {
 /// ```
 pub fn to_html_with_options(value: &str, options: &Options) -> Result<String, message::Message> {
     let (events, parse_state) = parser::parse(value, &options.parse)?;
-    Ok(to_html::compile(
+    to_html::compile(
         &events,
         parse_state.bytes,
         &options.compile,
         options.parse.inline_code_info,
-    ))
+    )
 }
 
 /// Turn markdown into a syntax tree.

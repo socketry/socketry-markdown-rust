@@ -1,4 +1,4 @@
-use markdown::{mdast::Node, message::Message, Constructs, ParseOptions};
+use socketry_markdown::{mdast::Node, message::Message, Constructs, ParseOptions};
 use test_utils::swc::{parse_esm, parse_expression};
 mod test_utils;
 
@@ -28,8 +28,8 @@ fn serde_compile_options() -> Result<(), Error> {
     use pretty_assertions::assert_eq;
 
     assert_eq!(
-        serde_json::to_string(&markdown::CompileOptions::gfm()).unwrap(),
-        r#"{"allowAnyImgSrc":false,"allowDangerousHtml":false,"allowDangerousProtocol":false,"defaultLineEnding":"\n","gfmFootnoteBackLabel":null,"gfmFootnoteClobberPrefix":null,"gfmFootnoteLabelAttributes":null,"gfmFootnoteLabelTagName":null,"gfmFootnoteLabel":null,"gfmTaskListItemCheckable":false,"gfmTagfilter":true}"#
+        serde_json::to_string(&socketry_markdown::CompileOptions::gfm()).unwrap(),
+        r#"{"allowAnyImgSrc":false,"allowDangerousHtml":false,"allowDangerousProtocol":false,"defaultLineEnding":"\n","gfmFootnoteBackLabel":null,"gfmFootnoteClobberPrefix":null,"gfmFootnoteLabelAttributes":null,"gfmFootnoteLabelTagName":null,"gfmFootnoteLabel":null,"gfmTaskListItemCheckable":false,"gfmTagfilter":true,"headingIds":false}"#
     );
 
     Ok(())
@@ -729,7 +729,7 @@ fn serde_paragraph() -> Result<(), Error> {
 fn assert_serde(input: &str, expected: &str, options: ParseOptions) -> Result<(), Error> {
     use pretty_assertions::assert_eq;
 
-    let mut source = markdown::to_mdast(input, &options).map_err(Error::Mdast)?;
+    let mut source = socketry_markdown::to_mdast(input, &options).map_err(Error::Mdast)?;
 
     remove_position(&mut source);
     // Serialize to JSON

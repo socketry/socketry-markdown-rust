@@ -89,6 +89,10 @@ struct CompileContext<'a> {
     // compile markdown.
     /// Rank of heading (atx).
     heading_atx_rank: Option<usize>,
+    /// Unique IDs assigned to Markdown headings when enabled.
+    heading_anchors: Vec<String>,
+    /// Index of the next heading ID to write.
+    heading_anchor_index: usize,
     /// Buffer of heading (setext) text.
     heading_setext_buffer: Option<String>,
     /// Whether raw (flow) (code (fenced), math (flow)) or code (indented) contains data.
@@ -142,11 +146,14 @@ impl<'a> CompileContext<'a> {
         options: &'a CompileOptions,
         line_ending: LineEnding,
         parse_inline_code_info: bool,
+        heading_anchors: Vec<String>,
     ) -> CompileContext<'a> {
         CompileContext {
             events,
             bytes,
             heading_atx_rank: None,
+            heading_anchors,
+            heading_anchor_index: 0,
             heading_setext_buffer: None,
             raw_flow_seen_data: None,
             raw_flow_fences_count: None,
@@ -206,6 +213,18 @@ impl<'a> CompileContext<'a> {
             self.line_ending();
         }
     }
+
+    /// Add the next heading ID, escaping it for an HTML attribute.
+    fn heading_id(&mut self) {
+        let anchor = self.heading_anchors.get(self.heading_anchor_index).cloned();
+
+        if let Some(anchor) = anchor {
+            self.heading_anchor_index += 1;
+            self.push(" id=\"");
+            self.push(&encode(&anchor, true));
+            self.push("\"");
+        }
+    }
 }
 
 /// Turn events and bytes into a string of HTML.
@@ -214,7 +233,17 @@ pub fn compile(
     bytes: &[u8],
     options: &CompileOptions,
     parse_inline_code_info: bool,
-) -> String {
+) -> Result<String, crate::message::Message> {
+    let heading_anchors = if options.heading_ids {
+        let tree = crate::to_mdast::compile(events, bytes, parse_inline_code_info)?;
+        crate::mdast::Headings::extract(&tree)
+            .iter()
+            .map(|heading| heading.anchor.clone())
+            .collect()
+    } else {
+        vec![]
+    };
+
     let mut index = 0;
     let mut line_ending_inferred = None;
 
@@ -244,6 +273,7 @@ pub fn compile(
         options,
         line_ending_default,
         parse_inline_code_info,
+        heading_anchors,
     );
     let mut definition_indices = vec![];
     let mut index = 0;
@@ -307,11 +337,11 @@ pub fn compile(
     }
 
     debug_assert_eq!(context.buffers.len(), 1, "expected 1 final buffer");
-    context
+    Ok(context
         .buffers
         .first()
         .expect("expected 1 final buffer")
-        .into()
+        .into())
 }
 
 /// Handle the event at `index`.
@@ -1291,6 +1321,7 @@ fn on_exit_heading_atx_sequence(context: &mut CompileContext) {
         context.heading_atx_rank = Some(rank);
         context.push("<h");
         context.push(&rank.to_string());
+        context.heading_id();
         context.push(">");
     }
 }
@@ -1321,6 +1352,7 @@ fn on_exit_heading_setext_underline_sequence(context: &mut CompileContext) {
     context.line_ending_if_needed();
     context.push("<h");
     context.push(rank);
+    context.heading_id();
     context.push(">");
     context.push(&text);
     context.push("</h");

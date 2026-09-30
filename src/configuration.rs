@@ -992,6 +992,15 @@ pub struct CompileOptions {
     /// * [*§ 6.1 Disallowed Raw HTML (extension)* in GFM](https://github.github.com/gfm/#disallowed-raw-html-extension-)
     /// * [`cmark-gfm#extensions/tagfilter.c`](https://github.com/github/cmark-gfm/blob/master/extensions/tagfilter.c)
     pub gfm_tagfilter: bool,
+
+    /// Whether to add unique `id` attributes to headings for in-page links
+    /// and tables of contents.
+    ///
+    /// IDs use the same text normalization and duplicate suffixes as
+    /// [`mdast::Headings::extract`][crate::mdast::Headings::extract].
+    ///
+    /// The default is `false`.
+    pub heading_ids: bool,
 }
 
 impl CompileOptions {
