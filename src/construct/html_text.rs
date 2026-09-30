@@ -17,7 +17,7 @@
 //! tag_close ::= '</' tag_name [space_or_tab_eol] '>'
 //! opening_tag ::= '<' tag_name *(space_or_tab_eol attribute) [[space_or_tab_eol] '/'] [space_or_tab_eol] '>'
 //!
-//! tag_name ::= ascii_alphabetic *( '-' | ascii_alphanumeric )
+//! tag_name ::= ascii_alphabetic *( '-' | ascii_alphanumeric | [':' when html_tag_namespaces] )
 //! attribute ::= attribute_name [[space_or_tab_eol] '=' [space_or_tab_eol] attribute_value]
 //! attribute_name ::= (':' | '_' | ascii_alphabetic) *('-' | '.' | ':' | '_' | ascii_alphanumeric)
 //! attribute_value ::= '"' *(byte - '"') '"' | "'" *(byte - "'")  "'" | 1*(text - '"' - "'" - '/' - '<' - '=' - '>' - '`')
@@ -368,6 +368,10 @@ pub fn tag_close(tokenizer: &mut Tokenizer) -> State {
             tokenizer.consume();
             State::Next(StateName::HtmlTextTagClose)
         }
+        Some(b':') if tokenizer.parse_state.options.html_tag_namespaces => {
+            tokenizer.consume();
+            State::Next(StateName::HtmlTextTagClose)
+        }
         _ => State::Retry(StateName::HtmlTextTagCloseBetween),
     }
 }
@@ -402,6 +406,10 @@ pub fn tag_open(tokenizer: &mut Tokenizer) -> State {
     match tokenizer.current {
         // ASCII alphanumerical and `-`.
         Some(b'-' | b'0'..=b'9' | b'A'..=b'Z' | b'a'..=b'z') => {
+            tokenizer.consume();
+            State::Next(StateName::HtmlTextTagOpen)
+        }
+        Some(b':') if tokenizer.parse_state.options.html_tag_namespaces => {
             tokenizer.consume();
             State::Next(StateName::HtmlTextTagOpen)
         }

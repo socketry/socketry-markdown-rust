@@ -1,14 +1,27 @@
-use markdown::{
+use pretty_assertions::assert_eq;
+use socketry_markdown::{
     mdast::{Html, Node, Root},
     message, to_html, to_html_with_options, to_mdast,
     unist::Position,
     CompileOptions, Constructs, Options, ParseOptions,
 };
-use pretty_assertions::assert_eq;
 
 #[test]
 fn html_flow() -> Result<(), message::Message> {
     let danger = Options {
+        compile: CompileOptions {
+            allow_dangerous_html: true,
+            allow_dangerous_protocol: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    let namespaced = Options {
+        parse: ParseOptions {
+            html_tag_namespaces: true,
+            ..Default::default()
+        },
         compile: CompileOptions {
             allow_dangerous_html: true,
             allow_dangerous_protocol: true,
@@ -27,6 +40,12 @@ fn html_flow() -> Result<(), message::Message> {
         to_html_with_options("<!-- asd -->", &danger)?,
         "<!-- asd -->",
         "should support a heading w/ rank 1"
+    );
+
+    assert_eq!(
+        to_html_with_options("<svg:circle />", &namespaced)?,
+        "<svg:circle />",
+        "should support namespace-prefixed flow tags when enabled"
     );
 
     assert_eq!(

@@ -21,7 +21,7 @@
 //! basic_tag_name ::= 'address' | 'article' | 'aside' | ... ; See `constants.rs`, and note: case-insensitive.
 //! opening_tag ::= '<' tag_name *(1*space_or_tab attribute) [*space_or_tab '/'] *space_or_tab '>'
 //! closing_tag ::= '</' tag_name *space_or_tab '>'
-//! tag_name ::= ascii_alphabetic *('-' | ascii_alphanumeric)
+//! tag_name ::= ascii_alphabetic *('-' | ascii_alphanumeric | [':' when html_tag_namespaces])
 //! attribute ::= attribute_name [*space_or_tab '=' *space_or_tab attribute_value]
 //! attribute_name ::= (':' | '_' | ascii_alphabetic) *('-' | '.' | ':' | '_' | ascii_alphanumeric)
 //! attribute_value ::= '"' *(line - '"') '"' | "'" *(line - "'")  "'" | 1*(text - '"' - "'" - '/' - '<' - '=' - '>' - '`')
@@ -369,6 +369,10 @@ pub fn tag_name(tokenizer: &mut Tokenizer) -> State {
         }
         // ASCII alphanumerical and `-`.
         Some(b'-' | b'0'..=b'9' | b'A'..=b'Z' | b'a'..=b'z') => {
+            tokenizer.consume();
+            State::Next(StateName::HtmlFlowTagName)
+        }
+        Some(b':') if tokenizer.parse_state.options.html_tag_namespaces => {
             tokenizer.consume();
             State::Next(StateName::HtmlFlowTagName)
         }
