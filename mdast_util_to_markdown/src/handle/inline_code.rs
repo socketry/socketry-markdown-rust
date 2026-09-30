@@ -3,11 +3,11 @@
 use super::Handle;
 use crate::state::{Info, State};
 use alloc::{format, string::String};
-use markdown::{
+use regex::Regex;
+use socketry_markdown::{
     mdast::{InlineCode, Node},
     message::Message,
 };
-use regex::Regex;
 
 impl Handle for InlineCode {
     fn handle(
@@ -64,7 +64,13 @@ impl Handle for InlineCode {
             }
         }
 
-        Ok(format!("{}{}{}", sequence, value, sequence))
+        let prefix = self
+            .lang
+            .as_ref()
+            .map(|lang| format!("{}:", lang))
+            .unwrap_or_default();
+
+        Ok(format!("{}{}{}{}", prefix, sequence, value, sequence))
     }
 }
 

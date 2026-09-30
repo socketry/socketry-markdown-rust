@@ -16,6 +16,7 @@ use crate::util::{
         decode as decode_character_reference, parse as parse_character_reference,
     },
     infer::{gfm_table_align, list_item_loose, list_loose},
+    inline_code_info,
     mdx_collect::{collect, Result as CollectResult},
     normalize_identifier::normalize_identifier,
     slice::{Position as SlicePosition, Slice},
@@ -90,6 +91,7 @@ struct CompileContext<'a> {
     events: &'a [Event],
     /// List of bytes.
     bytes: &'a [u8],
+    inline_code_info: bool,
     // Fields used by handlers to track the things they need to track to
     // compile markdown.
     character_reference_marker: u8,
@@ -109,7 +111,11 @@ struct CompileContext<'a> {
 
 impl<'a> CompileContext<'a> {
     /// Create a new compile context.
-    fn new(events: &'a [Event], bytes: &'a [u8]) -> CompileContext<'a> {
+    fn new(
+        events: &'a [Event],
+        bytes: &'a [u8],
+        parse_inline_code_info: bool,
+    ) -> CompileContext<'a> {
         let tree = Node::Root(Root {
             children: vec![],
             position: Some(Position {
@@ -129,6 +135,7 @@ impl<'a> CompileContext<'a> {
         CompileContext {
             events,
             bytes,
+            inline_code_info: parse_inline_code_info,
             character_reference_marker: 0,
             gfm_table_inside: false,
             hard_break_after: false,
@@ -225,8 +232,12 @@ impl<'a> CompileContext<'a> {
 }
 
 /// Turn events and bytes into a syntax tree.
-pub fn compile(events: &[Event], bytes: &[u8]) -> Result<Node, message::Message> {
-    let mut context = CompileContext::new(events, bytes);
+pub fn compile(
+    events: &[Event],
+    bytes: &[u8],
+    parse_inline_code_info: bool,
+) -> Result<Node, message::Message> {
+    let mut context = CompileContext::new(events, bytes, parse_inline_code_info);
 
     let mut index = 0;
     while index < events.len() {
@@ -494,9 +505,37 @@ fn on_enter_code_indented(context: &mut CompileContext) {
 
 /// Handle [`Enter`][Kind::Enter]:[`CodeText`][Name::CodeText].
 fn on_enter_code_text(context: &mut CompileContext) {
+    let prefix = if context.inline_code_info {
+        inline_code_info::before(context.bytes, context.events[context.index].point.index)
+            .map(|(start, info)| (start, info.to_string()))
+    } else {
+        None
+    };
+    let mut lang = None;
+
+    if let Some((start, info)) = prefix {
+        let suffix = alloc::format!("{}:", info);
+        let parent = context.tail_mut();
+        if let Some(children) = parent.children_mut() {
+            if let Some(Node::Text(text)) = children.last_mut() {
+                if text.value.ends_with(&suffix) {
+                    text.value.truncate(text.value.len() - suffix.len());
+                    if text.value.is_empty() {
+                        children.pop();
+                    } else if let Some(position) = text.position.as_mut() {
+                        position.end.offset = start;
+                        position.end.column -= suffix.len();
+                    }
+                    lang = Some(info);
+                }
+            }
+        }
+    }
+
     context.tail_push(Node::InlineCode(InlineCode {
         value: String::new(),
         position: None,
+        lang,
     }));
     context.buffer();
 }

@@ -8,6 +8,7 @@ pub mod encode;
 pub mod gfm_tagfilter;
 pub mod identifier;
 pub mod infer;
+pub(crate) mod inline_code_info;
 pub mod line_ending;
 pub mod location;
 pub mod mdx;

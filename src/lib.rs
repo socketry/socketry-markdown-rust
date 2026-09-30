@@ -159,6 +159,6 @@ pub fn to_html_with_options(value: &str, options: &Options) -> Result<String, me
 /// ```
 pub fn to_mdast(value: &str, options: &ParseOptions) -> Result<mdast::Node, message::Message> {
     let (events, parse_state) = parser::parse(value, options)?;
-    let node = to_mdast::compile(&events, parse_state.bytes)?;
+    let node = to_mdast::compile(&events, parse_state.bytes, options.inline_code_info)?;
     Ok(node)
 }

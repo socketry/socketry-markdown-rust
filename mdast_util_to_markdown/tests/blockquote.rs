@@ -1,12 +1,12 @@
-use markdown::mdast::{
-    Blockquote, Break, Code, Definition, Emphasis, Heading, Html, Image, ImageReference,
-    InlineCode, Link, LinkReference, List, ListItem, Node, Paragraph, ReferenceKind, Strong, Text,
-    ThematicBreak,
-};
 use mdast_util_to_markdown::{
     to_markdown as to, to_markdown_with_options as to_md_with_opts, Options,
 };
 use pretty_assertions::assert_eq;
+use socketry_markdown::mdast::{
+    Blockquote, Break, Code, Definition, Emphasis, Heading, Html, Image, ImageReference,
+    InlineCode, Link, LinkReference, List, ListItem, Node, Paragraph, ReferenceKind, Strong, Text,
+    ThematicBreak,
+};
 
 #[test]
 fn block_quote() {
@@ -117,7 +117,8 @@ fn block_quote() {
                                 }),
                                 Node::InlineCode(InlineCode {
                                     value: String::from("b\nc"),
-                                    position: None
+                                    position: None,
+                                    lang: None,
                                 }),
                                 Node::Text(Text {
                                     value: String::from("\nd"),
@@ -214,7 +215,8 @@ fn block_quote() {
                     }),
                     Node::InlineCode(InlineCode {
                         value: String::from("b\nc"),
-                        position: None
+                        position: None,
+                        lang: None,
                     }),
                     Node::Text(Text {
                         value: String::from("\nd"),

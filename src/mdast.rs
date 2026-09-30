@@ -9,6 +9,9 @@ use alloc::{
     vec::Vec,
 };
 
+mod headings;
+pub use headings::{HeadingEntry, HeadingOptions, Headings};
+
 /// MDX: relative byte index into a string, to an absolute byte index into the
 /// whole document.
 pub type Stop = (usize, usize);
@@ -518,6 +521,148 @@ impl Node {
             Node::Paragraph(x) => x.position = position,
         }
     }
+
+    /// Visit this node and its descendants in depth-first, pre-order.
+    pub fn walk<'a>(&'a self, mut visitor: impl FnMut(&'a Node)) {
+        fn visit<'a>(node: &'a Node, visitor: &mut impl FnMut(&'a Node)) {
+            visitor(node);
+            if let Some(children) = node.children() {
+                for child in children {
+                    visit(child, visitor);
+                }
+            }
+        }
+
+        visit(self, &mut visitor);
+    }
+
+    /// Mutably visit this node and its descendants in depth-first, pre-order.
+    pub fn walk_mut(&mut self, mut visitor: impl FnMut(&mut Node)) {
+        fn visit(node: &mut Node, visitor: &mut impl FnMut(&mut Node)) {
+            visitor(node);
+            if let Some(children) = node.children_mut() {
+                for child in children {
+                    visit(child, visitor);
+                }
+            }
+        }
+
+        visit(self, &mut visitor);
+    }
+
+    /// Return the concatenated text represented by this node.
+    ///
+    /// Image nodes contribute their alt text and hard breaks contribute a
+    /// newline. Structural nodes concatenate the text of their children.
+    #[must_use]
+    pub fn text_content(&self) -> String {
+        match self {
+            Node::Image(node) => node.alt.clone(),
+            Node::ImageReference(node) => node.alt.clone(),
+            Node::Break(_) => "\n".into(),
+            Node::Definition(_) | Node::FootnoteReference(_) | Node::ThematicBreak(_) => {
+                String::new()
+            }
+            _ => {
+                if let Some(children) = self.children() {
+                    children.iter().map(Node::text_content).collect()
+                } else {
+                    self.to_string()
+                }
+            }
+        }
+    }
+
+    /// Find a direct child heading with the requested text.
+    #[must_use]
+    pub fn find_heading(&self, title: &str) -> Option<&Node> {
+        self.children()?
+            .iter()
+            .find(|child| matches!(child, Node::Heading(_)) && child.text_content() == title)
+    }
+
+    /// Return the language identifier of inline or fenced code.
+    #[must_use]
+    pub fn code_language(&self) -> Option<&str> {
+        match self {
+            Node::InlineCode(node) => node.lang.as_deref(),
+            Node::Code(node) => node.lang.as_deref(),
+            _ => None,
+        }
+    }
+
+    /// Return code metadata for inline or fenced code.
+    ///
+    /// Inline code metadata is its language token. Fenced code metadata is
+    /// reconstructed from `lang` and `meta` when either is present.
+    #[must_use]
+    pub fn code_info(&self) -> Option<String> {
+        match self {
+            Node::InlineCode(node) => node.lang.clone(),
+            Node::Code(node) => match (&node.lang, &node.meta) {
+                (Some(lang), Some(meta)) => Some(alloc::format!("{} {}", lang, meta)),
+                (Some(lang), None) => Some(lang.clone()),
+                (None, Some(meta)) => Some(meta.clone()),
+                (None, None) => None,
+            },
+            _ => None,
+        }
+    }
+
+    /// Take all direct children from this node.
+    ///
+    /// Returns `None` for nodes that cannot contain children.
+    pub fn extract_children(&mut self) -> Option<Vec<Node>> {
+        self.children_mut().map(core::mem::take)
+    }
+
+    /// Replace a heading and the section below it in this node's children.
+    ///
+    /// `heading_index` is the direct-child index of the heading. When
+    /// `replace_heading` is false, the heading stays and only its section
+    /// content is replaced. When `remove_subsections` is true, nested heading
+    /// sections are included through the next heading of the same or higher
+    /// level. Returns `false` if the index is not a heading.
+    pub fn replace_heading_section(
+        &mut self,
+        heading_index: usize,
+        replacement: Vec<Node>,
+        replace_heading: bool,
+        remove_subsections: bool,
+    ) -> bool {
+        let children = match self.children_mut() {
+            Some(children) => children,
+            None => return false,
+        };
+        let depth = match children.get(heading_index) {
+            Some(Node::Heading(heading)) => heading.depth,
+            _ => return false,
+        };
+        let end = children
+            .iter()
+            .enumerate()
+            .skip(heading_index + 1)
+            .find_map(|(index, node)| {
+                let next = match node {
+                    Node::Heading(next) => next,
+                    _ => return None,
+                };
+                if !remove_subsections || next.depth <= depth {
+                    Some(index)
+                } else {
+                    None
+                }
+            })
+            .unwrap_or(children.len());
+        let start = if replace_heading {
+            heading_index
+        } else {
+            heading_index + 1
+        };
+
+        children.splice(start..end, replacement);
+        true
+    }
 }
 
 /// MDX: attribute content.
@@ -890,6 +1035,12 @@ pub struct InlineCode {
     /// Positional info.
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub position: Option<Position>,
+    /// Optional language identifier parsed from an inline code prefix.
+    ///
+    /// This is a Socketry Markdown extension; standard mdast inline code
+    /// nodes do not have a language field.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    pub lang: Option<String>,
 }
 
 /// Math (phrasing).
@@ -1424,11 +1575,12 @@ mod tests {
         let mut node = Node::InlineCode(InlineCode {
             value: "a".into(),
             position: None,
+            lang: None,
         });
 
         assert_eq!(
             format!("{:?}", node),
-            "InlineCode { value: \"a\", position: None }",
+            "InlineCode { value: \"a\", position: None, lang: None }",
             "should support `Debug`"
         );
         assert_eq!(node.to_string(), "a", "should support `ToString`");
@@ -1439,7 +1591,7 @@ mod tests {
         node.position_set(Some(Position::new(1, 1, 0, 1, 2, 1)));
         assert_eq!(
             format!("{:?}", node),
-            "InlineCode { value: \"a\", position: Some(1:1-1:2 (0-1)) }",
+            "InlineCode { value: \"a\", position: Some(1:1-1:2 (0-1)), lang: None }",
             "should support `position_set`"
         );
     }

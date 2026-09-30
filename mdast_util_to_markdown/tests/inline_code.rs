@@ -1,13 +1,14 @@
-use markdown::mdast::{InlineCode, Node};
 use mdast_util_to_markdown::to_markdown as to;
 use pretty_assertions::assert_eq;
+use socketry_markdown::mdast::{InlineCode, Node};
 
 #[test]
 fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::new(),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "``\n",
@@ -17,7 +18,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`a`\n",
@@ -27,7 +29,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from(" "),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "` `\n",
@@ -37,7 +40,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("\n"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`\n`\n",
@@ -47,7 +51,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("  "),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`  `\n",
@@ -57,7 +62,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a`b"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "``a`b``\n",
@@ -67,7 +73,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a``b"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`a``b`\n",
@@ -77,7 +84,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a``b`c"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "```a``b`c```\n",
@@ -87,7 +95,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("`a"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`` `a ``\n",
@@ -97,7 +106,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a`"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`` a` ``\n",
@@ -107,7 +117,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from(" a "),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`  a  `\n",
@@ -117,7 +128,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from(" a"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "` a`\n",
@@ -127,7 +139,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a "),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`a `\n",
@@ -137,7 +150,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a\n- b"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`a - b`\n",
@@ -147,7 +161,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a\n#"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`a #`\n",
@@ -157,7 +172,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a\n1. "),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`a 1. `\n",
@@ -167,7 +183,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a\r- b"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`a - b`\n",
@@ -177,7 +194,8 @@ fn text() {
     assert_eq!(
         to(&Node::InlineCode(InlineCode {
             value: String::from("a\r\n- b"),
-            position: None
+            position: None,
+            lang: None,
         }))
         .unwrap(),
         "`a - b`\n",

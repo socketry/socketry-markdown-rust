@@ -1,10 +1,10 @@
-use markdown::{
+use pretty_assertions::assert_eq;
+use socketry_markdown::{
     mdast::{AlignKind, InlineCode, Node, Root, Table, TableCell, TableRow, Text},
     message, to_html, to_html_with_options, to_mdast,
     unist::Position,
     CompileOptions, Constructs, Options, ParseOptions,
 };
-use pretty_assertions::assert_eq;
 
 #[test]
 fn gfm_table() -> Result<(), message::Message> {
@@ -1951,7 +1951,8 @@ normal escape: <a href="https://github.com/github/cmark-gfm/issues/277">https://
                     children: vec![Node::TableCell(TableCell {
                         children: vec![Node::InlineCode(InlineCode {
                             value: "a|b".into(),
-                            position: Some(Position::new(1, 3, 2, 1, 9, 8))
+                            position: Some(Position::new(1, 3, 2, 1, 9, 8)),
+                            lang: None,
                         }),],
                         position: Some(Position::new(1, 1, 0, 1, 11, 10))
                     }),],

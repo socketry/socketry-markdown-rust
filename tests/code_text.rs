@@ -1,10 +1,10 @@
-use markdown::{
+use pretty_assertions::assert_eq;
+use socketry_markdown::{
     mdast::{InlineCode, Node, Paragraph, Root, Text},
     message, to_html, to_html_with_options, to_mdast,
     unist::Position,
     CompileOptions, Constructs, Options, ParseOptions,
 };
-use pretty_assertions::assert_eq;
 
 #[test]
 fn code_text() -> Result<(), message::Message> {
@@ -191,7 +191,8 @@ fn code_text() -> Result<(), message::Message> {
                     }),
                     Node::InlineCode(InlineCode {
                         value: "alpha".into(),
-                        position: Some(Position::new(1, 3, 2, 1, 10, 9))
+                        position: Some(Position::new(1, 3, 2, 1, 10, 9)),
+                        lang: None,
                     }),
                     Node::Text(Text {
                         value: " b.".into(),
@@ -211,7 +212,8 @@ fn code_text() -> Result<(), message::Message> {
             children: vec![Node::Paragraph(Paragraph {
                 children: vec![Node::InlineCode(InlineCode {
                     value: " alpha".into(),
-                    position: Some(Position::new(1, 1, 0, 1, 11, 10))
+                    position: Some(Position::new(1, 1, 0, 1, 11, 10)),
+                    lang: None,
                 }),],
                 position: Some(Position::new(1, 1, 0, 1, 11, 10))
             })],
@@ -226,7 +228,8 @@ fn code_text() -> Result<(), message::Message> {
             children: vec![Node::Paragraph(Paragraph {
                 children: vec![Node::InlineCode(InlineCode {
                     value: "   ".into(),
-                    position: Some(Position::new(1, 1, 0, 1, 6, 5))
+                    position: Some(Position::new(1, 1, 0, 1, 6, 5)),
+                    lang: None,
                 }),],
                 position: Some(Position::new(1, 1, 0, 1, 6, 5))
             })],
