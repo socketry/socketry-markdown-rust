@@ -1,11 +1,3 @@
-<p align="center">
-  <br>
-  <img width="192" src="media/logo-chromatic.svg" alt="">
-  <br>
-  <br>
-  <br>
-</p>
-
 # socketry-markdown
 
 [![Build][badge-build-image]][badge-build-url]
@@ -484,10 +476,6 @@ Special thanks go out to:
 * [`mdxjs-rs`][mdxjs-rs]
   — wraps `markdown-rs` to *compile* MDX to JavaScript
 
-## License
-
-[MIT][license] © [Titus Wormer][author]
-
 [badge-build-image]: https://github.com/socketry/socketry-markdown-rust/actions/workflows/main.yml/badge.svg
 
 [badge-build-url]: https://github.com/socketry/socketry-markdown-rust/actions
@@ -515,10 +503,6 @@ Special thanks go out to:
 [improper]: https://github.com/ChALkeR/notes/blob/master/Improper-markup-sanitization.md
 
 [chalker]: https://github.com/ChALkeR
-
-[license]: license
-
-[author]: https://wooorm.com
 
 [mdast]: https://github.com/syntax-tree/mdast
 
