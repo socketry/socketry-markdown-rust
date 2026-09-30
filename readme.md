@@ -233,6 +233,21 @@ tree.walk(|node| {
 });
 ```
 
+`extract_children()` moves a node's children into a transparent `Fragment`
+node. AST nodes, including fragments, implement `Clone` for deep copies:
+
+```rust
+let mut tree = to_mdast("# *Intro*", &ParseOptions::default()).unwrap();
+let heading = tree.children_mut().unwrap().first_mut().unwrap();
+let fragment = heading.extract_children().unwrap();
+let duplicate = fragment.clone();
+
+assert_eq!(duplicate.text_content(), "Intro");
+```
+
+HTML compilation currently takes Markdown source text (`to_html(&str)`); there
+is no function that renders a mutated AST node or fragment directly.
+
 See the [crate docs][docs] for more info.
 
 ## Extensions

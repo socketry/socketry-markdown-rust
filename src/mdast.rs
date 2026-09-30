@@ -174,6 +174,10 @@ pub enum Node {
     Root(Root),
 
     // Container:
+    /// A transparent fragment containing a sequence of nodes.
+    ///
+    /// Fragments are useful for holding children extracted from another node.
+    Fragment(Fragment),
     /// Block quote.
     Blockquote(Blockquote),
     /// Footnote definition.
@@ -263,6 +267,7 @@ impl fmt::Debug for Node {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Node::Root(x) => x.fmt(f),
+            Node::Fragment(x) => x.fmt(f),
             Node::Blockquote(x) => x.fmt(f),
             Node::FootnoteDefinition(x) => x.fmt(f),
             Node::MdxJsxFlowElement(x) => x.fmt(f),
@@ -311,6 +316,7 @@ impl ToString for Node {
         match self {
             // Parents.
             Node::Root(x) => children_to_string(&x.children),
+            Node::Fragment(x) => children_to_string(&x.children),
             Node::Blockquote(x) => children_to_string(&x.children),
             Node::FootnoteDefinition(x) => children_to_string(&x.children),
             Node::MdxJsxFlowElement(x) => children_to_string(&x.children),
@@ -358,6 +364,7 @@ impl Node {
         match self {
             // Parent.
             Node::Root(x) => Some(&x.children),
+            Node::Fragment(x) => Some(&x.children),
             Node::Paragraph(x) => Some(&x.children),
             Node::Heading(x) => Some(&x.children),
             Node::Blockquote(x) => Some(&x.children),
@@ -383,6 +390,7 @@ impl Node {
         match self {
             // Parent.
             Node::Root(x) => Some(&mut x.children),
+            Node::Fragment(x) => Some(&mut x.children),
             Node::Paragraph(x) => Some(&mut x.children),
             Node::Heading(x) => Some(&mut x.children),
             Node::Blockquote(x) => Some(&mut x.children),
@@ -408,6 +416,7 @@ impl Node {
     pub fn position(&self) -> Option<&Position> {
         match self {
             Node::Root(x) => x.position.as_ref(),
+            Node::Fragment(_) => None,
             Node::Blockquote(x) => x.position.as_ref(),
             Node::FootnoteDefinition(x) => x.position.as_ref(),
             Node::MdxJsxFlowElement(x) => x.position.as_ref(),
@@ -447,6 +456,7 @@ impl Node {
     pub fn position_mut(&mut self) -> Option<&mut Position> {
         match self {
             Node::Root(x) => x.position.as_mut(),
+            Node::Fragment(_) => None,
             Node::Blockquote(x) => x.position.as_mut(),
             Node::FootnoteDefinition(x) => x.position.as_mut(),
             Node::MdxJsxFlowElement(x) => x.position.as_mut(),
@@ -486,6 +496,7 @@ impl Node {
     pub fn position_set(&mut self, position: Option<Position>) {
         match self {
             Node::Root(x) => x.position = position,
+            Node::Fragment(_) => (),
             Node::Blockquote(x) => x.position = position,
             Node::FootnoteDefinition(x) => x.position = position,
             Node::MdxJsxFlowElement(x) => x.position = position,
@@ -609,11 +620,17 @@ impl Node {
         }
     }
 
-    /// Take all direct children from this node.
+    /// Take all direct children from this node and return them in a fragment.
     ///
-    /// Returns `None` for nodes that cannot contain children.
-    pub fn extract_children(&mut self) -> Option<Vec<Node>> {
-        self.children_mut().map(core::mem::take)
+    /// Returns `None` for nodes that cannot contain children. The extracted
+    /// child nodes retain their own positions; the new fragment has no source
+    /// position of its own.
+    pub fn extract_children(&mut self) -> Option<Node> {
+        self.children_mut().map(|children| {
+            Node::Fragment(Fragment {
+                children: core::mem::take(children),
+            })
+        })
     }
 
     /// Replace a heading and the section below it in this node's children.
@@ -723,6 +740,17 @@ pub enum AttributeValue {
     ///          ^^^
     /// ```
     Literal(String),
+}
+
+/// A transparent container for a sequence of AST nodes.
+///
+/// Fragments have no source position of their own. They are useful for holding
+/// the children extracted from another node.
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Fragment {
+    /// Content model.
+    pub children: Vec<Node>,
 }
 
 /// Document.
