@@ -7,7 +7,7 @@ use crate::{
     util::check_emphasis::check_emphasis,
 };
 use alloc::format;
-use markdown::{
+use socketry_markdown::{
     mdast::{Emphasis, Node},
     message::Message,
 };

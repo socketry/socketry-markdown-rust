@@ -8,7 +8,7 @@ use crate::{
 };
 use alloc::string::String;
 use core::mem;
-use markdown::{
+use socketry_markdown::{
     mdast::{ImageReference, Node, ReferenceKind},
     message::Message,
 };

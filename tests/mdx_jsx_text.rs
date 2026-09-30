@@ -1,5 +1,6 @@
 mod test_utils;
-use markdown::{
+use pretty_assertions::assert_eq;
+use socketry_markdown::{
     mdast::{
         AttributeContent, AttributeValue, AttributeValueExpression, Emphasis, MdxFlowExpression,
         MdxJsxAttribute, MdxJsxExpressionAttribute, MdxJsxFlowElement, MdxJsxTextElement, Node,
@@ -9,7 +10,6 @@ use markdown::{
     unist::Position,
     Constructs, Options, ParseOptions,
 };
-use pretty_assertions::assert_eq;
 use test_utils::swc::{parse_esm, parse_expression};
 
 #[test]

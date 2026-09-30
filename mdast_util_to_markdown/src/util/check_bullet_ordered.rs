@@ -2,7 +2,7 @@
 
 use crate::state::State;
 use alloc::{boxed::Box, format};
-use markdown::message::Message;
+use socketry_markdown::message::Message;
 
 pub fn check_bullet_ordered(state: &mut State) -> Result<char, Message> {
     let marker = state.options.bullet_ordered;

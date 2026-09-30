@@ -12,7 +12,7 @@ use alloc::{boxed::Box, fmt, string::String};
 /// ## Examples
 ///
 /// ```
-/// use markdown::Constructs;
+/// use socketry_markdown::Constructs;
 /// # fn main() {
 ///
 /// // Use the default trait to get `CommonMark` constructs:
@@ -449,7 +449,7 @@ impl Constructs {
 /// ## Examples
 ///
 /// ```
-/// use markdown::CompileOptions;
+/// use socketry_markdown::CompileOptions;
 /// # fn main() {
 ///
 /// // Use the default trait to get safe defaults:
@@ -495,8 +495,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, CompileOptions, Options};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, CompileOptions, Options};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // By default, some protocols in image sources are dropped:
     /// assert_eq!(
@@ -540,8 +540,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html, to_html_with_options, CompileOptions, Options};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html, to_html_with_options, CompileOptions, Options};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `markdown-rs` is safe by default:
     /// assert_eq!(
@@ -594,8 +594,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html, to_html_with_options, CompileOptions, Options};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html, to_html_with_options, CompileOptions, Options};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `markdown-rs` is safe by default:
     /// assert_eq!(
@@ -640,8 +640,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html, to_html_with_options, CompileOptions, LineEnding, Options};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html, to_html_with_options, CompileOptions, LineEnding, Options};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `markdown-rs` uses `\n` by default:
     /// assert_eq!(
@@ -680,8 +680,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `"Back to content"` is used by default:
     /// assert_eq!(
@@ -736,8 +736,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `"user-content-"` is used by default:
     /// assert_eq!(
@@ -784,8 +784,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `"class=\"sr-only\""` is used by default:
     /// assert_eq!(
@@ -829,8 +829,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `"h2"` is used by default:
     /// assert_eq!(
@@ -874,8 +874,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `"Footnotes"` is used by default:
     /// assert_eq!(
@@ -913,8 +913,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // With `gfm_task_list_item_checkable`, generated `<input type="checkbox" />`
     /// // tags do not contain the attribute `disabled=""` and are thus toggleable by
@@ -950,8 +950,8 @@ pub struct CompileOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, CompileOptions, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // With `allow_dangerous_html`, `markdown-rs` passes HTML through untouched:
     /// assert_eq!(
@@ -1034,7 +1034,7 @@ impl CompileOptions {
 /// ## Examples
 ///
 /// ```
-/// use markdown::ParseOptions;
+/// use socketry_markdown::ParseOptions;
 /// # fn main() {
 ///
 /// // Use the default trait to parse markdown according to `CommonMark`:
@@ -1059,8 +1059,8 @@ pub struct ParseOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html, to_html_with_options, Constructs, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html, to_html_with_options, Constructs, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `markdown-rs` follows CommonMark by default:
     /// assert_eq!(
@@ -1127,8 +1127,8 @@ pub struct ParseOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, Constructs, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, Constructs, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `markdown-rs` supports single tildes by default:
     /// assert_eq!(
@@ -1183,8 +1183,8 @@ pub struct ParseOptions {
     /// ## Examples
     ///
     /// ```
-    /// use markdown::{to_html_with_options, Constructs, Options, ParseOptions};
-    /// # fn main() -> Result<(), markdown::message::Message> {
+    /// use socketry_markdown::{to_html_with_options, Constructs, Options, ParseOptions};
+    /// # fn main() -> Result<(), socketry_markdown::message::Message> {
     ///
     /// // `markdown-rs` supports single dollars by default:
     /// assert_eq!(
@@ -1351,7 +1351,7 @@ impl ParseOptions {
 /// ## Examples
 ///
 /// ```
-/// use markdown::Options;
+/// use socketry_markdown::Options;
 /// # fn main() {
 ///
 /// // Use the default trait to compile markdown to HTML according to `CommonMark`:

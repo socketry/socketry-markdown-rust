@@ -2,8 +2,8 @@
 
 use crate::state::State;
 use alloc::{format, string::ToString};
-use markdown::mdast::{Link, Node};
 use regex::RegexBuilder;
+use socketry_markdown::mdast::{Link, Node};
 
 pub fn format_link_as_auto_link(link: &Link, node: &Node, state: &State) -> bool {
     let raw = node.to_string();

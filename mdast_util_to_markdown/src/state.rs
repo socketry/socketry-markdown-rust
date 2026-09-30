@@ -27,8 +27,8 @@ use alloc::{
     string::{String, ToString},
     vec::Vec,
 };
-use markdown::{mdast::Node, message::Message};
 use regex::{Captures, Regex, RegexBuilder};
+use socketry_markdown::{mdast::Node, message::Message};
 
 pub struct Info<'a> {
     pub after: &'a str,
@@ -273,11 +273,11 @@ impl<'a> State<'a> {
                 } else {
                     &capture[1..]
                 };
-                return markdown::decode_numeric(numeric_encoded, radix);
+                return socketry_markdown::decode_numeric(numeric_encoded, radix);
             }
         }
 
-        markdown::decode_named(&caps[2], true).unwrap_or(caps[0].to_string())
+        socketry_markdown::decode_named(&caps[2], true).unwrap_or(caps[0].to_string())
     }
 
     /// No real JS equivalent, it’s written inline.

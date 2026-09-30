@@ -1,6 +1,6 @@
 use crate::{state::Info, State};
 use alloc::string::String;
-use markdown::{mdast::Node, message::Message};
+use socketry_markdown::{mdast::Node, message::Message};
 
 mod blockquote;
 mod r#break;

@@ -3,11 +3,11 @@
 use super::Handle;
 use crate::state::{Info, State};
 use alloc::format;
-use markdown::{
+use regex::Regex;
+use socketry_markdown::{
     mdast::{InlineMath, Node},
     message::Message,
 };
-use regex::Regex;
 
 impl Handle for InlineMath {
     fn handle(

@@ -3,7 +3,7 @@
 use super::check_bullet::check_bullet;
 use crate::state::State;
 use alloc::{boxed::Box, format};
-use markdown::message::Message;
+use socketry_markdown::message::Message;
 
 pub fn check_bullet_other(state: &mut State) -> Result<char, Message> {
     let bullet = check_bullet(state)?;

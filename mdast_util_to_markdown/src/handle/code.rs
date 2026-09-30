@@ -13,7 +13,7 @@ use alloc::{
     format,
     string::{String, ToString},
 };
-use markdown::{
+use socketry_markdown::{
     mdast::{Code, Node},
     message::Message,
 };

@@ -9,7 +9,7 @@ use crate::{
         check_bullet_other::check_bullet_other, check_rule::check_rule,
     },
 };
-use markdown::{
+use socketry_markdown::{
     mdast::{List, Node},
     message::Message,
 };

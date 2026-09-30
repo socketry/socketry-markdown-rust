@@ -6,7 +6,7 @@
 
 use alloc::string::String;
 pub use configure::{IndentOptions, Options};
-use markdown::{mdast::Node, message::Message};
+use socketry_markdown::{mdast::Node, message::Message};
 use state::{Info, State};
 
 extern crate alloc;

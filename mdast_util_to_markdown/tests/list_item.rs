@@ -1,8 +1,8 @@
-use markdown::mdast::{List, ListItem, Node, Paragraph, Root, Text, ThematicBreak};
 use mdast_util_to_markdown::{
     to_markdown as to, to_markdown_with_options as to_md_with_opts, IndentOptions, Options,
 };
 use pretty_assertions::assert_eq;
+use socketry_markdown::mdast::{List, ListItem, Node, Paragraph, Root, Text, ThematicBreak};
 
 #[test]
 fn list_item() {

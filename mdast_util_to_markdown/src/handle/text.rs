@@ -5,7 +5,7 @@ use crate::{
     state::{Info, State},
     util::safe::SafeConfig,
 };
-use markdown::{
+use socketry_markdown::{
     mdast::{Node, Text},
     message::Message,
 };

@@ -7,7 +7,7 @@ use crate::{
     util::check_strong::check_strong,
 };
 use alloc::format;
-use markdown::{
+use socketry_markdown::{
     mdast::{Node, Strong},
     message::Message,
 };

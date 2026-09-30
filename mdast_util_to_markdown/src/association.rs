@@ -3,7 +3,7 @@
 //! JS equivalent: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/70e1a4f/types/mdast/index.d.ts#L48.
 
 use alloc::string::String;
-use markdown::mdast::{Definition, ImageReference, LinkReference};
+use socketry_markdown::mdast::{Definition, ImageReference, LinkReference};
 
 pub trait Association {
     fn identifier(&self) -> &String;

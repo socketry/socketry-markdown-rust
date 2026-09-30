@@ -1,5 +1,5 @@
-use markdown::to_html;
 use pretty_assertions::assert_eq;
+use socketry_markdown::to_html;
 
 #[test]
 fn text() {

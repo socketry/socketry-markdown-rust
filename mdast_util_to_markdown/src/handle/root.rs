@@ -3,7 +3,7 @@
 use super::Handle;
 use crate::state::{Info, State};
 use alloc::string::String;
-use markdown::{
+use socketry_markdown::{
     mdast::{Node, Root},
     message::Message,
 };

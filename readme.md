@@ -6,12 +6,12 @@
   <br>
 </p>
 
-# markdown-rs
+# socketry-markdown
 
 [![Build][badge-build-image]][badge-build-url]
 [![Coverage][badge-coverage-image]][badge-coverage-url]
 
-CommonMark compliant markdown parser in Rust with ASTs and extensions.
+CommonMark compliant Markdown parser in Rust with ASTs and extensions.
 
 ## Feature highlights
 
@@ -28,9 +28,9 @@ CommonMark compliant markdown parser in Rust with ASTs and extensions.
 
 ## Links
 
-* [GitHub: `wooorm/markdown-rs`][repo]
-* [`crates.io`: `markdown`][crate]
-* [`docs.rs`: `markdown`][docs]
+* [GitHub: `socketry/socketry-markdown-rust`][repo]
+* [`crates.io`: `socketry-markdown`][crate]
+* [`docs.rs`: `socketry-markdown`][docs]
 
 ## When should I use this?
 
@@ -100,14 +100,14 @@ With [Rust][]
 install with `cargo`:
 
 ```sh
-cargo add markdown
+cargo add socketry-markdown
 ```
 
 ## Use
 
 ```rs
 fn main() {
-    println!("{}", markdown::to_html("## Hi, *Saturn*! 🪐"));
+    println!("{}", socketry_markdown::to_html("## Hi, *Saturn*! 🪐"));
 }
 ```
 
@@ -120,12 +120,12 @@ Yields:
 Extensions (in this case GFM):
 
 ```rs
-fn main() -> Result<(), markdown::message::Message> {
+fn main() -> Result<(), socketry_markdown::message::Message> {
     println!(
         "{}",
-        markdown::to_html_with_options(
+        socketry_markdown::to_html_with_options(
             "* [x] contact ~Mercury~Venus at hi@venus.com!",
-            &markdown::Options::gfm()
+            &socketry_markdown::Options::gfm()
         )?
     );
 
@@ -147,10 +147,10 @@ Yields:
 Syntax tree ([mdast][]):
 
 ```rs
-fn main() -> Result<(), markdown::message::Message> {
+fn main() -> Result<(), socketry_markdown::message::Message> {
     println!(
         "{:?}",
-        markdown::to_mdast("# Hi *Earth*!", &markdown::ParseOptions::default())?
+        socketry_markdown::to_mdast("# Hi *Earth*!", &socketry_markdown::ParseOptions::default())?
     );
 
     Ok(())
@@ -163,14 +163,75 @@ Yields:
 Root { children: [Heading { children: [Text { value: "Hi ", position: Some(1:3-1:6 (2-5)) }, Emphasis { children: [Text { value: "Earth", position: Some(1:7-1:12 (6-11)) }], position: Some(1:6-1:13 (5-12)) }, Text { value: "!", position: Some(1:13-1:14 (12-13)) }], position: Some(1:1-1:14 (0-13)), depth: 1 }], position: Some(1:1-1:14 (0-13)) }
 ```
 
+Extract headings for a table of contents. Duplicate heading text receives unique anchors.
+Set `CompileOptions::heading_ids` to add matching `id` attributes to rendered headings:
+
+```rs
+fn main() -> Result<(), socketry_markdown::message::Message> {
+    let tree = socketry_markdown::to_mdast(
+        "# Guide\n\n## Install\n\n## Install",
+        &socketry_markdown::ParseOptions::default(),
+    )?;
+    let headings = socketry_markdown::mdast::Headings::extract(&tree);
+
+    let html = socketry_markdown::to_html_with_options(
+        "# Guide\n\n## Install\n\n## Install",
+        &socketry_markdown::Options {
+            compile: socketry_markdown::CompileOptions {
+                heading_ids: true,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    )?;
+    println!("{}", html);
+
+    for heading in &headings {
+        println!(
+            "{}[{}](#{})",
+            "  ".repeat((heading.level - 1) as usize),
+            heading.text,
+            heading.anchor
+        );
+    }
+
+    Ok(())
+}
+```
+
+The extractor also supports filtering the heading levels with
+`mdast::HeadingOptions`.
+
 ## API
 
 `markdown-rs` exposes
-[`to_html`](https://docs.rs/markdown/latest/markdown/fn.to_html.html),
-[`to_html_with_options`](https://docs.rs/markdown/latest/markdown/fn.to_html_with_options.html),
-[`to_mdast`](https://docs.rs/markdown/latest/markdown/fn.to_mdast.html),
-[`Options`](https://docs.rs/markdown/latest/markdown/struct.Options.html),
+[`to_html`](https://docs.rs/socketry-markdown/latest/socketry_markdown/fn.to_html.html),
+[`to_html_with_options`](https://docs.rs/socketry-markdown/latest/socketry_markdown/fn.to_html_with_options.html),
+[`to_mdast`](https://docs.rs/socketry-markdown/latest/socketry_markdown/fn.to_mdast.html),
+[`Options`](https://docs.rs/socketry-markdown/latest/socketry_markdown/struct.Options.html),
 and a few other structs and enums.
+
+AST nodes provide depth-first traversal, text extraction, code info and
+language lookup, direct heading lookup, and owned child or section edits:
+
+```rust
+use socketry_markdown::{to_mdast, ParseOptions};
+
+let mut tree = to_mdast("# Intro\n\nrust:`code`", &ParseOptions {
+    inline_code_info: true,
+    ..Default::default()
+}).unwrap();
+
+if let Some(heading) = tree.find_heading("Intro") {
+    assert_eq!(heading.text_content(), "Intro");
+}
+
+tree.walk(|node| {
+    if let Some(language) = node.code_language() {
+        assert_eq!(language, "rust");
+    }
+});
+```
 
 See the [crate docs][docs] for more info.
 
@@ -193,6 +254,26 @@ They are not enabled by default but can be turned on with options.
   * JSX
 * frontmatter
 * math
+* inline code language prefixes (opt-in with `ParseOptions::inline_code_info`)
+* indented HTML blocks across blank lines (opt-in with `ParseOptions::html_block_blank_lines`)
+* namespace-prefixed HTML tags (opt-in with `ParseOptions::html_tag_namespaces`)
+
+```rust
+use socketry_markdown::{to_html_with_options, Options, ParseOptions};
+
+let options = Options {
+    parse: ParseOptions {
+        inline_code_info: true,
+        ..Default::default()
+    },
+    ..Default::default()
+};
+
+assert_eq!(
+    to_html_with_options("ruby:`Object.new`", &options).unwrap(),
+    "<p><code class=\"language-ruby\">Object.new</code></p>"
+);
+```
 
 It is not a goal of this project to support lots of different extensions.
 It’s instead a goal to support very common and mostly standardized extensions.
@@ -378,21 +459,21 @@ Special thanks go out to:
 
 [MIT][license] © [Titus Wormer][author]
 
-[badge-build-image]: https://github.com/wooorm/markdown-rs/workflows/main/badge.svg
+[badge-build-image]: https://github.com/socketry/socketry-markdown-rust/actions/workflows/main.yml/badge.svg
 
-[badge-build-url]: https://github.com/wooorm/markdown-rs/actions
+[badge-build-url]: https://github.com/socketry/socketry-markdown-rust/actions
 
-[badge-coverage-image]: https://img.shields.io/codecov/c/github/wooorm/markdown-rs.svg
+[badge-coverage-image]: https://img.shields.io/codecov/c/github/socketry/socketry-markdown-rust.svg
 
-[badge-coverage-url]: https://codecov.io/github/wooorm/markdown-rs
+[badge-coverage-url]: https://codecov.io/github/socketry/socketry-markdown-rust
 
-[docs]: https://docs.rs/markdown/latest/markdown/
+[docs]: https://docs.rs/socketry-markdown/latest/socketry_markdown/
 
-[crate]: https://crates.io/crates/markdown
+[crate]: https://crates.io/crates/socketry-markdown
 
-[repo]: https://github.com/wooorm/markdown-rs
+[repo]: https://github.com/socketry/socketry-markdown-rust
 
-[discussions]: https://github.com/wooorm/markdown-rs/discussions
+[discussions]: https://github.com/socketry/socketry-markdown-rust/discussions
 
 [commonmark]: https://spec.commonmark.org
 

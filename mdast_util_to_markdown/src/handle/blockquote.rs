@@ -6,7 +6,7 @@ use crate::{
     state::{Info, State},
 };
 use alloc::string::String;
-use markdown::{
+use socketry_markdown::{
     mdast::{Blockquote, Node},
     message::Message,
 };

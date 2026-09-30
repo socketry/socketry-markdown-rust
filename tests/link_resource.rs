@@ -1,10 +1,10 @@
-use markdown::{
+use pretty_assertions::assert_eq;
+use socketry_markdown::{
     mdast::{Image, Link, Node, Paragraph, Root, Text},
     message, to_html, to_html_with_options, to_mdast,
     unist::Position,
     CompileOptions, Options,
 };
-use pretty_assertions::assert_eq;
 
 #[test]
 fn link_resource() -> Result<(), message::Message> {

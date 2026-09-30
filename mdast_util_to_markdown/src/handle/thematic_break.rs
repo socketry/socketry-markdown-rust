@@ -6,7 +6,7 @@ use crate::{
     util::{check_rule::check_rule, check_rule_repetition::check_rule_repetition},
 };
 use alloc::format;
-use markdown::{
+use socketry_markdown::{
     mdast::{Node, ThematicBreak},
     message::Message,
 };

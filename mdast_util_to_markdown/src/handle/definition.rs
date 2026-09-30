@@ -10,7 +10,7 @@ use crate::{
     },
 };
 use alloc::string::String;
-use markdown::{
+use socketry_markdown::{
     mdast::{Definition, Node},
     message::Message,
 };

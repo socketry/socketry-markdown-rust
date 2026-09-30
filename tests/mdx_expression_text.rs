@@ -1,11 +1,11 @@
 mod test_utils;
-use markdown::{
+use pretty_assertions::assert_eq;
+use socketry_markdown::{
     mdast::{Blockquote, MdxTextExpression, Node, Paragraph, Root, Text},
     message, to_html_with_options, to_mdast,
     unist::Position,
     Constructs, Options, ParseOptions,
 };
-use pretty_assertions::assert_eq;
 use test_utils::swc::{parse_esm, parse_expression};
 
 /// Note: these tests are also in `micromark/micromark-extension-mdx-expression`

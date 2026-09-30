@@ -6,7 +6,7 @@ use crate::{
     util::pattern_in_scope::pattern_in_scope,
 };
 use alloc::string::ToString;
-use markdown::{
+use socketry_markdown::{
     mdast::{Break, Node},
     message::Message,
 };

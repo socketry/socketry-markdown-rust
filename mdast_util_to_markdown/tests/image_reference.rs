@@ -1,6 +1,6 @@
-use markdown::mdast::{ImageReference, Node, Paragraph, ReferenceKind};
 use mdast_util_to_markdown::to_markdown as to;
 use pretty_assertions::assert_eq;
+use socketry_markdown::mdast::{ImageReference, Node, Paragraph, ReferenceKind};
 
 #[test]
 fn image_reference() {

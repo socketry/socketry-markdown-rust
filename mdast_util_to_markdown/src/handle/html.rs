@@ -2,7 +2,7 @@
 
 use super::Handle;
 use crate::state::{Info, State};
-use markdown::{
+use socketry_markdown::{
     mdast::{Html, Node},
     message::Message,
 };

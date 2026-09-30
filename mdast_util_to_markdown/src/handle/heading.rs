@@ -7,7 +7,7 @@ use crate::{
     util::format_heading_as_setext::format_heading_as_setext,
 };
 use alloc::format;
-use markdown::{
+use socketry_markdown::{
     mdast::{Heading, Node},
     message::Message,
 };

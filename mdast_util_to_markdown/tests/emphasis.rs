@@ -1,8 +1,8 @@
-use markdown::mdast::{Emphasis, Node, Paragraph, Text};
 use mdast_util_to_markdown::{
     to_markdown as to, to_markdown_with_options as to_md_with_opts, Options,
 };
 use pretty_assertions::assert_eq;
+use socketry_markdown::mdast::{Emphasis, Node, Paragraph, Text};
 
 #[test]
 fn emphasis() {

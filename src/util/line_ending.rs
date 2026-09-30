@@ -8,7 +8,7 @@ use alloc::{str::FromStr, string::String};
 /// ## Examples
 ///
 /// ```
-/// use markdown::LineEnding;
+/// use socketry_markdown::LineEnding;
 /// # fn main() {
 ///
 /// // Use a CR + LF combination:
