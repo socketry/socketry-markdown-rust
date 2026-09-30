@@ -74,8 +74,20 @@ fn parse_expression_core(
     kind: &MdxExpressionKind,
 ) -> Result<Option<Box<Expr>>, (Span, String)> {
     // Empty expressions are OK.
-    if matches!(kind, MdxExpressionKind::Expression) && whitespace_and_comments(0, value).is_ok() {
-        return Ok(None);
+    if matches!(kind, MdxExpressionKind::Expression) {
+        match whitespace_and_comments(0, value) {
+            Ok(()) => return Ok(None),
+            Err((span, reason)) if reason.contains("Unexpected unclosed multiline comment") => {
+                return Err((span, reason));
+            }
+            Err((span, reason)) if reason.contains("Unexpected unclosed line comment") => {
+                return Err((
+                    span,
+                    "Could not parse expression with swc: Unexpected eof".into(),
+                ));
+            }
+            _ => {}
+        }
     }
 
     // For attribute expression, a spread is needed, for which we have to prefix
@@ -92,13 +104,25 @@ fn parse_expression_core(
     let result = parse_file_as_expr(&file, syntax, version, None, &mut errors);
 
     match result {
-        Err(error) => Err((
-            fix_span(error.span(), prefix.len() + 1),
-            format!(
-                "Could not parse expression with swc: {}",
-                swc_error_to_string(&error)
-            ),
-        )),
+        Err(error) => {
+            let span = fix_span(error.span(), prefix.len() + 1);
+
+            if unterminated_comment_at(value, span.lo.to_usize()) {
+                let end = value.len() as u32;
+                Err((
+                    create_span(end, end),
+                    "Could not parse expression with swc: Unexpected eof".into(),
+                ))
+            } else {
+                Err((
+                    span,
+                    format!(
+                        "Could not parse expression with swc: {}",
+                        swc_error_to_string(&error)
+                    ),
+                ))
+            }
+        }
         Ok(mut expr) => {
             if errors.is_empty() {
                 let expression_end = expr.span().hi.to_usize() - 1;
@@ -194,6 +218,24 @@ fn swc_error_to_string(error: &SwcError) -> String {
     error.kind().msg().into()
 }
 
+/// Whether SWC's error points at an unterminated JavaScript comment.
+fn unterminated_comment_at(value: &str, offset: usize) -> bool {
+    let bytes = value.as_bytes();
+    let Some(remaining) = bytes.get(offset..) else {
+        return false;
+    };
+
+    if remaining.starts_with(b"/*") {
+        !remaining[2..].windows(2).any(|window| window == b"*/")
+    } else if remaining.starts_with(b"//") {
+        !remaining[2..]
+            .iter()
+            .any(|byte| matches!(byte, b'\r' | b'\n'))
+    } else {
+        false
+    }
+}
+
 /// Move past JavaScript whitespace (well, actually ASCII whitespace) and
 /// comments.
 ///
@@ -269,7 +311,7 @@ fn create_config(source: String) -> (SourceFile, Syntax, EsVersion) {
             FileName::Anon.into(),
             false,
             FileName::Anon.into(),
-            source,
+            source.into(),
             BytePos::from_usize(1),
         ),
         // Syntax.
