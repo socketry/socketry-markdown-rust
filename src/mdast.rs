@@ -1,7 +1,15 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2023, by Kyle McCarthy.
+// Copyright, 2023, by Mia.
+// Copyright, 2023, by Rafael Bachmann.
+// Copyright, 2024, by Harsha Teja Kanna.
+// Copyright, 2026, by Samuel Williams.
+
 //! markdown syntax tree: [mdast][].
 //!
 //! [mdast]: https://github.com/syntax-tree/mdast
-
 use crate::unist::Position;
 use alloc::{
     fmt,
@@ -634,11 +642,36 @@ impl Node {
     }
 
     /// Render this node with a user-provided renderer.
-    pub fn render_with<R: crate::renderer::Renderer>(
-        &self,
-        renderer: &mut R,
-    ) -> String {
+    pub fn render_with<R: crate::renderer::Renderer>(&self, renderer: &mut R) -> String {
         renderer.render(self)
+    }
+
+    /// Serialize this AST node or fragment as Markdown.
+    ///
+    /// Markdown output ends with a newline. For custom formatting, use
+    /// [`to_markdown_with_options`][crate::markdown::to_markdown_with_options].
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// let markdown = node.to_markdown();
+    /// ```
+    #[must_use]
+    pub fn to_markdown(&self) -> String {
+        crate::markdown::to_markdown(self).expect("Markdown serialization failed for this AST node")
+    }
+
+    /// Serialize this AST node or fragment as Markdown with custom options.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if an option contains an invalid marker or the AST
+    /// contains a node that cannot be serialized.
+    pub fn to_markdown_with_options(
+        &self,
+        options: &crate::markdown::Options,
+    ) -> Result<String, crate::message::Message> {
+        crate::markdown::to_markdown_with_options(self, options)
     }
 
     /// Replace a heading and the section below it in this node's children.

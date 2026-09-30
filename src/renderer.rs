@@ -1,8 +1,12 @@
-//! Traits for rendering Markdown AST nodes.
+// Released under the MIT License.
+// Copyright, 2026, by Samuel Williams.
 
+//! Traits for rendering Markdown AST nodes.
 mod html;
+mod markdown;
 
 pub use html::HTMLRenderer;
+pub use markdown::MarkdownRenderer;
 
 use crate::mdast::Node;
 use alloc::string::String;

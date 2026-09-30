@@ -1,3 +1,9 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2023, by Rafael Bachmann.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2026, by Samuel Williams.
+
 //! Public API of `socketry-markdown`.
 //!
 //! This module exposes primarily [`to_html()`][].
@@ -15,6 +21,8 @@
 //!   — render AST nodes and fragments with a user-defined renderer
 //! * [`HTMLRenderer`][]
 //!   — render an AST node or fragment directly as HTML
+//! * [`MarkdownRenderer`][]
+//!   — render an AST node or fragment back to Markdown
 //!
 //! ## Features
 //!
@@ -25,7 +33,6 @@
 //!   you can show logs with `RUST_LOG=debug`
 //! * **`serde`**
 //!   — enable serde to serialize ASTs and configuration (includes `dep:serde`)
-
 #![no_std]
 #![deny(clippy::pedantic)]
 #![allow(clippy::doc_link_with_quotes)]
@@ -41,9 +48,10 @@ extern crate alloc;
 mod configuration;
 mod construct;
 mod event;
+pub mod markdown;
 mod parser;
-mod resolve;
 pub mod renderer;
+mod resolve;
 mod state;
 mod subtokenize;
 mod to_html;
@@ -75,7 +83,9 @@ pub use util::mdx::{
 };
 
 pub use configuration::{CompileOptions, Constructs, Options, ParseOptions};
-pub use renderer::{HTMLRenderer, Renderer};
+pub use markdown::{to_markdown, to_markdown_with_options};
+pub use markdown::{IndentOptions, Options as MarkdownOptions};
+pub use renderer::{HTMLRenderer, MarkdownRenderer, Renderer};
 
 use alloc::string::String;
 
