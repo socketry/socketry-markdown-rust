@@ -205,7 +205,10 @@ fn parse_esm(tokenizer: &mut Tokenizer) -> State {
 
     // Parse and handle what was signaled back.
     match parse(&result.value) {
-        MdxSignal::Ok => State::Ok,
+        MdxSignal::Ok => {
+            tokenizer.tokenize_state.mdx_last_parse_error = None;
+            State::Ok
+        }
         MdxSignal::Error(message, relative, source, rule_id) => {
             let point = tokenizer
                 .parse_state
