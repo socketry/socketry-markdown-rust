@@ -132,6 +132,8 @@ const COMPLETE: u8 = 7;
 /// ```
 pub fn start(tokenizer: &mut Tokenizer) -> State {
     if tokenizer.parse_state.options.constructs.html_flow {
+        tokenizer.tokenize_state.html_flow_indent = 0;
+        tokenizer.tokenize_state.html_flow_blank_lines = 0;
         tokenizer.enter(Name::HtmlFlow);
 
         if matches!(tokenizer.current, Some(b'\t' | b' ')) {
@@ -644,8 +646,13 @@ pub fn continuation(tokenizer: &mut Tokenizer) -> State {
         && tokenizer.current == Some(b'\n')
     {
         tokenizer.exit(Name::HtmlFlowData);
+        let retain_blank_lines = tokenizer.parse_state.options.html_block_blank_lines;
         tokenizer.check(
-            State::Next(StateName::HtmlFlowContinuationAfter),
+            if retain_blank_lines {
+                State::Next(StateName::HtmlFlowBlankLinesEnd)
+            } else {
+                State::Next(StateName::HtmlFlowContinuationAfter)
+            },
             State::Next(StateName::HtmlFlowContinuationStart),
         );
         State::Retry(StateName::HtmlFlowBlankLineBefore)
@@ -703,6 +710,7 @@ pub fn continuation_before(tokenizer: &mut Tokenizer) -> State {
     match tokenizer.current {
         None | Some(b'\n') => State::Retry(StateName::HtmlFlowContinuationStart),
         _ => {
+            record_line_indent(tokenizer);
             tokenizer.enter(Name::HtmlFlowData);
             State::Retry(StateName::HtmlFlowContinuation)
         }
@@ -866,8 +874,162 @@ pub fn continuation_after(tokenizer: &mut Tokenizer) -> State {
 ///   |
 /// ```
 pub fn blank_line_before(tokenizer: &mut Tokenizer) -> State {
+    if tokenizer.parse_state.options.html_block_blank_lines
+        && matches!(tokenizer.tokenize_state.marker, BASIC | COMPLETE)
+    {
+        tokenizer.tokenize_state.html_flow_blank_lines = 0;
+        tokenizer.enter(Name::LineEnding);
+        tokenizer.consume();
+        tokenizer.exit(Name::LineEnding);
+        tokenizer.tokenize_state.html_flow_blank_line_base = tokenizer.point.column;
+        return State::Next(StateName::HtmlFlowBlankLinesCheck);
+    }
+
     tokenizer.enter(Name::LineEnding);
     tokenizer.consume();
     tokenizer.exit(Name::LineEnding);
     State::Next(StateName::BlankLineStart)
+}
+
+/// Inspect blank lines and the indentation of the next content line.
+pub fn blank_lines_check(tokenizer: &mut Tokenizer) -> State {
+    match tokenizer.current {
+        Some(b'\t' | b' ') => {
+            tokenizer.consume();
+            State::Next(StateName::HtmlFlowBlankLinesCheck)
+        }
+        Some(b'\n') => {
+            tokenizer.tokenize_state.html_flow_blank_lines += 1;
+            tokenizer.enter(Name::LineEnding);
+            tokenizer.consume();
+            tokenizer.exit(Name::LineEnding);
+            tokenizer.tokenize_state.html_flow_blank_line_base = tokenizer.point.column;
+            State::Next(StateName::HtmlFlowBlankLinesCheck)
+        }
+        None => {
+            if tokenizer.point.column > tokenizer.tokenize_state.html_flow_blank_line_base {
+                tokenizer.tokenize_state.html_flow_blank_lines += 1;
+            }
+            if tokenizer.tokenize_state.html_flow_blank_lines > 0 {
+                State::Ok
+            } else {
+                State::Nok
+            }
+        }
+        Some(_) => {
+            if tokenizer.tokenize_state.html_flow_blank_lines == 0 {
+                return State::Nok;
+            }
+
+            let indent = tokenizer
+                .point
+                .column
+                .saturating_sub(tokenizer.tokenize_state.html_flow_blank_line_base);
+            let minimum = tokenizer.tokenize_state.html_flow_indent;
+            let continues = if minimum == 0 {
+                indent > 0
+            } else {
+                indent >= minimum
+            };
+
+            if continues {
+                State::Nok
+            } else {
+                State::Ok
+            }
+        }
+    }
+}
+
+/// Consume a retained run of blank lines, then end the HTML block.
+pub fn blank_lines_end(tokenizer: &mut Tokenizer) -> State {
+    tokenizer.enter(Name::LineEnding);
+    tokenizer.consume();
+    tokenizer.exit(Name::LineEnding);
+    State::Next(StateName::HtmlFlowBlankLinesEndStart)
+}
+
+/// At the start of a retained blank line.
+pub fn blank_lines_end_start(tokenizer: &mut Tokenizer) -> State {
+    if tokenizer.tokenize_state.html_flow_blank_lines == 0 {
+        return State::Next(StateName::HtmlFlowContinuationAfter);
+    }
+
+    match tokenizer.current {
+        Some(b'\t' | b' ') => {
+            tokenizer.enter(Name::HtmlFlowData);
+            tokenizer.consume();
+            State::Next(StateName::HtmlFlowBlankLinesEndData)
+        }
+        Some(b'\n') => {
+            tokenizer.enter(Name::LineEnding);
+            tokenizer.consume();
+            tokenizer.exit(Name::LineEnding);
+            tokenizer.tokenize_state.html_flow_blank_lines -= 1;
+            State::Next(StateName::HtmlFlowBlankLinesEndStart)
+        }
+        _ => {
+            tokenizer.tokenize_state.html_flow_blank_lines = 0;
+            State::Next(StateName::HtmlFlowContinuationAfter)
+        }
+    }
+}
+
+/// In retained whitespace on a blank line.
+pub fn blank_lines_end_data(tokenizer: &mut Tokenizer) -> State {
+    match tokenizer.current {
+        Some(b'\t' | b' ') => {
+            tokenizer.consume();
+            State::Next(StateName::HtmlFlowBlankLinesEndData)
+        }
+        Some(b'\n') => {
+            tokenizer.exit(Name::HtmlFlowData);
+            tokenizer.enter(Name::LineEnding);
+            tokenizer.consume();
+            tokenizer.exit(Name::LineEnding);
+            tokenizer.tokenize_state.html_flow_blank_lines -= 1;
+            State::Next(StateName::HtmlFlowBlankLinesEndStart)
+        }
+        _ => {
+            tokenizer.exit(Name::HtmlFlowData);
+            tokenizer.tokenize_state.html_flow_blank_lines = 0;
+            State::Next(StateName::HtmlFlowContinuationAfter)
+        }
+    }
+}
+
+/// Record the shallowest positive indentation of an HTML continuation line.
+fn record_line_indent(tokenizer: &mut Tokenizer) {
+    if !tokenizer.parse_state.options.html_block_blank_lines
+        || !matches!(tokenizer.tokenize_state.marker, BASIC | COMPLETE)
+    {
+        return;
+    }
+
+    let start_column = tokenizer.point.column;
+    let mut column = start_column;
+    let mut index = tokenizer.point.index;
+
+    while index < tokenizer.parse_state.bytes.len() {
+        match tokenizer.parse_state.bytes[index] {
+            b' ' => column += 1,
+            b'\t' => column += TAB_SIZE - ((column - 1) % TAB_SIZE),
+            _ => break,
+        }
+        index += 1;
+    }
+
+    if index >= tokenizer.parse_state.bytes.len()
+        || matches!(tokenizer.parse_state.bytes[index], b'\n' | b'\r')
+    {
+        return;
+    }
+
+    let indent = column - start_column;
+    if indent > 0
+        && (tokenizer.tokenize_state.html_flow_indent == 0
+            || indent < tokenizer.tokenize_state.html_flow_indent)
+    {
+        tokenizer.tokenize_state.html_flow_indent = indent;
+    }
 }

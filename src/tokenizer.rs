@@ -255,6 +255,12 @@ pub struct TokenizeState<'a> {
     pub start: usize,
     /// Index.
     pub end: usize,
+    /// Shallowest positive indentation in the current type 6 or 7 HTML block.
+    pub html_flow_indent: usize,
+    /// Number of blank lines seen while checking HTML block continuation.
+    pub html_flow_blank_lines: usize,
+    /// Column at which the current candidate HTML continuation line begins.
+    pub html_flow_blank_line_base: usize,
     /// Slot for an event name.
     pub token_1: Name,
     /// Slot for an event name.
@@ -353,6 +359,9 @@ impl<'a> Tokenizer<'a> {
                 gfm_footnote_definitions: vec![],
                 mdx_last_parse_error: None,
                 end: 0,
+                html_flow_indent: 0,
+                html_flow_blank_lines: 0,
+                html_flow_blank_line_base: 0,
                 label_starts: vec![],
                 label_starts_loose: vec![],
                 marker: 0,

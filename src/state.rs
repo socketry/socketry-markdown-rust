@@ -252,6 +252,10 @@ pub enum Name {
     HtmlFlowCompleteAttributeValueUnquoted,
     HtmlFlowCompleteAfter,
     HtmlFlowBlankLineBefore,
+    HtmlFlowBlankLinesCheck,
+    HtmlFlowBlankLinesEnd,
+    HtmlFlowBlankLinesEndStart,
+    HtmlFlowBlankLinesEndData,
     HtmlFlowContinuation,
     HtmlFlowContinuationDeclarationInside,
     HtmlFlowContinuationAfter,
@@ -722,6 +726,10 @@ pub fn call(tokenizer: &mut Tokenizer, name: Name) -> State {
         }
         Name::HtmlFlowCompleteAfter => construct::html_flow::complete_after,
         Name::HtmlFlowBlankLineBefore => construct::html_flow::blank_line_before,
+        Name::HtmlFlowBlankLinesCheck => construct::html_flow::blank_lines_check,
+        Name::HtmlFlowBlankLinesEnd => construct::html_flow::blank_lines_end,
+        Name::HtmlFlowBlankLinesEndStart => construct::html_flow::blank_lines_end_start,
+        Name::HtmlFlowBlankLinesEndData => construct::html_flow::blank_lines_end_data,
         Name::HtmlFlowContinuation => construct::html_flow::continuation,
         Name::HtmlFlowContinuationDeclarationInside => {
             construct::html_flow::continuation_declaration_inside
