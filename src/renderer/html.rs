@@ -110,7 +110,9 @@ impl HTMLRenderer {
             Node::Fragment(fragment) => self.render_root(&fragment.children),
             Node::Paragraph(paragraph) => {
                 let content = self.render_inline_children(&paragraph.children);
-                if self.tight_list {
+                if content.is_empty() {
+                    String::new()
+                } else if self.tight_list {
                     content
                 } else {
                     format!("<p>{}</p>", content)
@@ -353,7 +355,12 @@ impl HTMLRenderer {
             output.push_str(tag);
             output.push_str(alignment);
             output.push('>');
-            output.push_str(&self.render_node_inner(cell));
+            match cell {
+                Node::TableCell(cell) => {
+                    output.push_str(&self.render_inline_children(&cell.children));
+                }
+                _ => output.push_str(&self.render_node_inner(cell)),
+            }
             output.push_str("</");
             output.push_str(tag);
             output.push('>');
@@ -480,8 +487,8 @@ impl HTMLRenderer {
             let prefix = self
                 .options
                 .gfm_footnote_clobber_prefix
-                .as_deref()
-                .unwrap_or("user-content-");
+                .clone()
+                .unwrap_or_else(|| "user-content-".into());
             let id = crate::util::sanitize_uri::sanitize(&identifier.to_lowercase());
             let mut content = self.render_flow_children(&children);
             let count = self.footnote_calls.get(&identifier).copied().unwrap_or(1);
@@ -503,7 +510,7 @@ impl HTMLRenderer {
                 };
                 backrefs.push_str(&format!(
                     "<a href=\"#{}fnref-{}{}\" data-footnote-backref=\"\" aria-label=\"{}\" class=\"data-footnote-backref\">↩",
-                    encode(prefix, true),
+                    encode(&prefix, true),
                     id,
                     suffix,
                     encode(back_label, true)
@@ -524,7 +531,7 @@ impl HTMLRenderer {
             if has_item {
                 output.push_str(&line_ending);
             }
-            output.push_str(&format!("<li id=\"{}fn-{}\">", encode(prefix, true), id));
+            output.push_str(&format!("<li id=\"{}fn-{}\">", encode(&prefix, true), id));
             output.push_str(&line_ending);
             output.push_str(&content);
             output.push_str("</li>");
