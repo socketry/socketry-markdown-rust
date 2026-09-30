@@ -38,7 +38,7 @@ keywords = ["commonmark", "markdown", "parse", "render", "tokenize"]
 license = "MIT"
 name = "socketry-markdown"
 repository = "https://github.com/socketry/socketry-markdown-rust"
-rust-version = "1.56"
+rust-version = "1.73"
 version = "1.0.0"
 
 [workspace]
