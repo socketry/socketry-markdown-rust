@@ -1,7 +1,9 @@
+// Released under the MIT License.
+// Copyright, 2022, by Titus Wormer.
+
 //! Infer things from events.
 //!
 //! Used to share between `to_html` and `to_mdast`.
-
 use crate::event::{Event, Kind, Name};
 use crate::mdast::AlignKind;
 use alloc::{vec, vec::Vec};

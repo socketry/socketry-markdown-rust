@@ -1,5 +1,7 @@
-//! HTML rendering for mdast trees.
+// Released under the MIT License.
+// Copyright, 2026, by Samuel Williams.
 
+//! HTML rendering for mdast trees.
 use super::Renderer;
 use crate::{
     mdast::{AlignKind, AttributeContent, AttributeValue, Heading, Node},

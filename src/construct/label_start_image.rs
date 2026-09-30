@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Label start (image) occurs in the [text][] content type.
 //!
 //! ## Grammar
@@ -31,7 +34,6 @@
 //! [text]: crate::construct::text
 //! [label_end]: crate::construct::label_end
 //! [html_img]: https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element
-
 use crate::event::Name;
 use crate::resolve::Name as ResolveName;
 use crate::state::{Name as StateName, State};

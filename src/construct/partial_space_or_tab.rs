@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Space or tab occurs in tons of places.
 //!
 //! ## Grammar
@@ -12,7 +15,6 @@
 //! ## References
 //!
 //! * [`micromark-factory-space/index.js` in `micromark`](https://github.com/micromark/micromark/blob/main/packages/micromark-factory-space/dev/index.js)
-
 use crate::event::{Content, Link, Name};
 use crate::state::{Name as StateName, State};
 use crate::subtokenize::link;

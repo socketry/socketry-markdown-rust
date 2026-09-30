@@ -1,5 +1,7 @@
-//! Turn bytes of markdown into events.
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
 
+//! Turn bytes of markdown into events.
 use crate::event::{Event, Point};
 use crate::message;
 use crate::state::{Name as StateName, State};

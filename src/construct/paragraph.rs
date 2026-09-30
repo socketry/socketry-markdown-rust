@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Paragraph occurs in the [content][] content type.
 //!
 //! ## Grammar
@@ -40,7 +43,6 @@
 //! [autolink]: crate::construct::autolink
 //! [raw_text]: crate::construct::raw_text
 //! [html]: https://html.spec.whatwg.org/multipage/grouping-content.html#the-p-element
-
 use crate::event::{Content, Link, Name};
 use crate::state::{Name as StateName, State};
 use crate::subtokenize::link;

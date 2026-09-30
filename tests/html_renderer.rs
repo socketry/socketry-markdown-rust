@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2026, by Samuel Williams.
+
 use pretty_assertions::assert_eq;
 use socketry_markdown::{message, to_mdast, CompileOptions, HTMLRenderer, ParseOptions};
 

@@ -1,5 +1,7 @@
-//! Move across lists of events.
+// Released under the MIT License.
+// Copyright, 2022, by Titus Wormer.
 
+//! Move across lists of events.
 use crate::event::{Event, Kind, Name};
 
 /// Skip from `index`, optionally past `names`.

@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Trailing whitespace occurs in [string][] and [text][].
 //!
 //! ## Grammar
@@ -56,7 +59,6 @@
 //! [character_escape]: crate::construct::character_escape
 //! [hard_break_prefix_size_min]: crate::util::constant::HARD_BREAK_PREFIX_SIZE_MIN
 //! [html]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-br-element
-
 use crate::event::{Event, Kind, Name};
 use crate::tokenizer::Tokenizer;
 use crate::util::{

@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2023, by cel.
+
 //! Constants needed to parse markdown.
 //!
 //! Most of these constants are magic numbers, such as the number of markers

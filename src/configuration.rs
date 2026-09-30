@@ -1,3 +1,10 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2023, by cel.
+// Copyright, 2025, by Ophir Lojkine.
+// Copyright, 2026, by Samuel Williams.
+
 use crate::util::{
     line_ending::LineEnding,
     mdx::{EsmParse as MdxEsmParse, ExpressionParse as MdxExpressionParse},

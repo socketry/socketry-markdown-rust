@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Character escapes occur in the [string][] and [text][] content types.
 //!
 //! ## Grammar
@@ -40,7 +43,6 @@
 //! [text]: crate::construct::text
 //! [character_reference]: crate::construct::character_reference
 //! [hard_break_escape]: crate::construct::hard_break_escape
-
 use crate::event::Name;
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

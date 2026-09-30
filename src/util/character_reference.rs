@@ -1,5 +1,8 @@
-//! Helpers for character references.
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
+//! Helpers for character references.
 use crate::util::constant::{
     CHARACTER_REFERENCES, CHARACTER_REFERENCES_HTML_4, CHARACTER_REFERENCE_DECIMAL_SIZE_MAX,
     CHARACTER_REFERENCE_HEXADECIMAL_SIZE_MAX, CHARACTER_REFERENCE_NAMED_SIZE_MAX,

@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2023, by Fedor Sheremetyev.
+
 //! Label end occurs in the [text][] content type.
 //!
 //! ## Grammar
@@ -178,7 +182,6 @@
 //! [html_a]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element
 //! [html_img]: https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element
 //! [html_sup]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-sub-and-sup-elements
-
 use crate::construct::partial_space_or_tab_eol::space_or_tab_eol;
 use crate::event::{Event, Kind, Name};
 use crate::resolve::Name as ResolveName;

@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022, by Titus Wormer.
+
 //! Data occurs in the [string][] and [text][] content types.
 //!
 //! It can include anything (except for line endings) and stops at certain
@@ -5,7 +8,6 @@
 //!
 //! [string]: crate::construct::string
 //! [text]: crate::construct::text
-
 use crate::event::{Kind, Name};
 use crate::state::{Name as StateName, State};
 use crate::subtokenize::Subresult;

@@ -1,3 +1,8 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 fn main() -> Result<(), socketry_markdown::message::Message> {
     // Turn on debugging.
     // You can show it with `RUST_LOG=debug cargo run --features log --example lib`

@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! GFM: autolink literal occurs in the [text][] content type.
 //!
 //! ## Grammar
@@ -143,7 +147,6 @@
 //! [label_end]: crate::construct::label_end
 //! [sanitize_uri]: crate::util::sanitize_uri
 //! [html_a]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element
-
 use crate::event::{Event, Kind, Name};
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

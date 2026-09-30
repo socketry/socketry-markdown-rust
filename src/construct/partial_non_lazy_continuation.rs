@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022, by Titus Wormer.
+
 //! Non-lazy continuation.
 //!
 //! This is a tiny helper that [flow][] constructs can use to make sure that
@@ -9,7 +12,6 @@
 //! [raw_flow]: crate::construct::raw_flow
 //! [code_indented]: crate::construct::code_indented
 //! [html_flow]: crate::construct::html_flow
-
 use crate::event::Name;
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

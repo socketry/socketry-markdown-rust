@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Definition occurs in the [content] content type.
 //!
 //! ## Grammar
@@ -100,7 +103,6 @@
 //! [normalize_identifier]: crate::util::normalize_identifier
 //! [html_a]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element
 //! [html_img]: https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element
-
 use crate::construct::partial_space_or_tab::space_or_tab;
 use crate::construct::partial_space_or_tab_eol::space_or_tab_eol;
 use crate::event::Name;

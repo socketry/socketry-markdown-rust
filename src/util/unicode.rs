@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022, by Christian Murphy.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Info on Unicode.
 
 /// List of characters that are considered punctuation.

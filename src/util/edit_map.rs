@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022, by Titus Wormer.
+
 //! Deal with several changes in events, batching them together.
 //!
 //! Preferably, changes should be kept to a minimum.
@@ -7,7 +10,6 @@
 //! It can also help to merge many adjacent similar events.
 //! And, in other cases, it’s needed to parse subcontent: pass some events
 //! through another tokenizer and inject the result.
-
 use crate::event::Event;
 use alloc::{vec, vec::Vec};
 

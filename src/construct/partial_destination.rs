@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Destination occurs in [definition][] and [label end][label_end].
 //!
 //! ## Grammar
@@ -80,7 +83,6 @@
 //! [character_reference]: crate::construct::character_reference
 //! [label_end]: crate::construct::label_end
 //! [sanitize_uri]: crate::util::sanitize_uri
-
 use crate::event::{Content, Link, Name};
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

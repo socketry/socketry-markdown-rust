@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Constructs found in markdown.
 //!
 //! Constructs are grouped by content type.
@@ -147,7 +150,6 @@
 //! ```
 //!
 //! [bnf]: http://trevorjim.com/a-specification-for-markdown/
-
 pub mod attention;
 pub mod autolink;
 pub mod blank_line;

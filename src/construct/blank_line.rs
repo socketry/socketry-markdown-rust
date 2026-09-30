@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Blank lines occur in the [flow][] content type.
 //!
 //! ## Grammar
@@ -48,7 +51,6 @@
 //! [list_item]: crate::construct::list_item
 //! [paragraph]: crate::construct::paragraph
 //! [flow]: crate::construct::flow
-
 use crate::construct::partial_space_or_tab::space_or_tab;
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

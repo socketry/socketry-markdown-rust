@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Hard break (escape) occurs in the  [text][] content type.
 //!
 //! ## Grammar
@@ -43,7 +46,6 @@
 //! [character_reference]: crate::construct::character_reference
 //! [hard_break_trailing]: crate::construct::partial_whitespace
 //! [html]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-br-element
-
 use crate::event::Name;
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

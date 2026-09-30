@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2024-2025, by Titus Wormer.
+
 use crate::unist::{Point, Position};
 use alloc::{boxed::Box, fmt, string::String};
 

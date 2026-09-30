@@ -1,3 +1,8 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2025, by Bnchi.
+// Copyright, 2026, by Samuel Williams.
+
 //! MDX expression occurs in [MDX expression (flow)][mdx_expression_flow] and
 //! [MDX expression (text)][mdx_expression_text].
 //!
@@ -55,7 +60,6 @@
 //! [mdx_expression_flow]: crate::construct::mdx_expression_flow
 //! [mdx_expression_text]: crate::construct::mdx_expression_text
 //! [interleaving]: https://mdxjs.com/docs/what-is-mdx/#interleaving
-
 use crate::event::Name;
 use crate::message;
 use crate::state::{Name as StateName, State};

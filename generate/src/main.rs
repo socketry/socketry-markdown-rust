@@ -1,9 +1,13 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 // To regenerate, run the following from the repository root:
 //
 // ```sh
 // cargo run --manifest-path generate/Cargo.toml
 // ```
-
 use regex::Regex;
 use std::fs;
 

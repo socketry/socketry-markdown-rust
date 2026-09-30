@@ -1,5 +1,8 @@
-//! Utilities used when processing markdown.
+// Released under the MIT License.
+// Copyright, 2022, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
+//! Utilities used when processing markdown.
 pub mod char;
 pub mod character_reference;
 pub mod constant;

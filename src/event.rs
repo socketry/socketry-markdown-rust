@@ -1,5 +1,8 @@
-//! Semantic labels of things happening.
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2025, by Bnchi.
 
+//! Semantic labels of things happening.
 use crate::unist;
 use crate::util::constant::TAB_SIZE;
 

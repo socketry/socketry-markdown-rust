@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Label start (footnote) occurs in the [text][] content type.
 //!
 //! ## Grammar
@@ -36,7 +39,6 @@
 //! [label_end]: crate::construct::label_end
 //! [html_a]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element
 //! [html_sup]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-sub-and-sup-elements
-
 use crate::event::Name;
 use crate::resolve::Name as ResolveName;
 use crate::state::{Name as StateName, State};

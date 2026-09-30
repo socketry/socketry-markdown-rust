@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! GFM: table occurs in the [flow][] content type.
 //!
 //! ## Grammar
@@ -224,7 +227,6 @@
 //! [html_th]: https://html.spec.whatwg.org/multipage/tables.html#the-th-element
 //! [html_thead]: https://html.spec.whatwg.org/multipage/tables.html#the-thead-element
 //! [html_tr]: https://html.spec.whatwg.org/multipage/tables.html#the-tr-element
-
 use crate::construct::partial_space_or_tab::{space_or_tab, space_or_tab_min_max};
 use crate::event::{Content, Event, Kind, Link, Name};
 use crate::resolve::Name as ResolveName;

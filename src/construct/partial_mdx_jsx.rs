@@ -1,3 +1,8 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2023, by Mick van Gelderen.
+
 //! MDX JSX occurs in [MDX JSX (flow)][mdx_jsx_flow] and
 //! [MDX JSX (text)][mdx_jsx_text].
 //!
@@ -160,7 +165,6 @@
 //! [mdx_jsx_flow]: crate::construct::mdx_jsx_flow
 //! [mdx_jsx_text]: crate::construct::mdx_jsx_text
 //! [interleaving]: https://mdxjs.com/docs/what-is-mdx/#interleaving
-
 use crate::event::Name;
 use crate::message;
 use crate::state::{Name as StateName, State};

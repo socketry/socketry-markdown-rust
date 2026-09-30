@@ -1,3 +1,9 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2023, by Ophir Lojkine.
+// Copyright, 2023, by pinkforest(she/her).
+// Copyright, 2026, by Samuel Williams.
+
 //! A tokenizer glues states from the state machine together.
 //!
 //! It facilitates everything needed to turn bytes into events with a state
@@ -7,7 +13,6 @@
 //! unsuccessful, revert the attempt.
 //!
 //! [`attempt`]: Tokenizer::attempt
-
 use crate::event::{Content, Event, Kind, Link, Name, Point, VOID_EVENTS};
 use crate::message;
 use crate::parser::ParseState;

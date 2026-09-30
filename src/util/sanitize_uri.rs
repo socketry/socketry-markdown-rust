@@ -1,5 +1,9 @@
-//! Make urls safe.
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
+//! Make urls safe.
 use crate::util::encode::encode;
 use alloc::{format, string::String, vec::Vec};
 

@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Space or tab (eol) occurs in [destination][], [label][], and [title][].
 //!
 //! ## Grammar
@@ -18,7 +21,6 @@
 //! [destination]: crate::construct::partial_destination
 //! [label]: crate::construct::partial_label
 //! [title]: crate::construct::partial_title
-
 use crate::construct::partial_space_or_tab::{
     space_or_tab_with_options, Options as SpaceOrTabOptions,
 };

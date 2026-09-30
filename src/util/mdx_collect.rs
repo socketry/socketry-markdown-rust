@@ -1,5 +1,7 @@
-//! Collect info for MDX.
+// Released under the MIT License.
+// Copyright, 2022, by Titus Wormer.
 
+//! Collect info for MDX.
 use crate::event::{Event, Kind, Name};
 use crate::util::slice::{Position, Slice};
 use alloc::{string::String, vec, vec::Vec};

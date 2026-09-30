@@ -1,5 +1,7 @@
-//! Helpers for extracting headings from an mdast tree.
+// Released under the MIT License.
+// Copyright, 2026, by Samuel Williams.
 
+//! Helpers for extracting headings from an mdast tree.
 use super::Node;
 use alloc::{
     collections::{BTreeMap, BTreeSet},

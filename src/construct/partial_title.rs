@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Title occurs in [definition][] and [label end][label_end].
 //!
 //! ## Grammar
@@ -34,7 +37,6 @@
 //! [character_escape]: crate::construct::character_escape
 //! [character_reference]: crate::construct::character_reference
 //! [label_end]: crate::construct::label_end
-
 use crate::construct::partial_space_or_tab_eol::{space_or_tab_eol_with_options, Options};
 use crate::event::{Content, Link, Name};
 use crate::state::{Name as StateName, State};

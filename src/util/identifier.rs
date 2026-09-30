@@ -1,5 +1,7 @@
-//! Info on JavaScript identifiers.
+// Released under the MIT License.
+// Copyright, 2022, by Titus Wormer.
 
+//! Info on JavaScript identifiers.
 use unicode_id::UnicodeID;
 
 /// Check if a character can start a JS identifier.

@@ -1,3 +1,8 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 //! MDX ESM occurs in the [flow][] content type.
 //!
 //! ## Grammar
@@ -28,7 +33,6 @@
 //!
 //! [flow]: crate::construct::flow
 //! [parse_options]: crate::ParseOptions
-
 use crate::event::Name;
 use crate::message;
 use crate::state::{Name as StateName, State};

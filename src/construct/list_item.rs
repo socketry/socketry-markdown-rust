@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! List item occurs in the [document][] content type.
 //!
 //! ## Grammar
@@ -57,7 +60,6 @@
 //! [html_ol]: https://html.spec.whatwg.org/multipage/grouping-content.html#the-ol-element
 //! [html_ul]: https://html.spec.whatwg.org/multipage/grouping-content.html#the-ul-element
 //! [commonmark_block]: https://spec.commonmark.org/0.31/#phase-1-block-structure
-
 use crate::construct::partial_space_or_tab::space_or_tab_min_max;
 use crate::event::{Kind, Name};
 use crate::resolve::Name as ResolveName;

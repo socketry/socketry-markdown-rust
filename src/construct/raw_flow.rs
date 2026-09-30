@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Raw (flow) occurs in the [flow][] content type.
 //! It forms code (fenced) and math (flow).
 //!
@@ -137,7 +140,6 @@
 //! [raw_text]: crate::construct::raw_text
 //! [html_code]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-code-element
 //! [html_pre]: https://html.spec.whatwg.org/multipage/grouping-content.html#the-pre-element
-
 use crate::construct::partial_space_or_tab::{space_or_tab, space_or_tab_min_max};
 use crate::event::{Content, Link, Name};
 use crate::state::{Name as StateName, State};

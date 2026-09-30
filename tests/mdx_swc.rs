@@ -1,3 +1,8 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2024, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 mod test_utils;
 use pretty_assertions::assert_eq;
 use socketry_markdown::{message, to_html_with_options, Constructs, Options, ParseOptions};

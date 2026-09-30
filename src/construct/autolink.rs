@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Autolink occurs in the [text][] content type.
 //!
 //! ## Grammar
@@ -120,7 +123,6 @@
 //! [autolink_domain_size_max]: crate::util::constant::AUTOLINK_DOMAIN_SIZE_MAX
 //! [sanitize_uri]: crate::util::sanitize_uri
 //! [html_a]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element
-
 use crate::event::Name;
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

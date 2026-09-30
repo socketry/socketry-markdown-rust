@@ -1,5 +1,9 @@
-//! Bridge between `markdown-rs` and SWC.
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
+//! Bridge between `markdown-rs` and SWC.
 use crate::test_utils::swc_utils::{create_span, RewritePrefixContext};
 use socketry_markdown::{MdxExpressionKind, MdxSignal};
 use std::rc::Rc;

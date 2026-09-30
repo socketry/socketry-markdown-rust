@@ -1,6 +1,8 @@
+// Released under the MIT License.
+// Copyright, 2022-2024, by Titus Wormer.
+
 //! Lots of helpers for dealing with SWC, particularly from unist, and for
 //! building its ES AST.
-
 use swc_core::common::{BytePos, Span, DUMMY_SP};
 use swc_core::ecma::visit::{noop_visit_mut_type, VisitMut};
 

@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 //! HTML (flow) occurs in the [flow][] content type.
 //!
 //! ## Grammar
@@ -97,7 +101,6 @@
 //! [html_raw_names]: crate::util::constant::HTML_RAW_NAMES
 //! [html_block_names]: crate::util::constant::HTML_BLOCK_NAMES
 //! [html_parsing]: https://html.spec.whatwg.org/multipage/parsing.html#parsing
-
 use crate::construct::partial_space_or_tab::{
     space_or_tab_with_options, Options as SpaceOrTabOptions,
 };

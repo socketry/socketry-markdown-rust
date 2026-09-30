@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2024, by Nokome Bentley.
+
 //! The document content type.
 //!
 //! **Document** represents the containers, such as block quotes, list items,
@@ -8,7 +12,6 @@
 //! * [Block quote][crate::construct::block_quote]
 //! * [List item][crate::construct::list_item]
 //! * [GFM: Footnote definition][crate::construct::gfm_footnote_definition]
-
 use crate::event::{Content, Event, Kind, Link, Name};
 use crate::message;
 use crate::state::{Name as StateName, State};

@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Label occurs in [definition][] and [label end][label_end].
 //!
 //! ## Grammar
@@ -60,7 +63,6 @@
 //! [label_end]: crate::construct::label_end
 //! [raw_text]: crate::construct::raw_text
 //! [link_reference_size_max]: crate::util::constant::LINK_REFERENCE_SIZE_MAX
-
 use crate::construct::partial_space_or_tab_eol::{space_or_tab_eol_with_options, Options};
 use crate::event::{Content, Link, Name};
 use crate::state::{Name as StateName, State};

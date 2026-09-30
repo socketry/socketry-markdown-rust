@@ -1,5 +1,7 @@
-//! Deal with bytes.
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
 
+//! Deal with bytes.
 use crate::event::{Event, Kind, Point};
 use crate::util::constant::TAB_SIZE;
 use alloc::{format, string::String, vec};

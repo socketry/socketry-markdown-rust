@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 //! HTML (text) occurs in the [text][] content type.
 //!
 //! ## Grammar
@@ -50,7 +54,6 @@
 //! [text]: crate::construct::text
 //! [html_flow]: crate::construct::html_flow
 //! [html_parsing]: https://html.spec.whatwg.org/multipage/parsing.html#parsing
-
 use crate::construct::partial_space_or_tab::space_or_tab;
 use crate::event::Name;
 use crate::state::{Name as StateName, State};

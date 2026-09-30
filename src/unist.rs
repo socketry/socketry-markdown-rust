@@ -1,7 +1,11 @@
+// Released under the MIT License.
+// Copyright, 2022, by Titus Wormer.
+// Copyright, 2023, by Kyle McCarthy.
+// Copyright, 2023, by Rafael Bachmann.
+
 //! abstract syntax trees: [unist][].
 //!
 //! [unist]: https://github.com/syntax-tree/unist
-
 use alloc::fmt;
 
 /// One place in a source file.

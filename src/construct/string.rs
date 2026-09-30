@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! The string content type.
 //!
 //! **String** is a limited [text][] like content type which only allows
@@ -11,7 +14,6 @@
 //! * [Character reference][crate::construct::character_reference]
 //!
 //! [text]: crate::construct::text
-
 use crate::construct::partial_whitespace::resolve_whitespace;
 use crate::resolve::Name as ResolveName;
 use crate::state::{Name as StateName, State};

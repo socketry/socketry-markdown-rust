@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Thematic break occurs in the [flow][] content type.
 //!
 //! ## Grammar
@@ -55,7 +58,6 @@
 //! [heading_setext]: crate::construct::heading_setext
 //! [list-item]: crate::construct::list_item
 //! [html]: https://html.spec.whatwg.org/multipage/grouping-content.html#the-hr-element
-
 use crate::construct::partial_space_or_tab::{space_or_tab, space_or_tab_min_max};
 use crate::event::Name;
 use crate::state::{Name as StateName, State};

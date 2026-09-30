@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Raw (text) occurs in the [text][] content type.
 //! It forms code (text) and math (text).
 //!
@@ -114,7 +117,6 @@
 //! [raw_flow]: crate::construct::raw_flow
 //! [html_code]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-code-element
 //! [parse_options]: crate::ParseOptions
-
 use crate::event::Name;
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

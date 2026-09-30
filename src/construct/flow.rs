@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! The flow content type.
 //!
 //! **Flow** represents the sections, such as headings and code, which are
@@ -20,7 +23,6 @@
 //! * [MDX JSX (flow)][crate::construct::mdx_jsx_flow]
 //! * [Raw (flow)][crate::construct::raw_flow] (code (fenced), math (flow))
 //! * [Thematic break][crate::construct::thematic_break]
-
 use crate::event::Name;
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

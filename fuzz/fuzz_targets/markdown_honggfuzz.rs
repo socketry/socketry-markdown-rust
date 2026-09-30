@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2023, by Christian Murphy.
+// Copyright, 2026, by Samuel Williams.
+
 use honggfuzz::fuzz;
 
 fn main() {

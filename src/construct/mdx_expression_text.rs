@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! MDX expression (text) occurs in the [text][] content type.
 //!
 //! ## Grammar
@@ -29,7 +32,6 @@
 //!
 //! [text]: crate::construct::text
 //! [mdx_expression]: crate::construct::partial_mdx_expression
-
 use crate::event::Name;
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

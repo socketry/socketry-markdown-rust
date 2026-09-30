@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Content occurs in the [flow][] content type.
 //!
 //! Content contains zero or more [definition][definition]s, followed by zero
@@ -22,7 +25,6 @@
 //! [flow]: crate::construct::flow
 //! [definition]: crate::construct::definition
 //! [paragraph]: crate::construct::paragraph
-
 use crate::event::{Content, Kind, Link, Name};
 use crate::message;
 use crate::resolve::Name as ResolveName;

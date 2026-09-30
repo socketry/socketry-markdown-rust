@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! The text content type.
 //!
 //! **Text** contains phrasing content such as
@@ -23,7 +26,6 @@
 //!
 //! > 👉 **Note**: for performance reasons, hard break (trailing) is formed by
 //! > [whitespace][crate::construct::partial_whitespace].
-
 use crate::construct::gfm_autolink_literal::resolve as resolve_gfm_autolink_literal;
 use crate::construct::partial_whitespace::resolve_whitespace;
 use crate::resolve::Name as ResolveName;

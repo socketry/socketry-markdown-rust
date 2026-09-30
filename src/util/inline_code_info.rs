@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2026, by Samuel Williams.
+
 //! Helpers for the opt-in inline code language prefix extension.
 
 /// Find a valid language prefix ending immediately before an inline code span.

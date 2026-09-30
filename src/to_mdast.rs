@@ -1,5 +1,12 @@
-//! Turn events into a syntax tree.
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2024, by Titus Wormer.
+// Copyright, 2023, by Kyle McCarthy.
+// Copyright, 2024, by Harsha Teja Kanna.
+// Copyright, 2024, by Yuval Shavit.
+// Copyright, 2026, by Samuel Williams.
 
+//! Turn events into a syntax tree.
 use crate::event::{Event, Kind, Name};
 use crate::mdast::{
     AttributeContent, AttributeValue, AttributeValueExpression, Blockquote, Break, Code,

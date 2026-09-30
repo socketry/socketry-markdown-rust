@@ -1,5 +1,10 @@
-//! States of the state machine.
+// Released under the MIT License.
+// Copyright, 2022-2024, by Titus Wormer.
+// Copyright, 2024, by Niklas Begley.
+// Copyright, 2025, by Bnchi.
+// Copyright, 2026, by Samuel Williams.
 
+//! States of the state machine.
 use crate::construct;
 use crate::message;
 use crate::tokenizer::Tokenizer;

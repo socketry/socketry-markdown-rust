@@ -1,3 +1,9 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022, by Titus Wormer.
+// Copyright, 2025, by Ophir Lojkine.
+// Copyright, 2026, by Samuel Williams.
+
 use pretty_assertions::assert_eq;
 use socketry_markdown::to_html;
 

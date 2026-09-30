@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! GFM: Footnote definition occurs in the [document][] content type.
 //!
 //! ## Grammar
@@ -164,7 +167,6 @@
 //! [html_p]: https://html.spec.whatwg.org/multipage/grouping-content.html#the-p-element
 //! [html_section]: https://html.spec.whatwg.org/multipage/sections.html#the-section-element
 //! [html_sup]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-sub-and-sup-elements
-
 use crate::construct::partial_space_or_tab::space_or_tab_min_max;
 use crate::event::{Content, Link, Name};
 use crate::state::{Name as StateName, State};

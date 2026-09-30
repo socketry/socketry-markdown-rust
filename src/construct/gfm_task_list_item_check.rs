@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! GFM: Task list item check occurs in the [text][] content type.
 //!
 //! ## Grammar
@@ -43,7 +47,6 @@
 //!
 //! [text]: crate::construct::text
 //! [html-input-checkbox]: https://html.spec.whatwg.org/multipage/input.html#checkbox-state-(type=checkbox)
-
 use crate::construct::partial_space_or_tab::space_or_tab;
 use crate::event::Name;
 use crate::state::{Name as StateName, State};

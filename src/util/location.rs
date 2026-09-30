@@ -1,9 +1,11 @@
+// Released under the MIT License.
+// Copyright, 2022-2024, by Titus Wormer.
+
 //! Deal with positions in a file.
 //!
 //! * Convert between byte indices and unist points.
 //! * Convert between byte indices into a string which is built up of several
 //!   slices in a whole document, and byte indices into that whole document.
-
 use crate::unist::Point;
 use alloc::{vec, vec::Vec};
 

@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2024, by Niklas Begley.
+
 //! MDX expression (flow) occurs in the [flow][] content type.
 //!
 //! ## Grammar
@@ -33,7 +37,6 @@
 //!
 //! [flow]: crate::construct::flow
 //! [mdx_expression]: crate::construct::partial_mdx_expression
-
 use crate::construct::partial_space_or_tab::{space_or_tab, space_or_tab_min_max};
 use crate::event::Name;
 use crate::state::{Name as StateName, State};

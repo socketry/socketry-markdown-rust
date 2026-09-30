@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Character references occur in the [string][] and [text][] content types.
 //!
 //! ## Grammar
@@ -67,7 +70,6 @@
 //! [decode_numeric]: crate::util::character_reference::decode_numeric
 //! [character_references]: crate::util::constant::CHARACTER_REFERENCES
 //! [html]: https://html.spec.whatwg.org/multipage/parsing.html#character-reference-state
-
 use crate::event::Name;
 use crate::state::{Name as StateName, State};
 use crate::tokenizer::Tokenizer;

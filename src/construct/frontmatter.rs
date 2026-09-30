@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Frontmatter occurs at the start of the document.
 //!
 //! ## Grammar
@@ -55,7 +58,6 @@
 //! * [`micromark-extension-frontmatter`](https://github.com/micromark/micromark-extension-frontmatter)
 //!
 //! [constructs]: crate::Constructs
-
 use crate::construct::partial_space_or_tab::space_or_tab;
 use crate::event::Name;
 use crate::state::{Name as StateName, State};

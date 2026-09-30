@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Deal with content in other content.
 //!
 //! To deal with content in content, *you* (a `markdown-rs` contributor) add
@@ -16,7 +20,6 @@
 //! doing so due to definitions, which can occur after references, and thus the
 //! whole document needs to be parsed up to the level of definitions, before
 //! any level that can include references can be parsed.
-
 use crate::event::{Content, Event, Kind, Name, VOID_EVENTS};
 use crate::message;
 use crate::parser::ParseState;

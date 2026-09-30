@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Code (indented) occurs in the [flow][] content type.
 //!
 //! ## Grammar
@@ -52,7 +55,6 @@
 //! [raw_text]: crate::construct::raw_text
 //! [html_code]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-code-element
 //! [html_pre]: https://html.spec.whatwg.org/multipage/grouping-content.html#the-pre-element
-
 use crate::construct::partial_space_or_tab::{space_or_tab, space_or_tab_min_max};
 use crate::event::Name;
 use crate::state::{Name as StateName, State};

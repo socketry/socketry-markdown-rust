@@ -1,5 +1,8 @@
-//! Deal with bytes, chars, and kinds.
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2023, by pinkforest(she/her).
 
+//! Deal with bytes, chars, and kinds.
 use crate::util::unicode::PUNCTUATION;
 use alloc::{format, string::String};
 use core::str;

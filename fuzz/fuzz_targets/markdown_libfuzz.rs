@@ -1,4 +1,11 @@
 #![no_main]
+
+// Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022, by Titus Wormer.
+// Copyright, 2022-2023, by Christian Murphy.
+// Copyright, 2026, by Samuel Williams.
+
 use libfuzzer_sys::fuzz_target;
 
 fuzz_target!(|data: &[u8]| {

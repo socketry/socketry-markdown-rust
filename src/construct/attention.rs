@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2022-2025, by Titus Wormer.
+
 //! Attention (emphasis, strong, optionally GFM strikethrough) occurs in the
 //! [text][] content type.
 //!
@@ -75,7 +78,6 @@
 //! [html-em]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-em-element
 //! [html-strong]: https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-strong-element
 //! [html-del]: https://html.spec.whatwg.org/multipage/edits.html#the-del-element
-
 use crate::event::{Event, Kind, Name, Point};
 use crate::resolve::Name as ResolveName;
 use crate::state::{Name as StateName, State};

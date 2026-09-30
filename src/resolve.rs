@@ -1,5 +1,7 @@
-//! Resolve events.
+// Released under the MIT License.
+// Copyright, 2022-2024, by Titus Wormer.
 
+//! Resolve events.
 use crate::construct;
 use crate::message;
 use crate::subtokenize::Subresult;
