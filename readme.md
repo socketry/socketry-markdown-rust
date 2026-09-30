@@ -246,9 +246,21 @@ assert_eq!(duplicate.text_content(), "Intro");
 ```
 
 The built-in HTML compiler takes Markdown source text (`to_html(&str)`). To
-render a mutated AST node or fragment, implement `renderer::Renderer` and pass
-it to `Node::render_with()`. The custom renderer owns its output and escaping
-rules; the crate does not provide a built-in HTML renderer for AST nodes.
+render a mutated AST node or fragment as HTML, use `HTMLRenderer`:
+
+```rust
+use socketry_markdown::{to_mdast, HTMLRenderer, ParseOptions};
+
+let tree = to_mdast("# Hello *world*!", &ParseOptions::default()).unwrap();
+let html = tree.render_with(&mut HTMLRenderer::default());
+assert_eq!(html, "<h1>Hello <em>world</em>!</h1>");
+```
+
+`HTMLRenderer` uses `CompileOptions` for HTML safety and heading IDs. Raw HTML
+is escaped by default, JSX is omitted, and MDX expressions and ESM are omitted.
+Set `allow_dangerous_html` to render raw HTML and static JSX from trusted ASTs.
+For a different output format, implement `renderer::Renderer`; custom
+renderers own their output and escaping rules.
 
 See the [crate docs][docs] for more info.
 

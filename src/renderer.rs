@@ -1,5 +1,9 @@
 //! Traits for rendering Markdown AST nodes.
 
+mod html;
+
+pub use html::HTMLRenderer;
+
 use crate::mdast::Node;
 use alloc::string::String;
 
