@@ -39,6 +39,9 @@ jobs:
           import subprocess
           import tomllib
           from pathlib import Path
+          from urllib.error import HTTPError, URLError
+          from urllib.parse import quote
+          from urllib.request import Request, urlopen
 
           metadata = json.loads((Path(os.environ["RUNNER_TEMP"]) / "bake-metadata.json").read_text())
           root = Path(metadata["workspace_root"])
@@ -96,7 +99,34 @@ jobs:
                   raise SystemExit(f"Previous workspace version is not stable MAJOR.MINOR.PATCH: {prior}")
               previous = tuple(map(int, prior_match.groups()))
               if current < previous:
-                  raise SystemExit(f"Workspace version {version} is lower than previous version {prior}")
+                  published_versions = []
+                  for package in packages:
+                      name = package["name"]
+                      url = f"https://crates.io/api/v1/crates/{quote(name, safe='')}/versions"
+                      request = Request(url, headers={"User-Agent": "socketry-bake-publish-workflow"})
+                      try:
+                          with urlopen(request, timeout=30) as response:
+                              registry = json.load(response)
+                      except HTTPError as error:
+                          if error.code == 404:
+                              continue
+                          raise SystemExit(f"Could not check crates.io for {name}: HTTP {error.code}")
+                      except (URLError, TimeoutError, json.JSONDecodeError) as error:
+                          raise SystemExit(f"Could not check crates.io for {name}: {error}")
+                      versions = registry.get("versions")
+                      if not isinstance(versions, list):
+                          raise SystemExit(f"Unexpected crates.io response while checking {name}")
+                      for item in versions:
+                          if not isinstance(item, dict):
+                              continue
+                          published_match = pattern.fullmatch(item.get("num", ""))
+                          if published_match is not None:
+                              published_versions.append(tuple(map(int, published_match.groups())))
+                  if published_versions and current < max(published_versions):
+                      published = ".".join(map(str, max(published_versions)))
+                      raise SystemExit(
+                          f"Workspace version {version} is lower than latest version on crates.io {published}"
+                      )
               if current == previous:
                   with open(os.environ["GITHUB_OUTPUT"], "a") as output:
                       output.write("release=false\nversion=\n")
