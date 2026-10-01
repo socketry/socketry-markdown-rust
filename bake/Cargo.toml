@@ -5,5 +5,5 @@ edition = "2024"
 publish = false
 
 [dependencies]
-bake = { package = "socketry-bake", version = "0.2.1" }
-bake-license = "0.1.0"
+bake = "0.17.0"
+socketry-project = "0.2"

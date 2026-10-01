@@ -10,6 +10,7 @@ use crate::{
 };
 use alloc::{
     collections::BTreeMap,
+    fmt::Write as _,
     format,
     string::{String, ToString},
     vec::Vec,
@@ -117,7 +118,7 @@ impl HTMLRenderer {
                 } else if self.tight_list {
                     content
                 } else {
-                    format!("<p>{}</p>", content)
+                    format!("<p>{content}</p>")
                 }
             }
             Node::Heading(heading) => self.render_heading(heading),
@@ -203,7 +204,13 @@ impl HTMLRenderer {
                 format!("<td>{}</td>", self.render_inline_children(&cell.children))
             }
             Node::FootnoteReference(reference) => self.render_footnote_reference(reference),
-            Node::FootnoteDefinition(_) | Node::Definition(_) => String::new(),
+            Node::FootnoteDefinition(_)
+            | Node::Definition(_)
+            | Node::MdxTextExpression(_)
+            | Node::MdxFlowExpression(_)
+            | Node::MdxjsEsm(_)
+            | Node::Yaml(_)
+            | Node::Toml(_) => String::new(),
             Node::MdxJsxFlowElement(element) => self.render_jsx(
                 element.name.as_deref(),
                 &element.attributes,
@@ -216,9 +223,6 @@ impl HTMLRenderer {
                 &element.children,
                 false,
             ),
-            Node::MdxTextExpression(_) => String::new(),
-            Node::MdxFlowExpression(_) | Node::MdxjsEsm(_) => String::new(),
-            Node::Yaml(_) | Node::Toml(_) => String::new(),
         }
     }
 
@@ -268,14 +272,11 @@ impl HTMLRenderer {
             let start_attribute = if start == 1 {
                 String::new()
             } else {
-                format!(" start=\"{}\"", start)
+                format!(" start=\"{start}\"")
             };
-            format!(
-                "<ol{}>{}{}{}</ol>",
-                start_attribute, line_ending, content, line_ending
-            )
+            format!("<ol{start_attribute}>{line_ending}{content}{line_ending}</ol>")
         } else {
-            format!("<ul>{}{}{}</ul>", line_ending, content, line_ending)
+            format!("<ul>{line_ending}{content}{line_ending}</ul>")
         }
     }
 
@@ -293,7 +294,7 @@ impl HTMLRenderer {
         }
 
         let content = self.render_flow_children(&item.children);
-        format!("<li>{}{}</li>", checkbox, content)
+        format!("<li>{checkbox}{content}</li>")
     }
 
     fn render_table(&mut self, table: &crate::mdast::Table) -> String {
@@ -301,15 +302,13 @@ impl HTMLRenderer {
         let mut output = String::from("<table>");
         let line_ending = self.line_ending();
 
-        if let Some(header) = rows.next() {
-            if let Node::TableRow(row) = header {
-                output.push_str(&line_ending);
-                output.push_str("<thead>");
-                output.push_str(&line_ending);
-                output.push_str(&self.render_table_row(&row.children, true, &table.align));
-                output.push_str(&line_ending);
-                output.push_str("</thead>");
-            }
+        if let Some(Node::TableRow(row)) = rows.next() {
+            output.push_str(&line_ending);
+            output.push_str("<thead>");
+            output.push_str(&line_ending);
+            output.push_str(&self.render_table_row(&row.children, true, &table.align));
+            output.push_str(&line_ending);
+            output.push_str("</thead>");
         }
 
         let body = rows
@@ -353,7 +352,7 @@ impl HTMLRenderer {
                 Some(AlignKind::Center) => " align=\"center\"",
                 Some(AlignKind::None) | None => "",
             };
-            output.push_str("<");
+            output.push('<');
             output.push_str(tag);
             output.push_str(alignment);
             output.push('>');
@@ -431,7 +430,7 @@ impl HTMLRenderer {
         let suffix = if *call == 1 {
             String::new()
         } else {
-            format!("-{}", call)
+            format!("-{call}")
         };
 
         format!(
@@ -481,9 +480,8 @@ impl HTMLRenderer {
         while index < self.footnote_order.len() {
             let identifier = self.footnote_order[index].clone();
             index += 1;
-            let children = match self.footnote_definitions.get(&identifier).cloned() {
-                Some(children) => children,
-                None => continue,
+            let Some(children) = self.footnote_definitions.get(&identifier).cloned() else {
+                continue;
             };
 
             let prefix = self
@@ -508,23 +506,24 @@ impl HTMLRenderer {
                 let suffix = if call == 1 {
                     String::new()
                 } else {
-                    format!("-{}", call)
+                    format!("-{call}")
                 };
-                backrefs.push_str(&format!(
+                let _ = write!(
+                    backrefs,
                     "<a href=\"#{}fnref-{}{}\" data-footnote-backref=\"\" aria-label=\"{}\" class=\"data-footnote-backref\">↩",
                     encode(&prefix, true),
                     id,
                     suffix,
                     encode(back_label, true)
-                ));
+                );
                 if call > 1 {
-                    backrefs.push_str(&format!("<sup>{}</sup>", call));
+                    let _ = write!(backrefs, "<sup>{call}</sup>");
                 }
                 backrefs.push_str("</a>");
             }
 
             if let Some(index) = content.rfind("</p>") {
-                content.insert_str(index, &format!(" {}", backrefs));
+                content.insert_str(index, &format!(" {backrefs}"));
             } else {
                 content.push(' ');
                 content.push_str(&backrefs);
@@ -533,7 +532,7 @@ impl HTMLRenderer {
             if has_item {
                 output.push_str(&line_ending);
             }
-            output.push_str(&format!("<li id=\"{}fn-{}\">", encode(&prefix, true), id));
+            let _ = write!(output, "<li id=\"{}fn-{}\">", encode(&prefix, true), id);
             output.push_str(&line_ending);
             output.push_str(&content);
             output.push_str("</li>");
@@ -566,9 +565,8 @@ impl HTMLRenderer {
             self.render_inline_children(children)
         };
 
-        let name = match name {
-            Some(name) => name,
-            None => return content,
+        let Some(name) = name else {
+            return content;
         };
 
         let mut opening = format!("<{}", encode(name, true));
@@ -592,7 +590,7 @@ impl HTMLRenderer {
                     opening.push_str(&value);
                     opening.push('"');
                 }
-                Some(AttributeValue::Expression(_)) => continue,
+                Some(AttributeValue::Expression(_)) => {}
                 None => {
                     opening.push(' ');
                     opening.push_str(&encode(&attribute.name, true));
@@ -601,7 +599,7 @@ impl HTMLRenderer {
         }
 
         let output = if children.is_empty() {
-            format!("{}/>", opening)
+            format!("{opening}/>")
         } else {
             format!("{}>{}</{}>", opening, content, encode(name, true))
         };
@@ -717,6 +715,6 @@ fn with_surrounding_line_endings(value: &str, line_ending: &str) -> String {
     if value.is_empty() {
         String::new()
     } else {
-        format!("{}{}{}", line_ending, value, line_ending)
+        format!("{line_ending}{value}{line_ending}")
     }
 }

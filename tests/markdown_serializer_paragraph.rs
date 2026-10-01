@@ -1,3 +1,8 @@
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 use pretty_assertions::assert_eq;
 use socketry_markdown::markdown::to_markdown as to;
 use socketry_markdown::mdast::{Node, Paragraph, Text};

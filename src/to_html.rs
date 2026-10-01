@@ -540,7 +540,7 @@ fn on_enter_raw_text(context: &mut CompileContext) {
     };
 
     if let Some((start, info)) = &prefix {
-        let suffix = format!("{}:", info);
+        let suffix = format!("{info}:");
         let buffer = context
             .buffers
             .last_mut()
@@ -1807,7 +1807,7 @@ fn generate_autolink(
     if !context.image_alt_inside && (!is_in_link || !is_gfm_literal) {
         context.push("<a href=\"");
         let url = if let Some(protocol) = protocol {
-            format!("{}{}", protocol, value)
+            format!("{protocol}{value}")
         } else {
             value.into()
         };

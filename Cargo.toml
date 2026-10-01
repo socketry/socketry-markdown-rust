@@ -33,13 +33,14 @@ categories = ["compilers", "encoding", "parser-implementations", "parsing", "tex
 description = "CommonMark compliant markdown parser in Rust with ASTs and extensions"
 edition = "2018"
 homepage = "https://github.com/socketry/socketry-markdown-rust"
-include = ["src/", "license.md"]
+include = ["src/**", "context/**", "readme.md", "license.md", "releases.md"]
 keywords = ["commonmark", "markdown", "parse", "render", "tokenize"]
 license = "MIT"
 name = "socketry-markdown"
+readme = "readme.md"
 repository = "https://github.com/socketry/socketry-markdown-rust"
 rust-version = "1.73"
-version = "1.0.0"
+version = "0.1.0"
 
 [workspace]
 members = ["generate", "bake"]
@@ -47,6 +48,9 @@ resolver = "2"
 
 [workspace.metadata.bake]
 manifest = "bake/Cargo.toml"
+
+[workspace.metadata.bake.release]
+reviewers = ["socketry/managers"]
 
 [workspace.dependencies]
 pretty_assertions = "1"

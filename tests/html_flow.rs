@@ -32,7 +32,6 @@ fn html_flow() -> Result<(), message::Message> {
             allow_dangerous_protocol: true,
             ..Default::default()
         },
-        ..Default::default()
     };
 
     assert_eq!(

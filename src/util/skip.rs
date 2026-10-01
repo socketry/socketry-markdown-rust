@@ -1,5 +1,6 @@
 // Released under the MIT License.
 // Copyright, 2022, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
 //! Move across lists of events.
 use crate::event::{Event, Kind, Name};

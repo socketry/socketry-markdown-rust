@@ -1,7 +1,11 @@
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 //! Names of the things being serialized.
 //!
 //! JS equivalent: https://github.com/syntax-tree/mdast-util-to-markdown/blob/fd6a508/index.d.ts#L18.
-
 #[derive(Clone, PartialEq)]
 pub enum ConstructName {
     /// Whole autolink.

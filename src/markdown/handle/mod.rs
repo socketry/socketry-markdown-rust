@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2026, by Samuel Williams.
+
 use crate::markdown::{state::Info, State};
 use crate::{mdast::Node, message::Message};
 use alloc::string::String;

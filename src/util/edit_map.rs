@@ -1,5 +1,6 @@
 // Released under the MIT License.
 // Copyright, 2022, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
 //! Deal with several changes in events, batching them together.
 //!
@@ -117,7 +118,7 @@ impl EditMap {
             events.append(&mut slice);
         }
 
-        self.map.truncate(0);
+        self.map.clear();
     }
 }
 

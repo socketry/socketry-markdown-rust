@@ -58,7 +58,7 @@ pub fn sanitize(value: &str) -> String {
 pub fn sanitize_with_protocols(value: &str, protocols: &[&str]) -> String {
     let value = sanitize(value);
 
-    let end = value.find(|c| matches!(c, '?' | '#' | '/'));
+    let end = value.find(['?', '#', '/']);
     let mut colon = value.find(':');
 
     // If the first colon is after `?`, `#`, or `/`, it’s not a protocol.
@@ -136,7 +136,7 @@ fn normalize(value: &str) -> String {
             result.push_str(
                 &buff[0..char.len_utf8()]
                     .iter()
-                    .map(|&byte| format!("%{:>02X}", byte))
+                    .map(|&byte| format!("%{byte:>02X}"))
                     .collect::<String>(),
             );
 

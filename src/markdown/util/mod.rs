@@ -1,3 +1,8 @@
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 pub mod check_bullet;
 pub mod check_bullet_ordered;
 pub mod check_bullet_other;

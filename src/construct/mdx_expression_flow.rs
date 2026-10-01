@@ -1,6 +1,7 @@
 // Released under the MIT License.
 // Copyright, 2022-2025, by Titus Wormer.
 // Copyright, 2024, by Niklas Begley.
+// Copyright, 2026, by Samuel Williams.
 
 //! MDX expression (flow) occurs in the [flow][] content type.
 //!

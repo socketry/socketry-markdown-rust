@@ -1108,14 +1108,14 @@ pub struct ParseOptions {
     /// Whether indented type 6 and type 7 HTML blocks continue across blank
     /// lines when later content keeps a consistent indentation.
     ///
-    /// The default is `false`, which follows CommonMark's blank-line rule.
+    /// The default is `false`, which follows `CommonMark`'s blank-line rule.
     #[cfg_attr(feature = "serde", serde(default))]
     pub html_block_blank_lines: bool,
 
     /// Whether `:` is allowed in HTML tag names for namespace prefixes such
     /// as `svg:circle`.
     ///
-    /// The default is `false` to preserve CommonMark parsing of text such as
+    /// The default is `false` to preserve `CommonMark` parsing of text such as
     /// `<m:abc>`.
     #[cfg_attr(feature = "serde", serde(default))]
     pub html_tag_namespaces: bool,

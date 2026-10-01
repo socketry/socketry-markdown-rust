@@ -6,7 +6,7 @@
 /// Find a valid language prefix ending immediately before an inline code span.
 ///
 /// The return value contains the byte offset of the prefix and its ASCII
-/// language token. The accepted characters follow CMarkly's extension.
+/// language token. The accepted characters follow `CMarkly`'s extension.
 pub(crate) fn before(bytes: &[u8], code_start: usize) -> Option<(usize, &str)> {
     if code_start == 0 || bytes.get(code_start - 1) != Some(&b':') {
         return None;
@@ -19,7 +19,7 @@ pub(crate) fn before(bytes: &[u8], code_start: usize) -> Option<(usize, &str)> {
         start -= 1;
     }
 
-    if start == end || !bytes.get(start).copied().map_or(false, is_info_start_char) {
+    if start == end || !bytes.get(start).copied().is_some_and(is_info_start_char) {
         return None;
     }
 

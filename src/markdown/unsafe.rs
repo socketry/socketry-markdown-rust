@@ -1,8 +1,12 @@
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 //! Unsafe patterns.
 //!
 //! JS equivalent: <https://github.com/syntax-tree/mdast-util-to-markdown/blob/main/lib/unsafe.js>.
 //! Also: <https://github.com/syntax-tree/mdast-util-to-markdown/blob/fd6a508/lib/types.js#L287-L305>.
-
 use crate::markdown::{construct_name::ConstructName, Options};
 use alloc::{vec, vec::Vec};
 use regex::Regex;

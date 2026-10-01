@@ -1,5 +1,8 @@
-//! JS equivalent: https://github.com/syntax-tree/mdast-util-math/blob/main/lib/index.js#L204
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2026, by Samuel Williams.
 
+//! JS equivalent: https://github.com/syntax-tree/mdast-util-math/blob/main/lib/index.js#L204
 use super::Handle;
 use crate::markdown::{
     construct_name::ConstructName,

@@ -1,7 +1,11 @@
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 //! Traits for <https://github.com/syntax-tree/mdast#association>.
 //!
 //! JS equivalent: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/70e1a4f/types/mdast/index.d.ts#L48.
-
 use crate::mdast::{Definition, ImageReference, LinkReference};
 use alloc::string::String;
 

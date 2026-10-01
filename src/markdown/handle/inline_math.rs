@@ -1,5 +1,9 @@
-//! JS equivalent: https://github.com/syntax-tree/mdast-util-math/blob/main/lib/index.js#L241
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
+//! JS equivalent: https://github.com/syntax-tree/mdast-util-math/blob/main/lib/index.js#L241
 use super::Handle;
 use crate::markdown::state::{Info, State};
 use crate::{

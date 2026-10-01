@@ -1,6 +1,7 @@
 // Released under the MIT License.
 // Copyright, 2022, by Bernhard Berger.
 // Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
 //! GFM: autolink literal occurs in the [text][] content type.
 //!

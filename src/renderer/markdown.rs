@@ -1,5 +1,7 @@
-//! Markdown rendering for mdast trees.
+// Released under the MIT License.
+// Copyright, 2026, by Samuel Williams.
 
+//! Markdown rendering for mdast trees.
 use super::Renderer;
 use crate::{markdown::Options, mdast::Node, message::Message};
 use alloc::string::String;
