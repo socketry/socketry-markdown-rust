@@ -73,6 +73,14 @@ in `.agents/context/` and update `agents.md`.
 
 <!-- bake-readme:releases:start -->
 See [releases.md](releases.md) for the full release history.
+
+### v0.1.0
+
+- Add AST renderers for HTML and Markdown, including Markdown serialization on
+  nodes and fragments.
+- Add fragment extraction, heading helpers, and parser fixes from the Socketry
+  fork.
+- Adopt shared Socketry testing, documentation, and release automation.
 <!-- bake-readme:releases:end -->
 
 ## See Also
