@@ -1,6 +1,7 @@
 // Released under the MIT License.
 // Copyright, 2022-2025, by Titus Wormer.
 // Copyright, 2023, by Fedor Sheremetyev.
+// Copyright, 2026, by Samuel Williams.
 
 //! Label end occurs in the [text][] content type.
 //!

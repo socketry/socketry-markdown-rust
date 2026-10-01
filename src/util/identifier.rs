@@ -1,5 +1,6 @@
 // Released under the MIT License.
 // Copyright, 2022, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
 //! Info on JavaScript identifiers.
 use unicode_id::UnicodeID;

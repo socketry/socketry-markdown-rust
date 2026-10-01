@@ -1,5 +1,9 @@
-//! JS equivalent https://github.com/wooorm/longest-streak/blob/main/index.js
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
+//! JS equivalent https://github.com/wooorm/longest-streak/blob/main/index.js
 pub fn longest_char_streak(haystack: &str, needle: char) -> usize {
     let mut max = 0;
     let mut chars = haystack.chars();

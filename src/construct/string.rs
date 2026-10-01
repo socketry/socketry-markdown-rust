@@ -1,5 +1,6 @@
 // Released under the MIT License.
 // Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
 //! The string content type.
 //!
@@ -21,7 +22,7 @@ use crate::subtokenize::Subresult;
 use crate::tokenizer::Tokenizer;
 
 /// Characters that can start something in string.
-const MARKERS: [u8; 2] = [b'&', b'\\'];
+const MARKERS: [u8; 2] = *b"&\\";
 
 /// Start of string.
 ///

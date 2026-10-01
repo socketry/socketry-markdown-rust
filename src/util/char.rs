@@ -1,6 +1,7 @@
 // Released under the MIT License.
 // Copyright, 2022-2025, by Titus Wormer.
 // Copyright, 2023, by pinkforest(she/her).
+// Copyright, 2026, by Samuel Williams.
 
 //! Deal with bytes, chars, and kinds.
 use crate::util::unicode::PUNCTUATION;
@@ -44,7 +45,7 @@ pub enum Kind {
 /// In most cases, markdown operates on ASCII bytes.
 /// In a few cases, it is unicode aware, so we need to find an actual char.
 pub fn before_index(bytes: &[u8], index: usize) -> Option<char> {
-    let start = if index < 4 { 0 } else { index - 4 };
+    let start = index.saturating_sub(4);
     String::from_utf8_lossy(&bytes[start..index]).chars().last()
 }
 
@@ -130,12 +131,12 @@ pub fn format(char: char) -> String {
     let representation = format!("U+{:>04X}", char as u32);
     let printable = match char {
         '`' => Some("`` ` ``".into()),
-        '!'..='~' => Some(format!("`{}`", char)),
+        '!'..='~' => Some(format!("`{char}`")),
         _ => None,
     };
 
     if let Some(char) = printable {
-        format!("{} ({})", char, representation)
+        format!("{char} ({representation})")
     } else {
         representation
     }
@@ -143,7 +144,7 @@ pub fn format(char: char) -> String {
 
 /// Format a byte (`u8`).
 pub fn format_byte(byte: u8) -> String {
-    let representation = format!("U+{:>04X}", byte);
+    let representation = format!("U+{byte:>04X}");
     let printable = match byte {
         b'`' => Some("`` ` ``".into()),
         b'!'..=b'~' => Some(format!("`{}`", str::from_utf8(&[byte]).unwrap())),
@@ -151,7 +152,7 @@ pub fn format_byte(byte: u8) -> String {
     };
 
     if let Some(char) = printable {
-        format!("{} ({})", char, representation)
+        format!("{char} ({representation})")
     } else {
         representation
     }

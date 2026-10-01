@@ -1,5 +1,6 @@
 // Released under the MIT License.
 // Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
 //! Character escapes occur in the [string][] and [text][] content types.
 //!

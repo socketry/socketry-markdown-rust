@@ -140,7 +140,7 @@ impl AnchorGenerator {
         let mut anchor = base.clone();
 
         while self.used.contains(&anchor) {
-            anchor = alloc::format!("{}-{}", base, suffix);
+            anchor = alloc::format!("{base}-{suffix}");
             suffix += 1;
         }
 

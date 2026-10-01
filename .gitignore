@@ -1,8 +1,11 @@
 .DS_Store
 *.log
 *.lock
+!Cargo.lock
+.agents/context/
 coverage/
 target/
+/external/
 commonmark-data.txt
 unicode-data.txt
 fuzz/target

@@ -1,5 +1,9 @@
-//! JS equivalent: https://github.com/syntax-tree/mdast-util-to-markdown/blob/main/lib/handle/heading.js
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
+//! JS equivalent: https://github.com/syntax-tree/mdast-util-to-markdown/blob/main/lib/handle/heading.js
 use super::Handle;
 use crate::markdown::{
     construct_name::ConstructName,
@@ -65,7 +69,7 @@ impl Handle for Heading {
         if value.is_empty() {
             value.push_str(&sequence);
         } else {
-            value = format!("{} {}", &sequence, value);
+            value = format!("{} {}", sequence, value);
         }
 
         if state.options.close_atx {

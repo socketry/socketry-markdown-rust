@@ -1,3 +1,7 @@
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2026, by Samuel Williams.
+
 use pretty_assertions::assert_eq;
 use socketry_markdown::markdown::{
     to_markdown as to, to_markdown_with_options as to_md_with_opts, Options,

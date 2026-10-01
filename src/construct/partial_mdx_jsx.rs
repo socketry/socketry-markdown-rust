@@ -2,6 +2,7 @@
 // Copyright, 2022, by Bernhard Berger.
 // Copyright, 2022-2025, by Titus Wormer.
 // Copyright, 2023, by Mick van Gelderen.
+// Copyright, 2026, by Samuel Williams.
 
 //! MDX JSX occurs in [MDX JSX (flow)][mdx_jsx_flow] and
 //! [MDX JSX (text)][mdx_jsx_text].
@@ -1112,12 +1113,12 @@ pub fn es_whitespace_eol_after(tokenizer: &mut Tokenizer) -> State {
 
 /// Check if a character can start a JSX identifier.
 fn id_start_opt(code: Option<char>) -> bool {
-    code.map_or(false, id_start)
+    code.is_some_and(id_start)
 }
 
 /// Check if a character can continue a JSX identifier.
 fn id_cont_opt(code: Option<char>) -> bool {
-    code.map_or(false, |c| id_cont(c, true))
+    code.is_some_and(|c| id_cont(c, true))
 }
 
 /// Crash because something happened `at`, with info on what was `expect`ed

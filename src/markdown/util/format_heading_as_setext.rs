@@ -1,5 +1,9 @@
-//! JS equivalent https://github.com/syntax-tree/mdast-util-to-markdown/blob/main/lib/util/format-heading-as-setext.js
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
+//! JS equivalent https://github.com/syntax-tree/mdast-util-to-markdown/blob/main/lib/util/format-heading-as-setext.js
 use crate::mdast::{Heading, Node};
 use alloc::string::{String, ToString};
 use regex::Regex;

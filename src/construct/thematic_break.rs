@@ -1,5 +1,6 @@
 // Released under the MIT License.
 // Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
 
 //! Thematic break occurs in the [flow][] content type.
 //!

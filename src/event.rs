@@ -1,6 +1,7 @@
 // Released under the MIT License.
 // Copyright, 2022-2025, by Titus Wormer.
 // Copyright, 2025, by Bnchi.
+// Copyright, 2026, by Samuel Williams.
 
 //! Semantic labels of things happening.
 use crate::unist;

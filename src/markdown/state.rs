@@ -1,7 +1,11 @@
+// Released under the MIT License.
+// Copyright, 2024, by Bnchi.
+// Copyright, 2024-2025, by Titus Wormer.
+// Copyright, 2026, by Samuel Williams.
+
 //! State.
 //!
 //! JS equivalent: https://github.com/syntax-tree/mdast-util-to-markdown/blob/fd6a508/lib/types.js#L195.
-
 use crate::markdown::{
     association::Association,
     construct_name::ConstructName,

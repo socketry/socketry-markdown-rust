@@ -1,6 +1,7 @@
 // Released under the MIT License.
 // Copyright, 2022-2025, by Titus Wormer.
 // Copyright, 2023, by cel.
+// Copyright, 2026, by Samuel Williams.
 
 //! Constants needed to parse markdown.
 //!
@@ -209,7 +210,7 @@ pub const HTML_BLOCK_NAMES: [&str; 62] = [
 ///
 /// [html_flow]: crate::construct::html_flow
 /// [html_text]: crate::construct::html_text
-pub const HTML_CDATA_PREFIX: [u8; 6] = [b'C', b'D', b'A', b'T', b'A', b'['];
+pub const HTML_CDATA_PREFIX: [u8; 6] = *b"CDATA[";
 
 /// List of HTML tag names that form the **raw** production of
 /// [HTML (flow)][html_flow].
