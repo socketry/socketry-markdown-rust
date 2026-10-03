@@ -1861,9 +1861,9 @@ fn on_mismatch_error(
             );
         }
         unreachable!("mismatched (non-jsx): {:?} / {:?}", left.name, right.name);
-    } else {
-        unreachable!("mismatched (non-jsx): document / {:?}", right.name);
     }
+
+    unreachable!("mismatched (non-jsx): document / {:?}", right.name);
 }
 
 /// Format a JSX tag, ignoring its attributes.
