@@ -62,17 +62,15 @@ HTML output escapes raw HTML and omits MDX expressions by default. See the
 [API documentation](https://docs.rs/socketry-markdown/latest/socketry_markdown/)
 for parser options, renderer configuration, and AST types.
 
-### Agent Context
-
-This crate publishes context files for coding agents. Configure Bake Agent
-Context in your private `bake/` crate, then run
-`cargo bake agent:context:install --package socketry-markdown` to install them
-in `.agents/context/` and update `agents.md`.
-
 ## Releases
 
 <!-- bake-readme:releases:start -->
 See [releases.md](releases.md) for the full release history.
+
+### v0.1.1
+
+- Update agent guidance to install dependency context and skills without
+  generating `agents.md`.
 
 ### v0.1.0
 
@@ -93,6 +91,12 @@ See [releases.md](releases.md) for the full release history.
 ## Contributing
 
 Please open an issue or pull request on [GitHub](https://github.com/socketry/socketry-markdown-rust).
+
+### Agent Context
+
+Run `cargo bake agent:context:install` to install shared context and skills
+from Cargo dependencies. Read `.agents/context/index.md` and the skills that
+apply to your task.
 
 [badge-build-image]: https://github.com/socketry/socketry-markdown-rust/actions/workflows/test.yml/badge.svg
 [badge-build-url]: https://github.com/socketry/socketry-markdown-rust/actions

@@ -1,5 +1,10 @@
 # Releases
 
+## v0.1.1
+
+- Update agent guidance to install dependency context and skills without
+  generating `agents.md`.
+
 ## v0.1.0
 
 - Add AST renderers for HTML and Markdown, including Markdown serialization on
