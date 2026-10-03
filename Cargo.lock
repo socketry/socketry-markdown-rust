@@ -147,9 +147,9 @@ dependencies = [
 
 [[package]]
 name = "bake-cargo"
-version = "0.2.7"
+version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2d8780cff4285213546222baf8d11cce0ab66aab934ee313145462f8016d4bf"
+checksum = "65773524aaf038da8f0eda00e606e3566ff64d05810271110405113d1edc6de4"
 dependencies = [
  "bake",
  "bake-license",
@@ -2044,9 +2044,9 @@ dependencies = [
 
 [[package]]
 name = "socketry-project"
-version = "0.3.1"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "247cda4e8404ab4fffb23a25d45c400b33890e493af0f722b1b69cd22e5ae7db"
+checksum = "f5c5a54ff8afc1eb90dfff374dad7550205d28956993b32c1bb7ae49776e1d3c"
 dependencies = [
  "bake",
  "bake-agent-context",
