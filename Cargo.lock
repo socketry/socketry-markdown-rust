@@ -142,7 +142,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml_ng",
- "socketry-markdown 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "socketry-markdown 0.1.0",
 ]
 
 [[package]]
@@ -156,7 +156,7 @@ dependencies = [
  "bake-releases",
  "serde",
  "serde_json",
- "socketry-markdown 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "socketry-markdown 0.1.0",
  "tempfile",
  "toml_edit",
  "ureq",
@@ -2012,6 +2012,16 @@ dependencies = [
 [[package]]
 name = "socketry-markdown"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb6b36f84563d391bc2e67e1c8aef731a773acafd4bf4a9c97886f3771133610"
+dependencies = [
+ "regex",
+ "unicode-id",
+]
+
+[[package]]
+name = "socketry-markdown"
+version = "0.1.1"
 dependencies = [
  "criterion",
  "env_logger",
@@ -2021,16 +2031,6 @@ dependencies = [
  "serde",
  "serde_json",
  "swc_core",
- "unicode-id",
-]
-
-[[package]]
-name = "socketry-markdown"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb6b36f84563d391bc2e67e1c8aef731a773acafd4bf4a9c97886f3771133610"
-dependencies = [
- "regex",
  "unicode-id",
 ]
 
