@@ -2,7 +2,33 @@
 // Copyright, 2026, by Samuel Williams.
 
 use pretty_assertions::assert_eq;
-use socketry_markdown::{message, to_mdast, CompileOptions, HTMLRenderer, ParseOptions};
+use socketry_markdown::{
+    mdast::{
+        AlignKind, AttributeContent, AttributeValue, AttributeValueExpression, Blockquote, Break,
+        Code, Definition, Delete, Emphasis, FootnoteDefinition, FootnoteReference, Heading, Html,
+        Image, ImageReference, InlineCode, InlineMath, Link, LinkReference, List, ListItem, Math,
+        MdxFlowExpression, MdxJsxAttribute, MdxJsxExpressionAttribute, MdxJsxFlowElement,
+        MdxJsxTextElement, MdxTextExpression, MdxjsEsm, Node, Paragraph, ReferenceKind, Root,
+        Strong, Table, TableCell, TableRow, Text, ThematicBreak, Toml, Yaml,
+    },
+    message,
+    renderer::Renderer,
+    to_html_with_options, to_mdast, CompileOptions, HTMLRenderer, Options, ParseOptions,
+};
+
+fn text(value: &str) -> Node {
+    Node::Text(Text {
+        value: value.into(),
+        position: None,
+    })
+}
+
+fn paragraph(children: Vec<Node>) -> Node {
+    Node::Paragraph(Paragraph {
+        children,
+        position: None,
+    })
+}
 
 fn render(
     source: &str,
@@ -137,6 +163,466 @@ fn omits_mdx_by_default_and_renders_static_jsx_when_enabled() -> Result<(), mess
             },
         )?,
         "<p><Widget title=\"demo\">hello</Widget></p>"
+    );
+
+    Ok(())
+}
+
+#[test]
+fn renders_ast_node_variants_and_custom_renderer_methods() {
+    let tree = Node::Root(Root {
+        position: None,
+        children: vec![
+            Node::Fragment(socketry_markdown::mdast::Fragment {
+                children: vec![paragraph(vec![text("fragment")])],
+            }),
+            Node::Heading(Heading {
+                children: vec![text("A heading")],
+                position: None,
+                depth: 2,
+            }),
+            Node::Blockquote(Blockquote {
+                children: vec![paragraph(vec![text("quoted")])],
+                position: None,
+            }),
+            Node::Blockquote(Blockquote {
+                children: vec![],
+                position: None,
+            }),
+            Node::List(List {
+                children: vec![
+                    Node::ListItem(ListItem {
+                        children: vec![paragraph(vec![text("checked")])],
+                        position: None,
+                        spread: false,
+                        checked: Some(true),
+                    }),
+                    Node::ListItem(ListItem {
+                        children: vec![paragraph(vec![text("unchecked")])],
+                        position: None,
+                        spread: false,
+                        checked: Some(false),
+                    }),
+                ],
+                position: None,
+                ordered: true,
+                start: Some(3),
+                spread: true,
+            }),
+            Node::List(List {
+                children: vec![],
+                position: None,
+                ordered: true,
+                start: Some(1),
+                spread: false,
+            }),
+            Node::Code(Code {
+                value: "code".into(),
+                position: None,
+                lang: Some("rust".into()),
+                meta: None,
+            }),
+            Node::Html(Html {
+                value: "<!-- raw html -->".into(),
+                position: None,
+            }),
+            Node::Math(Math {
+                value: "x < y".into(),
+                position: None,
+                meta: None,
+            }),
+            Node::ThematicBreak(ThematicBreak { position: None }),
+            paragraph(vec![
+                Node::Break(Break { position: None }),
+                Node::InlineCode(InlineCode {
+                    value: "inline <code>".into(),
+                    position: None,
+                    lang: Some("ruby".into()),
+                }),
+                Node::InlineMath(InlineMath {
+                    value: "x < y".into(),
+                    position: None,
+                }),
+                Node::Emphasis(Emphasis {
+                    children: vec![text("emphasis")],
+                    position: None,
+                }),
+                Node::Strong(Strong {
+                    children: vec![text("strong")],
+                    position: None,
+                }),
+                Node::Delete(Delete {
+                    children: vec![text("deleted")],
+                    position: None,
+                }),
+                Node::Link(Link {
+                    children: vec![text("linked")],
+                    position: None,
+                    url: "javascript:alert(1)".into(),
+                    title: Some("link title".into()),
+                }),
+                Node::Image(Image {
+                    position: None,
+                    alt: "image & alt".into(),
+                    url: "javascript:alert(1)".into(),
+                    title: Some("image title".into()),
+                }),
+                Node::MdxTextExpression(MdxTextExpression {
+                    value: "value".into(),
+                    position: None,
+                    stops: vec![],
+                }),
+                Node::MdxJsxTextElement(MdxJsxTextElement {
+                    children: vec![text("jsx text")],
+                    position: None,
+                    name: Some("Widget".into()),
+                    attributes: vec![AttributeContent::Property(MdxJsxAttribute {
+                        name: "title".into(),
+                        value: Some(AttributeValue::Literal("a & \"b\"".into())),
+                    })],
+                }),
+            ]),
+            Node::Definition(Definition {
+                position: None,
+                url: "/guide".into(),
+                title: Some("Reference title".into()),
+                identifier: "guide".into(),
+                label: None,
+            }),
+            paragraph(vec![
+                Node::LinkReference(LinkReference {
+                    children: vec![text("reference link")],
+                    position: None,
+                    reference_kind: ReferenceKind::Full,
+                    identifier: "guide".into(),
+                    label: None,
+                }),
+                Node::LinkReference(LinkReference {
+                    children: vec![text("unresolved link")],
+                    position: None,
+                    reference_kind: ReferenceKind::Shortcut,
+                    identifier: "missing".into(),
+                    label: None,
+                }),
+                Node::ImageReference(ImageReference {
+                    position: None,
+                    alt: "reference image".into(),
+                    reference_kind: ReferenceKind::Full,
+                    identifier: "guide".into(),
+                    label: None,
+                }),
+                Node::ImageReference(ImageReference {
+                    position: None,
+                    alt: "unresolved image".into(),
+                    reference_kind: ReferenceKind::Shortcut,
+                    identifier: "missing".into(),
+                    label: None,
+                }),
+                Node::FootnoteReference(FootnoteReference {
+                    position: None,
+                    identifier: "note".into(),
+                    label: None,
+                }),
+                Node::FootnoteReference(FootnoteReference {
+                    position: None,
+                    identifier: "missing-note".into(),
+                    label: None,
+                }),
+                Node::FootnoteReference(FootnoteReference {
+                    position: None,
+                    identifier: "other-note".into(),
+                    label: None,
+                }),
+            ]),
+            Node::Table(Table {
+                children: vec![
+                    Node::TableRow(TableRow {
+                        children: vec![
+                            Node::TableCell(TableCell {
+                                children: vec![text("left")],
+                                position: None,
+                            }),
+                            Node::TableCell(TableCell {
+                                children: vec![text("center")],
+                                position: None,
+                            }),
+                            Node::TableCell(TableCell {
+                                children: vec![text("right")],
+                                position: None,
+                            }),
+                            Node::TableCell(TableCell {
+                                children: vec![text("none")],
+                                position: None,
+                            }),
+                        ],
+                        position: None,
+                    }),
+                    Node::TableRow(TableRow {
+                        children: vec![
+                            Node::TableCell(TableCell {
+                                children: vec![text("body")],
+                                position: None,
+                            }),
+                            text("raw cell node"),
+                        ],
+                        position: None,
+                    }),
+                    Node::TableRow(TableRow {
+                        children: vec![Node::TableCell(TableCell {
+                            children: vec![text("second body row")],
+                            position: None,
+                        })],
+                        position: None,
+                    }),
+                    paragraph(vec![text("ignored table child")]),
+                ],
+                position: None,
+                align: vec![
+                    AlignKind::Left,
+                    AlignKind::Center,
+                    AlignKind::Right,
+                    AlignKind::None,
+                ],
+            }),
+            Node::TableRow(TableRow {
+                children: vec![text("standalone row")],
+                position: None,
+            }),
+            Node::TableCell(TableCell {
+                children: vec![text("standalone cell")],
+                position: None,
+            }),
+            Node::Table(Table {
+                children: vec![
+                    paragraph(vec![text("not a table row")]),
+                    Node::TableRow(TableRow {
+                        children: vec![text("body without header")],
+                        position: None,
+                    }),
+                ],
+                position: None,
+                align: vec![],
+            }),
+            Node::MdxFlowExpression(MdxFlowExpression {
+                value: "expression".into(),
+                position: None,
+                stops: vec![],
+            }),
+            Node::MdxjsEsm(MdxjsEsm {
+                value: "export const answer = 42".into(),
+                position: None,
+                stops: vec![],
+            }),
+            Node::Yaml(Yaml {
+                value: "title: Example".into(),
+                position: None,
+            }),
+            Node::Toml(Toml {
+                value: "title = 'Example'".into(),
+                position: None,
+            }),
+            Node::MdxJsxFlowElement(MdxJsxFlowElement {
+                children: vec![paragraph(vec![text("jsx flow")])],
+                position: None,
+                name: Some("Panel".into()),
+                attributes: vec![
+                    AttributeContent::Expression(MdxJsxExpressionAttribute {
+                        value: "...props".into(),
+                        stops: vec![],
+                    }),
+                    AttributeContent::Property(MdxJsxAttribute {
+                        name: "href".into(),
+                        value: Some(AttributeValue::Literal("javascript:bad()".into())),
+                    }),
+                    AttributeContent::Property(MdxJsxAttribute {
+                        name: "src".into(),
+                        value: Some(AttributeValue::Literal("data:image/png;base64,abc".into())),
+                    }),
+                    AttributeContent::Property(MdxJsxAttribute {
+                        name: "title".into(),
+                        value: Some(AttributeValue::Expression(AttributeValueExpression {
+                            value: "title".into(),
+                            stops: vec![],
+                        })),
+                    }),
+                    AttributeContent::Property(MdxJsxAttribute {
+                        name: "disabled".into(),
+                        value: None,
+                    }),
+                ],
+            }),
+            Node::MdxJsxFlowElement(MdxJsxFlowElement {
+                children: vec![],
+                position: None,
+                name: Some("Empty".into()),
+                attributes: vec![],
+            }),
+            Node::MdxJsxTextElement(MdxJsxTextElement {
+                children: vec![],
+                position: None,
+                name: None,
+                attributes: vec![],
+            }),
+            Node::FootnoteReference(FootnoteReference {
+                position: None,
+                identifier: "note".into(),
+                label: None,
+            }),
+            Node::FootnoteDefinition(FootnoteDefinition {
+                children: vec![paragraph(vec![text("footnote text")])],
+                position: None,
+                identifier: "note".into(),
+                label: None,
+            }),
+            Node::FootnoteDefinition(FootnoteDefinition {
+                children: vec![Node::Html(Html {
+                    value: "raw footnote".into(),
+                    position: None,
+                })],
+                position: None,
+                identifier: "other-note".into(),
+                label: None,
+            }),
+        ],
+    });
+
+    let options = CompileOptions {
+        allow_any_img_src: true,
+        allow_dangerous_html: true,
+        gfm_tagfilter: true,
+        gfm_task_list_item_checkable: true,
+        heading_ids: true,
+        gfm_footnote_back_label: Some("Back & forth".into()),
+        gfm_footnote_clobber_prefix: Some("custom-".into()),
+        gfm_footnote_label: Some("Notes & details".into()),
+        gfm_footnote_label_attributes: Some("class=\"notes\"".into()),
+        gfm_footnote_label_tag_name: Some("h3".into()),
+        ..CompileOptions::default()
+    };
+    let mut renderer = HTMLRenderer::with_options(options);
+    assert!(renderer.options().heading_ids);
+
+    let output = tree.render_with(&mut renderer);
+    for expected in [
+        "<h2 id=\"a-heading\">A heading</h2>",
+        "<blockquote>\n<p>quoted</p>\n</blockquote>",
+        "<ol start=\"3\">",
+        "<input type=\"checkbox\" checked=\"\" />",
+        "<img src=\"javascript:alert(1)\" alt=\"image &amp; alt\" title=\"image title\" />",
+        "<img src=\"/guide\" alt=\"reference image\" title=\"Reference title\" />",
+        "<th align=\"center\">center</th>",
+        "<td align=\"center\">raw cell node</td>",
+        "second body row",
+        "<table>\n<tbody>",
+        "<Widget title=\"a &amp; &quot;b&quot;\">jsx text</Widget>",
+        "<Panel href=\"\" src=\"data:image/png;base64,abc\" disabled>",
+        "<Empty/>",
+        "<h3 id=\"footnote-label\" class=\"notes\">Notes &amp; details</h3>",
+        "aria-label=\"Back &amp; forth\"",
+    ] {
+        assert!(
+            output.contains(expected),
+            "missing {:?} in {:?}",
+            expected,
+            output
+        );
+    }
+
+    let mut renderer = HTMLRenderer::new();
+    let paragraph = paragraph(vec![text("child")]);
+    assert_eq!(renderer.render_node(&text("direct")), "direct");
+    assert_eq!(renderer.render_children(&paragraph), "child");
+    assert_eq!(
+        renderer.render_children(&Node::Root(Root {
+            position: None,
+            children: vec![paragraph.clone()],
+        })),
+        "<p>child</p>"
+    );
+    assert_eq!(
+        renderer.render_children(&Node::ThematicBreak(ThematicBreak { position: None })),
+        ""
+    );
+
+    let image = Node::Image(Image {
+        position: None,
+        alt: "image".into(),
+        url: "javascript:bad()".into(),
+        title: None,
+    });
+    let mut safe_renderer = HTMLRenderer::default();
+    assert_eq!(
+        safe_renderer.render_node(&image),
+        "<img src=\"\" alt=\"image\" />"
+    );
+}
+
+#[test]
+fn covers_parser_html_options_and_generated_heading_ids() -> Result<(), message::Message> {
+    let mut parse_options = ParseOptions::gfm();
+    parse_options.inline_code_info = true;
+    parse_options.constructs.math_text = true;
+    parse_options.constructs.math_flow = true;
+    let options = Options {
+        parse: parse_options,
+        compile: CompileOptions {
+            heading_ids: true,
+            gfm_task_list_item_checkable: false,
+            ..CompileOptions::default()
+        },
+    };
+    let html = to_html_with_options(
+        "# Same\n\n# Same\n\nUse ruby:`puts 1` and $x$.\n\n- [x] done\n\n$$\nx^2\n$$",
+        &options,
+    )?;
+
+    assert!(html.contains("<h1 id=\"same\">Same</h1>"));
+    assert!(html.contains("<h1 id=\"same-2\">Same</h1>"));
+    assert!(html.contains("<code class=\"language-ruby\">puts 1</code>"));
+    assert!(html.contains("<code class=\"language-math math-inline\">x</code>"));
+    assert!(html.contains("disabled=\"\""), "{:?}", html);
+    assert!(html.contains("<code class=\"language-math math-display\">x^2"));
+
+    Ok(())
+}
+
+#[test]
+fn renders_unchecked_items_and_header_only_tables() {
+    let tree = Node::Root(Root {
+        position: None,
+        children: vec![
+            Node::ListItem(ListItem {
+                children: vec![paragraph(vec![text("ordinary item")])],
+                position: None,
+                spread: false,
+                checked: None,
+            }),
+            Node::Table(Table {
+                children: vec![Node::TableRow(TableRow {
+                    children: vec![Node::TableCell(TableCell {
+                        children: vec![text("header")],
+                        position: None,
+                    })],
+                    position: None,
+                })],
+                position: None,
+                align: vec![AlignKind::None],
+            }),
+        ],
+    });
+    let mut renderer = HTMLRenderer::new();
+    let output = tree.render_with(&mut renderer);
+
+    assert!(output.contains("<li><p>ordinary item</p></li>"));
+    assert!(output.contains("<thead>"));
+    assert!(!output.contains("<tbody>"));
+}
+
+#[test]
+fn suppresses_inline_markup_inside_image_alt_text() -> Result<(), message::Message> {
+    assert_eq!(
+        to_html_with_options("![`code`](image)", &Options::default())?,
+        "<p><img src=\"image\" alt=\"code\" /></p>"
     );
 
     Ok(())

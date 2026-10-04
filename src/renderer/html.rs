@@ -718,3 +718,62 @@ fn with_surrounding_line_endings(value: &str, line_ending: &str) -> String {
         format!("{line_ending}{value}{line_ending}")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::HTMLRenderer;
+    use crate::mdast::{Node, Paragraph, Text};
+    use alloc::vec;
+
+    #[test]
+    fn skips_footnote_entries_without_definitions() {
+        let mut renderer = HTMLRenderer::new();
+        renderer.footnote_order.push("missing".into());
+
+        let output = renderer.render_footnote_section();
+
+        assert!(output.contains("<ol>"));
+        assert!(!output.contains("<li>"));
+    }
+
+    #[test]
+    fn renders_footnotes_without_preceding_root_content() {
+        let mut renderer = HTMLRenderer::new();
+        renderer.footnote_order.push("note".into());
+        renderer.footnote_definitions.insert(
+            "note".into(),
+            vec![Node::Paragraph(Paragraph {
+                children: vec![Node::Text(Text {
+                    value: "footnote".into(),
+                    position: None,
+                })],
+                position: None,
+            })],
+        );
+
+        let output = renderer.render_root(&[]);
+
+        assert!(output.starts_with("<section data-footnotes"));
+        assert!(!output.starts_with('\n'));
+    }
+
+    #[test]
+    fn omits_empty_nodes_from_lists_and_only_terminates_code_when_needed() {
+        let mut renderer = HTMLRenderer::new();
+        let list = crate::mdast::List {
+            children: vec![Node::MdxFlowExpression(crate::mdast::MdxFlowExpression {
+                value: "value".into(),
+                position: None,
+                stops: vec![],
+            })],
+            position: None,
+            ordered: false,
+            start: None,
+            spread: false,
+        };
+
+        assert_eq!(renderer.render_list(&list), "<ul>\n\n</ul>");
+        assert_eq!(renderer.render_code_value(""), "");
+        assert_eq!(renderer.render_code_value("code\n"), "code\n");
+    }
+}

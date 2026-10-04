@@ -959,7 +959,7 @@ pub fn blank_lines_end(tokenizer: &mut Tokenizer) -> State {
 /// At the start of a retained blank line.
 pub fn blank_lines_end_start(tokenizer: &mut Tokenizer) -> State {
     if tokenizer.tokenize_state.html_flow_blank_lines == 0 {
-        return State::Next(StateName::HtmlFlowContinuationAfter);
+        return State::Retry(StateName::HtmlFlowContinuationAfter);
     }
 
     match tokenizer.current {
@@ -977,7 +977,7 @@ pub fn blank_lines_end_start(tokenizer: &mut Tokenizer) -> State {
         }
         _ => {
             tokenizer.tokenize_state.html_flow_blank_lines = 0;
-            State::Next(StateName::HtmlFlowContinuationAfter)
+            State::Retry(StateName::HtmlFlowContinuationAfter)
         }
     }
 }
@@ -1000,7 +1000,7 @@ pub fn blank_lines_end_data(tokenizer: &mut Tokenizer) -> State {
         _ => {
             tokenizer.exit(Name::HtmlFlowData);
             tokenizer.tokenize_state.html_flow_blank_lines = 0;
-            State::Next(StateName::HtmlFlowContinuationAfter)
+            State::Retry(StateName::HtmlFlowContinuationAfter)
         }
     }
 }
@@ -1038,5 +1038,73 @@ fn record_line_indent(tokenizer: &mut Tokenizer) {
             || indent < tokenizer.tokenize_state.html_flow_indent)
     {
         tokenizer.tokenize_state.html_flow_indent = indent;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{record_line_indent, BASIC, COMMENT, COMPLETE};
+    use crate::{event::Point, parser::parse, tokenizer::Tokenizer, ParseOptions};
+
+    fn with_tokenizer(source: &str, options: &ParseOptions, run: impl FnOnce(&mut Tokenizer<'_>)) {
+        let (_, parse_state) = parse(source, options).expect("parse test input");
+        let mut tokenizer = Tokenizer::new(
+            Point {
+                line: 1,
+                column: 1,
+                index: 0,
+                vs: 0,
+            },
+            &parse_state,
+        );
+        run(&mut tokenizer);
+    }
+
+    #[test]
+    fn tracks_blank_lines_for_basic_and_complete_html() {
+        let options = ParseOptions {
+            html_block_blank_lines: true,
+            ..ParseOptions::default()
+        };
+
+        crate::parser::parse("<div>\n\n  content\n\n</div>", &options)
+            .expect("tracks blank lines in a basic HTML block");
+        crate::parser::parse("<widget>\n\n  content\n\n</widget>", &options)
+            .expect("tracks blank lines in a complete HTML block");
+    }
+
+    #[test]
+    fn records_the_shallowest_indentation_for_html_continuations() {
+        let options = ParseOptions {
+            html_block_blank_lines: true,
+            ..ParseOptions::default()
+        };
+
+        with_tokenizer("  content", &options, |tokenizer| {
+            tokenizer.tokenize_state.marker = BASIC;
+            record_line_indent(tokenizer);
+            assert_eq!(tokenizer.tokenize_state.html_flow_indent, 2);
+
+            tokenizer.tokenize_state.marker = COMPLETE;
+            tokenizer.tokenize_state.html_flow_indent = 3;
+            record_line_indent(tokenizer);
+            assert_eq!(tokenizer.tokenize_state.html_flow_indent, 2);
+
+            tokenizer.tokenize_state.marker = COMMENT;
+            tokenizer.tokenize_state.html_flow_indent = 0;
+            record_line_indent(tokenizer);
+            assert_eq!(tokenizer.tokenize_state.html_flow_indent, 0);
+        });
+    }
+
+    #[test]
+    fn blank_lines_after_comments_use_the_general_flow_path() {
+        let options = ParseOptions {
+            html_block_blank_lines: true,
+            ..ParseOptions::default()
+        };
+
+        parse("<!-- comment -->\n\ncontent", &options)
+            .expect("parses blank lines after an HTML comment");
     }
 }

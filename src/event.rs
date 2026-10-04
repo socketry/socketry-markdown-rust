@@ -3572,3 +3572,35 @@ pub struct Event {
     /// Link to another event.
     pub link: Option<Link>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Point;
+
+    #[test]
+    fn shifts_points_across_tabs() {
+        let point = Point {
+            line: 1,
+            column: 1,
+            index: 0,
+            vs: 0,
+        };
+
+        let shifted = point.shift_to(b"a\tb", 2);
+        assert_eq!(shifted.index, 2);
+        assert_eq!(shifted.column, 5);
+    }
+
+    #[test]
+    #[should_panic(expected = "cannot move past line endings")]
+    fn cannot_shift_a_point_past_a_line_ending() {
+        let point = Point {
+            line: 1,
+            column: 1,
+            index: 0,
+            vs: 0,
+        };
+
+        point.shift_to(b"\n", 1);
+    }
+}

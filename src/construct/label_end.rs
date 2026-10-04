@@ -752,31 +752,29 @@ fn inject_labels(tokenizer: &mut Tokenizer, labels: &[Label]) {
             ],
         );
 
-        // Empty events not allowed.
-        // Though: if this was what looked like a footnote, but didn’t match,
-        // it’s a link instead, and we need to inject the `^`.
-        if label.start.1 != label.end.0 || !caret.is_empty() {
-            tokenizer.map.add_before(
-                label.start.1 + 1,
-                0,
-                vec![Event {
-                    kind: Kind::Enter,
-                    name: Name::LabelText,
-                    point: tokenizer.events[label.start.1].point.clone(),
-                    link: None,
-                }],
-            );
-            tokenizer.map.add(
-                label.end.0,
-                0,
-                vec![Event {
-                    kind: Kind::Exit,
-                    name: Name::LabelText,
-                    point: tokenizer.events[label.end.0].point.clone(),
-                    link: None,
-                }],
-            );
-        }
+        // Label start and end markers always leave a boundary to wrap, even
+        // for an empty label. If this was an unmatched footnote, the `^` is
+        // injected below as the label text.
+        tokenizer.map.add_before(
+            label.start.1 + 1,
+            0,
+            vec![Event {
+                kind: Kind::Enter,
+                name: Name::LabelText,
+                point: tokenizer.events[label.start.1].point.clone(),
+                link: None,
+            }],
+        );
+        tokenizer.map.add(
+            label.end.0,
+            0,
+            vec![Event {
+                kind: Kind::Exit,
+                name: Name::LabelText,
+                point: tokenizer.events[label.end.0].point.clone(),
+                link: None,
+            }],
+        );
 
         if !caret.is_empty() {
             tokenizer.map.add(label.start.1 + 1, 0, caret);

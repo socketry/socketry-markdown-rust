@@ -79,3 +79,21 @@ pub fn gfm_tagfilter(value: &str) -> String {
 
     result
 }
+
+#[cfg(test)]
+mod tests {
+    use super::gfm_tagfilter;
+
+    #[test]
+    fn filters_disallowed_tags_with_html_separators() {
+        for separator in ['\t', '\n', '\u{000c}', '\r', ' ', '/', '>'] {
+            let input = alloc::format!("<script{separator}");
+            assert_eq!(gfm_tagfilter(&input), input.replacen('<', "&lt;", 1));
+        }
+
+        assert_eq!(gfm_tagfilter("<script"), "&lt;script");
+        assert_eq!(gfm_tagfilter("<script=source>"), "<script=source>");
+        assert_eq!(gfm_tagfilter("<scriptx>"), "<scriptx>");
+        assert_eq!(gfm_tagfilter("</script>"), "&lt;/script>");
+    }
+}

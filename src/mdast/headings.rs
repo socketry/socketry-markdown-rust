@@ -181,3 +181,114 @@ fn chomp_line_ending(text: &str) -> &str {
         text
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{chomp_line_ending, slug, HeadingOptions, Headings};
+    use crate::mdast::{Heading, Node, Root, Text};
+    use alloc::{string::String, vec, vec::Vec};
+
+    fn heading(depth: u8, text: &str) -> Node {
+        Node::Heading(Heading {
+            position: None,
+            depth,
+            children: vec![Node::Text(Text {
+                value: String::from(text),
+                position: None,
+            })],
+        })
+    }
+
+    fn root(children: Vec<Node>) -> Node {
+        Node::Root(Root {
+            position: None,
+            children,
+        })
+    }
+
+    #[test]
+    fn extracts_headings_with_filtered_unique_anchors() {
+        let document = root(vec![
+            heading(1, "Title"),
+            heading(2, "Title"),
+            heading(3, "Other"),
+            heading(6, "Title"),
+        ]);
+        let headings = Headings::extract_with_options(
+            &document,
+            &HeadingOptions {
+                min_level: 2,
+                max_level: 3,
+            },
+        );
+
+        assert_eq!(headings.len(), 2);
+        assert!(!headings.is_empty());
+        assert_eq!(headings.as_slice()[0].text, "Title");
+        assert_eq!(headings.as_slice()[0].anchor, "title-2");
+        assert_eq!(headings.as_slice()[1].text, "Other");
+        assert_eq!(headings.as_slice()[1].anchor, "other");
+        assert_eq!(headings.iter().count(), 2);
+        assert_eq!((&headings).into_iter().count(), 2);
+        assert_eq!(
+            headings
+                .into_iter()
+                .map(|entry| entry.anchor)
+                .collect::<Vec<_>>(),
+            ["title-2", "other"]
+        );
+
+        let empty = Headings::extract_with_options(
+            &document,
+            &HeadingOptions {
+                min_level: 4,
+                max_level: 3,
+            },
+        );
+        assert!(empty.is_empty());
+        assert_eq!(empty.len(), 0);
+        assert_eq!(empty.as_slice(), &[]);
+    }
+
+    #[test]
+    fn extracts_all_headings_and_resolves_explicit_slug_collisions() {
+        let document = root(vec![
+            heading(1, "Heading"),
+            heading(2, "Heading"),
+            heading(3, "Heading-2"),
+            heading(4, "Heading"),
+        ]);
+        let headings = Headings::extract(&document);
+
+        assert_eq!(headings.len(), 4);
+        assert_eq!(
+            headings
+                .iter()
+                .map(|entry| entry.anchor.as_str())
+                .collect::<Vec<_>>(),
+            ["heading", "heading-2", "heading-2-2", "heading-3"]
+        );
+        assert_eq!(
+            headings.iter().map(|entry| entry.level).collect::<Vec<_>>(),
+            [1, 2, 3, 4]
+        );
+        assert_eq!(
+            headings
+                .iter()
+                .map(|entry| entry.node)
+                .collect::<Vec<_>>()
+                .len(),
+            4
+        );
+    }
+
+    #[test]
+    fn normalizes_slug_whitespace_and_chomps_line_endings() {
+        assert_eq!(slug("  Crème\r\nTea \t"), "-crème-tea-");
+        assert_eq!(slug(""), "");
+        assert_eq!(chomp_line_ending("line\r\n"), "line");
+        assert_eq!(chomp_line_ending("line\n"), "line");
+        assert_eq!(chomp_line_ending("line\r"), "line");
+        assert_eq!(chomp_line_ending("line"), "line");
+    }
+}

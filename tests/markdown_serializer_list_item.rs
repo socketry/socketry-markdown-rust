@@ -406,6 +406,26 @@ fn list_item() {
     );
 }
 
+#[test]
+fn rejects_an_invalid_bullet_marker() {
+    let item = Node::ListItem(ListItem {
+        children: vec![],
+        position: None,
+        spread: false,
+        checked: None,
+    });
+    let error = to_md_with_opts(
+        &item,
+        &Options {
+            bullet: 'x',
+            ..Options::default()
+        },
+    )
+    .expect_err("unsupported list markers should be rejected");
+
+    assert_eq!(*error.rule_id, "unexpected-marker");
+}
+
 trait IntoVecNode {
     fn into_vec(self) -> Vec<Node>;
 }

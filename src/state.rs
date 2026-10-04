@@ -982,3 +982,14 @@ pub fn call(tokenizer: &mut Tokenizer, name: Name) -> State {
 
     func(tokenizer)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{Name, State};
+
+    #[test]
+    #[should_panic(expected = "cannot turn intermediate state into result")]
+    fn intermediate_states_cannot_become_results() {
+        State::Next(Name::FlowStart).to_result().unwrap();
+    }
+}

@@ -23,11 +23,8 @@ pub(crate) fn before(bytes: &[u8], code_start: usize) -> Option<(usize, &str)> {
         return None;
     }
 
-    if start > 0 && is_info_char(bytes[start - 1]) {
-        return None;
-    }
-
-    let info = core::str::from_utf8(&bytes[start..end]).ok()?;
+    let info = core::str::from_utf8(&bytes[start..end])
+        .expect("inline code info contains only accepted ASCII characters");
     Some((start, info))
 }
 
@@ -37,4 +34,17 @@ fn is_info_start_char(byte: u8) -> bool {
 
 fn is_info_char(byte: u8) -> bool {
     is_info_start_char(byte) || matches!(byte, b'_' | b'-' | b'+' | b'#' | b'.')
+}
+
+#[cfg(test)]
+mod tests {
+    use super::before;
+
+    #[test]
+    fn recognizes_only_prefixed_info_tokens() {
+        assert_eq!(before(b"rust:`code`", 5), Some((0, "rust")));
+        assert_eq!(before(b"-:`code`", 2), None);
+        assert_eq!(before(b"code", 4), None);
+        assert_eq!(before(b":code", 0), None);
+    }
 }

@@ -7,7 +7,7 @@ use pretty_assertions::assert_eq;
 use socketry_markdown::markdown::{
     to_markdown as to, to_markdown_with_options as to_md_with_opts, Options,
 };
-use socketry_markdown::mdast::{Break, Heading, Html, Node, Text};
+use socketry_markdown::mdast::{Break, Emphasis, Heading, Html, Node, Text};
 
 #[test]
 fn heading() {
@@ -67,6 +67,23 @@ fn heading() {
         .unwrap(),
         "# a\n",
         "should serialize a heading w/ content"
+    );
+
+    assert_eq!(
+        to(&Node::Heading(Heading {
+            children: vec![Node::Emphasis(Emphasis {
+                children: vec![Node::Text(Text {
+                    value: String::from("plain"),
+                    position: None,
+                })],
+                position: None,
+            })],
+            position: None,
+            depth: 1,
+        }))
+        .unwrap(),
+        "# *plain*\n",
+        "should keep nested literal content in an atx heading when it has no line break"
     );
 
     assert_eq!(

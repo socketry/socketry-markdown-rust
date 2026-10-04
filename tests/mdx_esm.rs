@@ -44,6 +44,12 @@ fn mdx_esm() -> Result<(), message::Message> {
     );
 
     assert_eq!(
+        to_html_with_options("ordinary", &swc)?,
+        "<p>ordinary</p>",
+        "should leave non-import and non-export lines as Markdown"
+    );
+
+    assert_eq!(
         to_html_with_options("exporting", &swc)?,
         "<p>exporting</p>",
         "should not support other keywords (`exporting`)"

@@ -43,9 +43,12 @@ impl Handle for ListItem {
                 };
 
                 if state.options.increment_list_marker {
-                    if let Some(position_node) = list.children.iter().position(|x| *x == *node) {
-                        bullet = format!("{}{}", bullet_number + position_node, bullet);
-                    }
+                    let position_node = list
+                        .children
+                        .iter()
+                        .position(|x| *x == *node)
+                        .expect("list item should be a child of its parent list");
+                    bullet = format!("{}{}", bullet_number + position_node, bullet);
                 } else {
                     bullet = format!("{}{}", bullet_number, bullet);
                 }

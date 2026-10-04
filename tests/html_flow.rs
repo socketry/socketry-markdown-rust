@@ -86,6 +86,47 @@ fn html_flow() -> Result<(), message::Message> {
 }
 
 #[test]
+fn html_flow_can_continue_across_blank_lines_when_indented() -> Result<(), message::Message> {
+    let options = ParseOptions {
+        html_block_blank_lines: true,
+        ..Default::default()
+    };
+
+    let indented = to_mdast("<div>\n\n  text\n", &options)?;
+    let children = indented.children().expect("root has children");
+    assert_eq!(children.len(), 1);
+    assert!(matches!(children[0], Node::Html(_)));
+    assert_eq!(children[0].to_string(), "<div>\n\n  text\n");
+
+    let terminated = to_mdast("<div>\n\ntext\n", &options)?;
+    let children = terminated.children().expect("root has children");
+    assert_eq!(children.len(), 2);
+    assert!(matches!(children[0], Node::Html(_)));
+    assert!(matches!(children[1], Node::Paragraph(_)));
+    assert_eq!(children[0].to_string(), "<div>\n\n");
+    assert_eq!(children[1].to_string(), "text");
+
+    let at_eof = to_mdast("<div>\n\n", &options)?;
+    let children = at_eof.children().expect("root has children");
+    assert_eq!(children.len(), 1);
+    assert_eq!(children[0].to_string(), "<div>\n\n");
+
+    let blank_with_spaces = to_mdast("<div>\n  \n  text\n", &options)?;
+    assert_eq!(blank_with_spaces.to_string(), "<div>\n  \n  text\n");
+
+    let tab_indented = to_mdast("<div>\n\n\ttext\n", &options)?;
+    assert_eq!(tab_indented.to_string(), "<div>\n\n\ttext\n");
+
+    let trailing_indent = to_mdast("<div>\n  ", &options)?;
+    assert_eq!(trailing_indent.to_string(), "<div>\n  ");
+
+    let shallower_continuation = to_mdast("<div>\n\tfirst\n  second\n\n  last\n", &options)?;
+    assert!(shallower_continuation.to_string().contains("<div>"));
+
+    Ok(())
+}
+
+#[test]
 fn html_flow_1_raw() -> Result<(), message::Message> {
     let danger = Options {
         compile: CompileOptions {

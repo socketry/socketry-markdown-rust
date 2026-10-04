@@ -218,3 +218,33 @@ pub fn parse(value: &str) -> String {
 
     result
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{decode, decode_numeric, value_max, value_test};
+
+    #[test]
+    fn replaces_disallowed_numeric_codepoints_but_keeps_ascii_whitespace() {
+        assert_eq!(decode_numeric("128", 10), "�");
+        assert_eq!(decode_numeric("55296", 10), "�");
+        assert_eq!(decode_numeric("9", 10), "\t");
+    }
+
+    #[test]
+    #[should_panic(expected = "Unexpected marker")]
+    fn decode_rejects_unknown_markers() {
+        decode("value", b'?', true);
+    }
+
+    #[test]
+    #[should_panic(expected = "Unexpected marker")]
+    fn value_max_rejects_unknown_markers() {
+        value_max(b'?');
+    }
+
+    #[test]
+    #[should_panic(expected = "Unexpected marker")]
+    fn value_test_rejects_unknown_markers() {
+        value_test(b'?');
+    }
+}

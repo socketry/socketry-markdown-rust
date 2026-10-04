@@ -10,7 +10,7 @@ use crate::markdown::{
     state::{Info, State},
     util::{
         check_quote::check_quote, contains_control_or_whitespace::contains_control_or_whitespace,
-        format_link_as_auto_link::format_link_as_auto_link, safe::SafeConfig,
+        format_link_as_auto_link::auto_link_text, safe::SafeConfig,
     },
 };
 use crate::{
@@ -30,11 +30,11 @@ impl Handle for Link {
     ) -> Result<alloc::string::String, Message> {
         let quote = check_quote(state)?;
 
-        if format_link_as_auto_link(self, node, state) {
+        if let Some(text) = auto_link_text(self, node, state) {
             let old_stack = mem::take(&mut state.stack);
             state.enter(ConstructName::Autolink);
             let mut value = String::from("<");
-            value.push_str(&state.container_phrasing(node, &Info::new(&value, ">"))?);
+            value.push_str(&state.safe(&text.value, &SafeConfig::new(&value, ">", None)));
             value.push('>');
             state.exit();
             state.stack = old_stack;
@@ -89,7 +89,7 @@ impl Handle for Link {
 }
 
 pub fn peek_link(link: &Link, node: &Node, state: &State) -> char {
-    if format_link_as_auto_link(link, node, state) {
+    if auto_link_text(link, node, state).is_some() {
         '>'
     } else {
         '['
