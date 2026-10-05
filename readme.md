@@ -67,6 +67,10 @@ Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or
 
 See [releases.md](releases.md) for the full release history.
 
+### v0.3.2
+
+- Name renderer source files after their public types without changing public import paths.
+
 ### v0.3.1
 
 - Adopt `socketry-project` 0.3.7 for shared project tasks and Markdown normalization.
@@ -76,16 +80,6 @@ See [releases.md](releases.md) for the full release history.
 ### v0.3.0
 
 - Use hyphens as the default marker for unordered lists in Markdown serialization.
-
-### v0.2.0
-
-- Add an option to unwrap soft line breaks when serializing Markdown.
-
-- Preserve checked and unchecked task list items when serializing Markdown.
-
-- Fix a panic when serializing long inline code or math values containing CRLF before unsafe Markdown characters.
-
-- Fix parsing and serialization edge cases for HTML blocks, inline code, and Unicode escapes.
 
 <!-- bake-readme:releases:end -->
 
