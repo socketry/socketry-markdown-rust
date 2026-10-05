@@ -1,6 +1,6 @@
 # Releases
 
-## Unreleased
+## v0.3.0
 
 - Use hyphens as the default marker for unordered lists in Markdown serialization.
 

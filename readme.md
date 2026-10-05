@@ -81,6 +81,10 @@ for the standard process.
 <!-- bake-readme:releases:start -->
 See [releases.md](releases.md) for the full release history.
 
+### v0.3.0
+
+- Use hyphens as the default marker for unordered lists in Markdown serialization.
+
 ### v0.2.0
 
 - Add an option to unwrap soft line breaks when serializing Markdown.
@@ -95,14 +99,6 @@ See [releases.md](releases.md) for the full release history.
 
 - Update agent guidance to install dependency context and skills without
   generating `agents.md`.
-
-### v0.1.0
-
-- Add AST renderers for HTML and Markdown, including Markdown serialization on
-  nodes and fragments.
-- Add fragment extraction, heading helpers, and parser fixes from the Socketry
-  fork.
-- Adopt shared Socketry testing, documentation, and release automation.
 <!-- bake-readme:releases:end -->
 
 ## See Also
