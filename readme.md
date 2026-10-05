@@ -57,6 +57,9 @@ let markdown = document.to_markdown();
 assert!(markdown.starts_with("# Introduction"));
 ```
 
+`MarkdownOptions::line_wrapping` can preserve soft source line breaks or unwrap
+them into spaces when serializing Markdown.
+
 ### Extensions
 
 The parser supports CommonMark, GFM, MDX, frontmatter, and math constructs.

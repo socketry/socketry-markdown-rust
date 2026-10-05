@@ -22,6 +22,11 @@ and safety logic separate from the parser's event-to-HTML compiler. Serializer
 changes should preserve references, extensions, and formatting options when
 possible.
 
+`MarkdownOptions::line_wrapping` controls soft source line breaks in text.
+`Preserve` is the default and keeps round-trip behavior; `Unwrap` joins those
+breaks with spaces. Explicit hard-break nodes, code, and block boundaries are
+not unwrapped. The serializer does not currently enforce a line width.
+
 ## Tests and generated data
 
 Integration tests are organized by Markdown construct in `tests/`; keep

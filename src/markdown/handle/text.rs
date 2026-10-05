@@ -13,6 +13,7 @@ use crate::{
     mdast::{Node, Text},
     message::Message,
 };
+use alloc::{borrow::Cow, string::String};
 
 impl Handle for Text {
     fn handle(
@@ -22,6 +23,44 @@ impl Handle for Text {
         _parent: Option<&Node>,
         _node: &Node,
     ) -> Result<alloc::string::String, Message> {
-        Ok(state.safe(&self.value, &SafeConfig::new(info.before, info.after, None)))
+        let value = match state.options.line_wrapping {
+            crate::markdown::LineWrapping::Preserve => Cow::Borrowed(&self.value),
+            crate::markdown::LineWrapping::Unwrap => {
+                Cow::Owned(unwrap_soft_line_breaks(&self.value))
+            }
+        };
+
+        Ok(state.safe(&value, &SafeConfig::new(info.before, info.after, None)))
     }
+}
+
+fn unwrap_soft_line_breaks(value: &str) -> String {
+    let mut result = String::with_capacity(value.len());
+    let mut characters = value.chars().peekable();
+
+    while let Some(character) = characters.next() {
+        match character {
+            '\r' | '\n' => {
+                if character == '\r' && characters.peek() == Some(&'\n') {
+                    characters.next();
+                }
+
+                while matches!(result.chars().next_back(), Some(' ' | '\t')) {
+                    result.pop();
+                }
+
+                while characters
+                    .peek()
+                    .is_some_and(|next| matches!(*next, ' ' | '\t'))
+                {
+                    characters.next();
+                }
+
+                result.push(' ');
+            }
+            _ => result.push(character),
+        }
+    }
+
+    result
 }
