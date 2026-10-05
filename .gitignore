@@ -2,7 +2,6 @@
 *.log
 *.lock
 !Cargo.lock
-.agents/context/
 coverage/
 target/
 /external/

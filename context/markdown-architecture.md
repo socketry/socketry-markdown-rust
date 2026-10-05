@@ -31,6 +31,10 @@ the CommonMark corpus, and `tests/html_renderer.rs` and
 contains the Markdown serializer corpus.
 
 Run formatting, linting, and tests from the workspace root. The standard test
-workflow covers default features; run the all-features suite too because the
-crate exposes optional `json`, `log`, and `serde` features. The `generate/`
-program refreshes generated CommonMark and Unicode data used by the tests.
+workflow requires 100% source-region coverage for the published
+`socketry-markdown` package across all targets and features, then runs the
+workspace test task. This runs the package's tests again with default features
+and covers the private Bake and generator packages, which are outside the
+coverage gate. The crate exposes optional `json`, `log`, and `serde` features.
+The `generate/` program refreshes generated CommonMark and Unicode data used by
+the tests.
