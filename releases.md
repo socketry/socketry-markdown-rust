@@ -1,6 +1,12 @@
 # Releases
 
-## Unreleased
+## v0.4.0
+
+- Add language-agnostic frontmatter through the existing `Constructs::frontmatter` option: closed, language-tagged backtick/tilde fences at document start and format hints on `---`/`+++`.
+
+- Add `Node::Frontmatter` with a raw body, opaque info string, and opening/closing fence metadata; preserve legacy untagged YAML/TOML nodes. Exhaustive matches on `Node` must handle the new variant.
+
+- Preserve generic frontmatter during Markdown serialization, protect edited bodies with safe fences, and omit it from HTML.
 
 - Document the fork's motivation, optional parsing extensions, and AST and rendering additions.
 

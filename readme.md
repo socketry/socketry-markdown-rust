@@ -14,6 +14,8 @@ The fork adds three parsing options to `ParseOptions`, all disabled by default s
 - `html_block_blank_lines` lets ordinary HTML blocks continue across blank lines when subsequent content maintains consistent indentation. This keeps indented HTML content together instead of ending the block at the first blank line.
 - `html_tag_namespaces` recognizes namespace-prefixed HTML tags, such as `<svg:circle />`, in both block and inline HTML.
 
+The existing `Constructs::frontmatter` option also supports language-agnostic frontmatter, following [Markly](https://github.com/socketry/markly) and [cmarkly](https://github.com/socketry/cmarkly). A closed, language-tagged backtick or tilde fence at the start of a document becomes frontmatter; format hints on `---` or `+++` do too. The AST preserves the full info string and raw body without parsing the named format, and HTML output omits it.
+
 Beyond parsing, the fork adds AST traversal, text extraction, heading and section editing, and `Fragment` nodes for working with detached content. `HTMLRenderer`, `MarkdownRenderer`, and the custom `Renderer` interface render edited trees; Markdown serialization preserves language metadata and can unwrap soft line breaks. Optional `CompileOptions::heading_ids` generates unique heading anchors for in-page links and tables of contents.
 
 The fork also includes fixes for stale MDX parser errors and parsing and serialization edge cases, including CRLF handling in inline code and math. See [releases.md](releases.md) for changes and the [API documentation](https://docs.rs/socketry-markdown/latest/socketry_markdown/) for configuration details.
@@ -71,6 +73,27 @@ assert!(markdown.starts_with("# Introduction"));
 
 The parser inherits support for CommonMark, GFM, MDX, frontmatter, and math constructs from `markdown-rs`. The fork-specific parsing options are described under [Motivation](#motivation). HTML output escapes raw HTML and omits MDX expressions by default. See the [API documentation](https://docs.rs/socketry-markdown/latest/socketry_markdown/) for parser options, renderer configuration, and AST types.
 
+### Language-agnostic frontmatter
+
+Enable the existing frontmatter construct to accept any format:
+
+````rust
+use socketry_markdown::{mdast::Node, to_mdast, Constructs, ParseOptions};
+
+let options = ParseOptions {
+    constructs: Constructs { frontmatter: true, ..Constructs::default() },
+    ..ParseOptions::default()
+};
+let document = to_mdast("```json title=example\n{\"draft\": true}\n```\n\n# Hello", &options).unwrap();
+if let Node::Frontmatter(frontmatter) = &document.children().unwrap()[0] {
+    assert_eq!(frontmatter.language(), Some("json"));
+    assert_eq!(frontmatter.info, "json title=example");
+    assert_eq!(frontmatter.value, "{\"draft\": true}\n");
+}
+````
+
+Tagged forms such as `--- json` and `---yaml` use the same node. Untagged `---` and `+++` keep their existing `Yaml` and `Toml` nodes. Fences without a language, fences later in a document, and unclosed fences remain ordinary Markdown. Markdown serialization retains the info string and body, and adjusts fences when edited content would close them prematurely.
+
 ## Releasing
 
 Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or `bump --version X.Y.Z`), then run `cargo bake cargo:release` and open a pull request. After review and merge, GitHub Actions publishes the release when the configured `crates-io` environment approves it. Follow the shared [Releasing skill](https://github.com/socketry/socketry-project-rust/blob/main/context/releasing.md) for the standard process.
@@ -81,6 +104,16 @@ Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or
 
 See [releases.md](releases.md) for the full release history.
 
+### v0.4.0
+
+- Add language-agnostic frontmatter through the existing `Constructs::frontmatter` option: closed, language-tagged backtick/tilde fences at document start and format hints on `---`/`+++`.
+
+- Add `Node::Frontmatter` with a raw body, opaque info string, and opening/closing fence metadata; preserve legacy untagged YAML/TOML nodes. Exhaustive matches on `Node` must handle the new variant.
+
+- Preserve generic frontmatter during Markdown serialization, protect edited bodies with safe fences, and omit it from HTML.
+
+- Document the fork's motivation, optional parsing extensions, and AST and rendering additions.
+
 ### v0.3.2
 
 - Name renderer source files after their public types without changing public import paths.
@@ -90,10 +123,6 @@ See [releases.md](releases.md) for the full release history.
 - Adopt `socketry-project` 0.3.7 for shared project tasks and Markdown normalization.
 - Require the aggregate test and coverage result for pull request merges.
 - Refresh dependency examples and repository-owned agent guidance.
-
-### v0.3.0
-
-- Use hyphens as the default marker for unordered lists in Markdown serialization.
 
 <!-- bake-readme:releases:end -->
 

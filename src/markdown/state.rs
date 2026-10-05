@@ -371,6 +371,7 @@ impl<'a> State<'a> {
             Node::TableRow(row) => self.render_table_row(&row.children),
             Node::TableCell(_) => self.container_phrasing(node, info),
             Node::Toml(toml) => Ok(render_frontmatter("+++", &toml.value)),
+            Node::Frontmatter(frontmatter) => frontmatter.handle(self, info, parent, node),
             Node::Yaml(yaml) => Ok(render_frontmatter("---", &yaml.value)),
         }
     }

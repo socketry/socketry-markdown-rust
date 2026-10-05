@@ -972,6 +972,8 @@ pub enum Name {
     ///     ^^^
     /// ```
     FrontmatterFence,
+    /// Opaque format hint and metadata on an opening frontmatter fence.
+    FrontmatterFenceInfo,
     /// Frontmatter sequence.
     ///
     /// ## Info
@@ -3385,7 +3387,7 @@ pub enum Name {
 }
 
 /// List of void events, used to make sure everything is working well.
-pub const VOID_EVENTS: [Name; 76] = [
+pub const VOID_EVENTS: [Name; 77] = [
     Name::AttentionSequence,
     Name::AutolinkEmail,
     Name::AutolinkMarker,
@@ -3411,6 +3413,7 @@ pub const VOID_EVENTS: [Name; 76] = [
     Name::DefinitionTitleMarker,
     Name::EmphasisSequence,
     Name::FrontmatterChunk,
+    Name::FrontmatterFenceInfo,
     Name::GfmAutolinkLiteralEmail,
     Name::GfmAutolinkLiteralProtocol,
     Name::GfmAutolinkLiteralWww,

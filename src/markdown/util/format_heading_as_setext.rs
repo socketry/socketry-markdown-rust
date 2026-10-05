@@ -41,6 +41,7 @@ fn include_literal_with_line_break(node: &Node, regex: &Regex) -> bool {
         Node::MdxjsEsm(x) => regex.is_match(&x.value),
         Node::Text(x) => regex.is_match(&x.value),
         Node::Toml(x) => regex.is_match(&x.value),
+        Node::Frontmatter(x) => regex.is_match(&x.value),
         Node::Yaml(x) => regex.is_match(&x.value),
         // Anything else.
         _ => {
@@ -68,8 +69,8 @@ mod tests {
     use crate::{
         markdown::{state::State, Options},
         mdast::{
-            Break, Code, Heading, Html, Image, InlineCode, InlineMath, Math, MdxFlowExpression,
-            MdxTextExpression, MdxjsEsm, Node, Text, Toml, Yaml,
+            Break, Code, Frontmatter, Heading, Html, Image, InlineCode, InlineMath, Math,
+            MdxFlowExpression, MdxTextExpression, MdxjsEsm, Node, Text, Toml, Yaml,
         },
     };
     use alloc::string::String;
@@ -143,6 +144,14 @@ mod tests {
             }),
             Node::Text(Text {
                 value: literal("a\nb"),
+                position: None,
+            }),
+            Node::Frontmatter(Frontmatter {
+                value: literal("a\nb"),
+                info: "custom".into(),
+                fence: '~',
+                fence_length: 3,
+                closing_fence_length: 3,
                 position: None,
             }),
             Node::Toml(Toml {

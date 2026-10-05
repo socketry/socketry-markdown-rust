@@ -10,8 +10,8 @@
 use crate::event::{Event, Kind, Name};
 use crate::mdast::{
     AttributeContent, AttributeValue, AttributeValueExpression, Blockquote, Break, Code,
-    Definition, Delete, Emphasis, FootnoteDefinition, FootnoteReference, Heading, Html, Image,
-    ImageReference, InlineCode, InlineMath, Link, LinkReference, List, ListItem, Math,
+    Definition, Delete, Emphasis, FootnoteDefinition, FootnoteReference, Frontmatter, Heading,
+    Html, Image, ImageReference, InlineCode, InlineMath, Link, LinkReference, List, ListItem, Math,
     MdxFlowExpression, MdxJsxAttribute, MdxJsxExpressionAttribute, MdxJsxFlowElement,
     MdxJsxTextElement, MdxTextExpression, MdxjsEsm, Node, Paragraph, ReferenceKind, Root, Strong,
     Table, TableCell, TableRow, Text, ThematicBreak, Toml, Yaml,
@@ -411,6 +411,8 @@ fn exit(context: &mut CompileContext) -> Result<(), message::Message> {
         }
         Name::DefinitionTitleString => on_exit_definition_title_string(context),
         Name::Frontmatter => on_exit_frontmatter(context)?,
+        Name::FrontmatterFenceInfo => on_exit_frontmatter_info(context),
+        Name::FrontmatterSequence => on_exit_frontmatter_sequence(context),
         Name::GfmAutolinkLiteralEmail
         | Name::GfmAutolinkLiteralMailto
         | Name::GfmAutolinkLiteralProtocol
@@ -697,7 +699,19 @@ fn on_enter_hard_break(context: &mut CompileContext) {
 fn on_enter_frontmatter(context: &mut CompileContext) {
     let index = context.events[context.index].point.index;
     let byte = context.bytes[index];
-    let node = if byte == b'+' {
+    let node = if matches!(byte, b'`' | b'~') {
+        Node::Frontmatter(Frontmatter {
+            value: String::new(),
+            info: String::new(),
+            fence: char::from(byte),
+            fence_length: context.bytes[index..]
+                .iter()
+                .take_while(|&&b| b == byte)
+                .count(),
+            closing_fence_length: 0,
+            position: None,
+        })
+    } else if byte == b'+' {
         Node::Toml(Toml {
             value: String::new(),
             position: None,
@@ -1214,16 +1228,68 @@ fn on_exit_drop(context: &mut CompileContext) {
 
 /// Handle [`Exit`][Kind::Exit]:[`Frontmatter`][Name::Frontmatter].
 fn on_exit_frontmatter(context: &mut CompileContext) -> Result<(), message::Message> {
-    let value = trim_eol(context.resume().to_string(), true, true);
+    let raw_value = context.resume().to_string();
 
     match context.tail_mut() {
-        Node::Yaml(node) => node.value = value,
-        Node::Toml(node) => node.value = value,
-        _ => unreachable!("expected yaml/toml on stack for value"),
+        Node::Frontmatter(node) => node.value = trim_eol(raw_value, true, false),
+        Node::Yaml(node) => node.value = trim_eol(raw_value, true, true),
+        Node::Toml(node) => node.value = trim_eol(raw_value, true, true),
+        _ => unreachable!("expected frontmatter/yaml/toml on stack for value"),
     }
 
     on_exit(context)?;
     Ok(())
+}
+
+/// Access the frontmatter node below its literal-content buffer.
+fn frontmatter_tail_mut<'a>(context: &'a mut CompileContext<'_>) -> &'a mut Node {
+    let index = context.trees.len() - 2;
+    let (tree, stack, _) = &mut context.trees[index];
+    delve_mut(tree, stack)
+}
+
+/// Preserve the full format hint separately from the literal frontmatter body.
+fn on_exit_frontmatter_info(context: &mut CompileContext) {
+    let info = Slice::from_position(
+        context.bytes,
+        &SlicePosition::from_exit_event(context.events, context.index),
+    )
+    .serialize()
+    .trim_matches([' ', '\t'])
+    .to_string();
+    let node = frontmatter_tail_mut(context);
+    match node {
+        Node::Frontmatter(node) => node.info = info,
+        Node::Yaml(_) | Node::Toml(_) => {
+            let fence = if matches!(node, Node::Yaml(_)) {
+                '-'
+            } else {
+                '+'
+            };
+            let position = node.position().cloned();
+            *node = Node::Frontmatter(Frontmatter {
+                value: String::new(),
+                info,
+                fence,
+                fence_length: 3,
+                closing_fence_length: 0,
+                position,
+            });
+        }
+        _ => unreachable!("frontmatter info must belong to a frontmatter node"),
+    }
+}
+
+/// Retain the closing fence length for Markdown round trips.
+fn on_exit_frontmatter_sequence(context: &mut CompileContext) {
+    let length = Slice::from_position(
+        context.bytes,
+        &SlicePosition::from_exit_event(context.events, context.index),
+    )
+    .len();
+    if let Node::Frontmatter(node) = frontmatter_tail_mut(context) {
+        node.closing_fence_length = length;
+    }
 }
 
 /// Handle [`Exit`][Kind::Exit]:{[`GfmAutolinkLiteralEmail`][Name::GfmAutolinkLiteralEmail],[`GfmAutolinkLiteralMailto`][Name::GfmAutolinkLiteralMailto],[`GfmAutolinkLiteralProtocol`][Name::GfmAutolinkLiteralProtocol],[`GfmAutolinkLiteralWww`][Name::GfmAutolinkLiteralWww],[`GfmAutolinkLiteralXmpp`][Name::GfmAutolinkLiteralXmpp]}.

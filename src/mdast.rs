@@ -19,6 +19,8 @@ use alloc::{
 
 mod headings;
 pub use headings::{HeadingEntry, HeadingOptions, Headings};
+mod frontmatter;
+pub use frontmatter::Frontmatter;
 
 /// MDX: relative byte index into a string, to an absolute byte index into the
 /// whole document.
@@ -196,6 +198,8 @@ pub enum Node {
     List(List),
 
     // Frontmatter:
+    /// Language-agnostic frontmatter with an explicit format hint.
+    Frontmatter(Frontmatter),
     /// MDX.js ESM.
     MdxjsEsm(MdxjsEsm),
     /// Toml.
@@ -282,6 +286,7 @@ impl fmt::Debug for Node {
             Node::List(x) => x.fmt(f),
             Node::MdxjsEsm(x) => x.fmt(f),
             Node::Toml(x) => x.fmt(f),
+            Node::Frontmatter(x) => x.fmt(f),
             Node::Yaml(x) => x.fmt(f),
             Node::Break(x) => x.fmt(f),
             Node::InlineCode(x) => x.fmt(f),
@@ -345,6 +350,7 @@ impl ToString for Node {
             // Literals.
             Node::MdxjsEsm(x) => x.value.clone(),
             Node::Toml(x) => x.value.clone(),
+            Node::Frontmatter(x) => x.value.clone(),
             Node::Yaml(x) => x.value.clone(),
             Node::InlineCode(x) => x.value.clone(),
             Node::InlineMath(x) => x.value.clone(),
@@ -431,6 +437,7 @@ impl Node {
             Node::List(x) => x.position.as_ref(),
             Node::MdxjsEsm(x) => x.position.as_ref(),
             Node::Toml(x) => x.position.as_ref(),
+            Node::Frontmatter(x) => x.position.as_ref(),
             Node::Yaml(x) => x.position.as_ref(),
             Node::Break(x) => x.position.as_ref(),
             Node::InlineCode(x) => x.position.as_ref(),
@@ -471,6 +478,7 @@ impl Node {
             Node::List(x) => x.position.as_mut(),
             Node::MdxjsEsm(x) => x.position.as_mut(),
             Node::Toml(x) => x.position.as_mut(),
+            Node::Frontmatter(x) => x.position.as_mut(),
             Node::Yaml(x) => x.position.as_mut(),
             Node::Break(x) => x.position.as_mut(),
             Node::InlineCode(x) => x.position.as_mut(),
@@ -511,6 +519,7 @@ impl Node {
             Node::List(x) => x.position = position,
             Node::MdxjsEsm(x) => x.position = position,
             Node::Toml(x) => x.position = position,
+            Node::Frontmatter(x) => x.position = position,
             Node::Yaml(x) => x.position = position,
             Node::Break(x) => x.position = position,
             Node::InlineCode(x) => x.position = position,
@@ -600,24 +609,27 @@ impl Node {
             .find(|child| matches!(child, Node::Heading(_)) && child.text_content() == title)
     }
 
-    /// Return the language identifier of inline or fenced code.
+    /// Return the language identifier of inline code, fenced code, or tagged frontmatter.
     #[must_use]
     pub fn code_language(&self) -> Option<&str> {
         match self {
             Node::InlineCode(node) => node.lang.as_deref(),
             Node::Code(node) => node.lang.as_deref(),
+            Node::Frontmatter(node) => node.language(),
             _ => None,
         }
     }
 
-    /// Return code metadata for inline or fenced code.
+    /// Return the info string for inline code, fenced code, or tagged frontmatter.
     ///
     /// Inline code metadata is its language token. Fenced code metadata is
-    /// reconstructed from `lang` and `meta` when either is present.
+    /// reconstructed from `lang` and `meta` when either is present. Tagged
+    /// frontmatter returns its opaque info string.
     #[must_use]
     pub fn code_info(&self) -> Option<String> {
         match self {
             Node::InlineCode(node) => node.lang.clone(),
+            Node::Frontmatter(node) => Some(node.info.clone()),
             Node::Code(node) => match (&node.lang, &node.meta) {
                 (Some(lang), Some(meta)) => Some(alloc::format!("{lang} {meta}")),
                 (Some(lang), None) => Some(lang.clone()),

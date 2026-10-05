@@ -13,6 +13,14 @@ The Markdown serializer lives in `src/markdown/`. Keep its construct handlers an
 
 `MarkdownOptions::line_wrapping` controls soft source line breaks in text. `Preserve` is the default and keeps round-trip behavior; `Unwrap` joins those breaks with spaces. Explicit hard-break nodes, code, and block boundaries are not unwrapped. The serializer does not currently enforce a line width.
 
+## Frontmatter
+
+`Constructs::frontmatter` recognizes closed fences only at the beginning of a document, outside containers and without opening indentation. Untagged `---` and `+++` retain the inherited `Yaml` and `Toml` nodes. Tagged delimiter forms (including `---yaml`) and language-tagged backtick or tilde fences use `Frontmatter`.
+
+The generic node follows Markly/cmarkly's format-agnostic model: `info` is the entire opaque info string, trimmed only at its outer spaces and tabs; `value` is the raw body, including its trailing line ending. Neither is decoded or interpreted. `language()` and `Node::code_language()` return the first word, while `Node::code_info()` returns the full info string. Opening and closing fence lengths are retained. Closing code fences follow the usual marker, minimum length, and indentation rules; the Rust extension requires a closing fence for every form.
+
+Both HTML paths omit frontmatter. Markdown serialization preserves info and body while normalizing fence spacing. It lengthens code fences when edited content could close them, and switches conflicting dash/plus delimiters to tildes. Edited bodies without a trailing line ending gain one before the closing fence. Keep these safety checks in the Markdown handler, separate from the public AST type.
+
 ## Tests and generated data
 
 Integration tests are organized by Markdown construct in `tests/`; keep regressions close to the behavior they cover. `tests/commonmark.rs` exercises the CommonMark corpus, and `tests/html_renderer.rs` and `tests/markdown_renderer.rs` cover AST rendering. `tests/markdown_serializer_*.rs` contains the Markdown serializer corpus.
