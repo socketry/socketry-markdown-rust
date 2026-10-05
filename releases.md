@@ -1,5 +1,10 @@
 # Releases
 
+## Unreleased
+
+- Fix a panic when serializing long inline code or math values containing CRLF
+  before unsafe Markdown characters.
+
 ## v0.1.1
 
 - Update agent guidance to install dependency context and skills without
