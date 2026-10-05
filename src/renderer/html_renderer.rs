@@ -210,6 +210,7 @@ impl HTMLRenderer {
             | Node::MdxFlowExpression(_)
             | Node::MdxjsEsm(_)
             | Node::Yaml(_)
+            | Node::Frontmatter(_)
             | Node::Toml(_) => String::new(),
             Node::MdxJsxFlowElement(element) => self.render_jsx(
                 element.name.as_deref(),

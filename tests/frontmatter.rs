@@ -105,8 +105,8 @@ fn frontmatter() -> Result<(), message::Message> {
 
     assert_eq!(
         to_html_with_options("--- a\n---", &frontmatter)?,
-        "<h2>--- a</h2>",
-        "should not support content after opening fence"
+        "",
+        "should support a format hint after the opening fence"
     );
 
     assert_eq!(
@@ -170,4 +170,298 @@ fn frontmatter() -> Result<(), message::Message> {
     );
 
     Ok(())
+}
+
+fn parse_options() -> ParseOptions {
+    ParseOptions {
+        constructs: Constructs {
+            frontmatter: true,
+            ..Constructs::default()
+        },
+        ..ParseOptions::default()
+    }
+}
+
+fn generic(source: &str) -> socketry_markdown::mdast::Frontmatter {
+    let document = to_mdast(source, &parse_options()).unwrap();
+    match &document.children().unwrap()[0] {
+        Node::Frontmatter(node) => node.clone(),
+        node => panic!("expected frontmatter for {:?}, got {:?}", source, node),
+    }
+}
+
+#[test]
+fn tagged_frontmatter_keeps_opaque_info_and_literal_body() {
+    for (source, fence, opening, closing, info, body) in [
+        (
+            "```json\n{\"name\": \"Neptune\"}\n```",
+            '`',
+            3,
+            3,
+            "json",
+            "{\"name\": \"Neptune\"}\n",
+        ),
+        (
+            "~~~~toml title=planet\nname = 'Neptune'\n~~~~~",
+            '~',
+            4,
+            5,
+            "toml title=planet",
+            "name = 'Neptune'\n",
+        ),
+        (
+            "---yaml\nname: Neptune\n---",
+            '-',
+            3,
+            3,
+            "yaml",
+            "name: Neptune\n",
+        ),
+        ("--- json\n{}\n---", '-', 3, 3, "json", "{}\n"),
+        (
+            "+++ custom\nraw &amp; \\* text\n+++",
+            '+',
+            3,
+            3,
+            "custom",
+            "raw &amp; \\* text\n",
+        ),
+        (
+            "``` \tjson\\+ &amp; title=planet \t\n\na\n\n \t\n```",
+            '`',
+            3,
+            3,
+            "json\\+ &amp; title=planet",
+            "\na\n\n \t\n",
+        ),
+        ("~~~\u{a0}\nraw\n~~~", '~', 3, 3, "\u{a0}", "raw\n"),
+        ("\u{feff}```json\n{}\n```", '`', 3, 3, "json", "{}\n"),
+        ("~~~\u{c}\nraw\n~~~", '~', 3, 3, "\u{c}", "raw\n"),
+        (
+            "~~~ ~format metadata\nraw\n~~~",
+            '~',
+            3,
+            3,
+            "~format metadata",
+            "raw\n",
+        ),
+        ("~~~json\n~~~", '~', 3, 3, "json", ""),
+        ("```json\r\n{}\r\n```", '`', 3, 3, "json", "{}\r\n"),
+        ("~~~json\r{}\r~~~", '~', 3, 3, "json", "{}\r"),
+        (
+            "~~~some`format\nraw\n   ~~~~ \t",
+            '~',
+            3,
+            4,
+            "some`format",
+            "raw\n",
+        ),
+        ("```json\n{}\n  ```", '`', 3, 3, "json", "{}\n"),
+    ] {
+        let node = generic(source);
+        assert_eq!(node.info, info, "{source:?}");
+        assert_eq!(node.value, body, "{source:?}");
+        assert_eq!(
+            (node.fence, node.fence_length, node.closing_fence_length),
+            (fence, opening, closing)
+        );
+        assert_eq!(node.language(), info.split_ascii_whitespace().next());
+        let document = to_mdast(source, &parse_options()).unwrap();
+        let output = document.to_markdown();
+        let reparsed = generic(&output);
+        assert_eq!(reparsed.info, info);
+        assert_eq!(reparsed.value, body);
+        assert_eq!(
+            (
+                reparsed.fence,
+                reparsed.fence_length,
+                reparsed.closing_fence_length
+            ),
+            (fence, opening, closing)
+        );
+    }
+}
+
+#[test]
+fn only_closed_tagged_fences_at_document_start_are_frontmatter() {
+    for source in [
+        "```\nbody\n```",
+        "~~~ \t\nbody\n~~~",
+        "```json",
+        "~~~json\nbody",
+        "```json\nbody\n~~~",
+        "````json\nbody\n```",
+        "```json`bad\nbody\n```",
+        "``json\nbody\n``",
+        "~~json\nbody\n~~",
+        " ```json\nbody\n ```",
+        "\n```json\nbody\n```",
+        "text\n\n~~~json\nbody\n~~~",
+        "> ```json\n> body\n> ```",
+        "- ~~~json\n  body\n  ~~~",
+        "~~~json\nbody\n    ~~~",
+        "```json\n{}\n\t```",
+        "---json",
+        "+++json\nbody",
+        "----json\nbody\n----",
+    ] {
+        let document = to_mdast(source, &parse_options()).unwrap();
+        assert!(
+            !document
+                .children()
+                .unwrap()
+                .iter()
+                .any(|node| matches!(node, Node::Frontmatter(_))),
+            "{:?}",
+            source
+        );
+    }
+
+    for source in [
+        "```json\n{}\n```",
+        "~~~toml\na = 1\n~~~",
+        "---json\n{}\n---",
+    ] {
+        let document = to_mdast(source, &ParseOptions::default()).unwrap();
+        assert!(!document
+            .children()
+            .unwrap()
+            .iter()
+            .any(|node| matches!(node, Node::Frontmatter(_))));
+    }
+}
+
+#[test]
+fn nonclosing_fence_lines_remain_in_the_body() {
+    let source = "````json\n```\n~~~~\n```` suffix\n    ````\n`````";
+    assert_eq!(generic(source).value, "```\n~~~~\n```` suffix\n    ````\n");
+    assert_eq!(
+        generic("---custom\n----\n--- suffix\n---").value,
+        "----\n--- suffix\n"
+    );
+    assert_eq!(
+        generic("~~~json\nbody\n~~~\n\n```rust\ncode\n```").value,
+        "body\n"
+    );
+}
+
+#[test]
+fn both_html_paths_omit_generic_frontmatter_and_keep_later_code() {
+    let options = Options {
+        parse: parse_options(),
+        ..Options::default()
+    };
+    let source = "--- json\n{}\n---\n\n# Neptune\n\n```rust\nlet x = 1;\n```";
+    let expected = "<h1>Neptune</h1>\n<pre><code class=\"language-rust\">let x = 1;\n</code></pre>";
+    assert_eq!(to_html_with_options(source, &options).unwrap(), expected);
+    let document = to_mdast(source, &options.parse).unwrap();
+    assert_eq!(
+        document.render_with(&mut socketry_markdown::HTMLRenderer::new()),
+        expected
+    );
+    assert_eq!(document.children().unwrap().len(), 3);
+    assert!(matches!(&document.children().unwrap()[2], Node::Code(_)));
+}
+
+#[test]
+fn frontmatter_ast_helpers_and_source_positions() {
+    let mut node = Node::Frontmatter(generic("```json title=x\n{}\n```"));
+    assert_eq!(node.code_language(), Some("json"));
+    assert_eq!(node.code_info().as_deref(), Some("json title=x"));
+    assert_eq!(node.text_content(), "{}\n");
+    assert_eq!(node.to_string(), "{}\n");
+    assert!(format!("{node:?}").starts_with("Frontmatter {"));
+    assert!(node.children().is_none());
+    assert!(node.children_mut().is_none());
+    assert_eq!(node.position(), Some(&Position::new(1, 1, 0, 3, 4, 22)));
+    node.position_mut().unwrap().start.line = 2;
+    assert_eq!(node.position().unwrap().start.line, 2);
+    node.position_set(None);
+    assert_eq!(node.position(), None);
+    let mut visited = 0;
+    node.walk(&mut |_| visited += 1);
+    assert_eq!(visited, 1);
+}
+
+#[test]
+fn serialization_protects_edited_frontmatter_bodies() {
+    for (source, body, expected) in [
+        (
+            "```json\n{}\n```",
+            "a\n```\nb\n",
+            "````json\na\n```\nb\n````\n",
+        ),
+        ("~~~custom\n~~~", "~~~~\n", "~~~~~custom\n~~~~\n~~~~~\n"),
+        ("--- json\n---", "--- \t\n", "~~~json\n--- \t\n~~~\n"),
+        ("+++ json\n+++", "+++\rbody\r", "~~~json\n+++\rbody\r~~~\n"),
+        ("--- json\n---", "value", "--- json\nvalue\n---\n"),
+        ("~~~json\n~~~~~", "", "~~~json\n~~~~~\n"),
+    ] {
+        let mut frontmatter = generic(source);
+        frontmatter.value = body.into();
+        let output = Node::Frontmatter(frontmatter).to_markdown();
+        assert_eq!(output, expected);
+        assert_eq!(
+            generic(&output).value,
+            if body.is_empty() || body.ends_with(['\r', '\n']) {
+                body.into()
+            } else {
+                format!("{body}\n")
+            }
+        );
+    }
+}
+
+#[test]
+fn serialization_rejects_invalid_edited_frontmatter_metadata() {
+    for (fence, info) in [
+        ('!', "json"),
+        ('~', ""),
+        ('~', " \t"),
+        ('~', "json\nother"),
+        ('~', "json\rother"),
+        ('`', "json`other"),
+    ] {
+        let mut frontmatter = generic("~~~json\n~~~");
+        frontmatter.fence = fence;
+        frontmatter.info = info.into();
+        let result = socketry_markdown::to_markdown(&Node::Frontmatter(frontmatter));
+        assert_eq!(*result.unwrap_err().rule_id, "invalid-frontmatter");
+    }
+}
+
+#[cfg(feature = "serde")]
+#[test]
+fn frontmatter_serde_roundtrip_preserves_body_and_fences() {
+    let mut node = generic("~~~~custom title=x\nraw\n~~~~~");
+    let json = serde_json::to_value(&node).unwrap();
+    assert_eq!(json["info"], "custom title=x");
+    assert_eq!(json["value"], "raw\n");
+    assert_eq!(json["fenceLength"], 4);
+    assert_eq!(json["closingFenceLength"], 5);
+    assert_eq!(
+        serde_json::from_value::<socketry_markdown::mdast::Frontmatter>(json).unwrap(),
+        node
+    );
+    let ast = Node::Frontmatter(node.clone());
+    assert_eq!(
+        serde_json::from_str::<Node>(&serde_json::to_string(&ast).unwrap()).unwrap(),
+        ast
+    );
+    node.position = None;
+    assert!(serde_json::to_value(&node)
+        .unwrap()
+        .get("position")
+        .is_none());
+}
+
+#[test]
+fn generic_frontmatter_does_not_require_the_code_fenced_construct() {
+    let mut options = parse_options();
+    options.constructs.code_fenced = false;
+    let document = to_mdast("```json\n{}\n```", &options).unwrap();
+    assert!(matches!(
+        &document.children().unwrap()[0],
+        Node::Frontmatter(_)
+    ));
 }

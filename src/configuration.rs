@@ -111,7 +111,12 @@ pub struct Constructs {
     ///     ^^^^^^^^^^
     /// ```
     pub definition: bool,
-    /// Frontmatter.
+    /// Frontmatter at the start of the document, requiring a closing fence.
+    ///
+    /// Untagged `---` and `+++` produce YAML and TOML nodes. A format hint after
+    /// either delimiter, or a language-tagged backtick/tilde code fence, produces
+    /// a language-agnostic [`Frontmatter`][crate::mdast::Frontmatter] node. The
+    /// parser preserves its raw body and full info string; HTML omits it.
     ///
     /// ````markdown
     /// > | ---

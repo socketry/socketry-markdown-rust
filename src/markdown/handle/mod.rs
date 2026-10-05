@@ -11,6 +11,7 @@ mod r#break;
 mod code;
 mod definition;
 pub mod emphasis;
+mod frontmatter;
 mod heading;
 pub mod html;
 pub mod image;
