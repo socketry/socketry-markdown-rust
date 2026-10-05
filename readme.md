@@ -81,6 +81,16 @@ for the standard process.
 <!-- bake-readme:releases:start -->
 See [releases.md](releases.md) for the full release history.
 
+### v0.2.0
+
+- Add an option to unwrap soft line breaks when serializing Markdown.
+- Preserve checked and unchecked task list items when serializing Markdown.
+- Fix a panic when serializing long inline code or math values containing CRLF
+  before unsafe Markdown characters.
+
+- Fix parsing and serialization edge cases for HTML blocks, inline code, and
+  Unicode escapes.
+
 ### v0.1.1
 
 - Update agent guidance to install dependency context and skills without
@@ -96,8 +106,6 @@ See [releases.md](releases.md) for the full release history.
 <!-- bake-readme:releases:end -->
 
 ## See Also
-
-- [socketry-markdown](https://github.com/socketry/socketry-markdown-rust) — CommonMark compliant markdown parser in Rust with ASTs and extensions <!-- bake-readme:package -->
 
 - [`markdown-rs`](https://github.com/wooorm/markdown-rs) — the upstream parser.
 - [CommonMark](https://commonmark.org/) — the Markdown specification.

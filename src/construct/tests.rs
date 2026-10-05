@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2026, by Samuel Williams.
+
 use crate::{
     construct::{
         content, flow, frontmatter, gfm_autolink_literal, html_flow, html_text, label_end,
