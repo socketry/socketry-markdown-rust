@@ -110,6 +110,7 @@ fn joins_code_and_spread_list_children_consistently() {
     };
     let state = State::new(&options);
     let code = Node::Code(Code {
+        fence: None,
         value: "indented".into(),
         position: None,
         lang: None,

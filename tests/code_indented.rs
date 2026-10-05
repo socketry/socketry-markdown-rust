@@ -214,6 +214,7 @@ fn code_indented() -> Result<(), message::Message> {
         )?,
         Node::Root(Root {
             children: vec![Node::Code(Code {
+                fence: None,
                 lang: None,
                 meta: None,
                 value: "console.log(1)\nconsole.log(2)".into(),

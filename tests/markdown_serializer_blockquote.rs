@@ -178,6 +178,7 @@ fn block_quote() {
         to_md_with_opts(
             &Node::Blockquote(Blockquote {
                 children: vec![Node::Code(Code {
+                    fence: None,
                     value: String::from("a\nb\n\nc"),
                     position: None,
                     lang: None,
@@ -198,6 +199,7 @@ fn block_quote() {
     assert_eq!(
         to(&Node::Blockquote(Blockquote {
             children: vec![Node::Code(Code {
+                fence: None,
                 value: String::from("c\nd\n\ne"),
                 position: None,
                 lang: String::from("a\nb").into(),

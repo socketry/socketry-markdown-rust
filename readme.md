@@ -69,6 +69,22 @@ assert!(markdown.starts_with("# Introduction"));
 
 `MarkdownOptions::line_wrapping` can preserve soft source line breaks or unwrap them into spaces when serializing Markdown.
 
+### Inspect code fences
+
+`Node::code_fence()` exposes the opening marker, length, and indentation, following Markly's fence structure:
+
+```rust
+use socketry_markdown::{to_mdast, ParseOptions};
+
+let document = to_mdast("  ~~~~rust\n  let x = 1;\n  ~~~~", &ParseOptions::default()).unwrap();
+let fence = document.children().unwrap()[0].code_fence().unwrap();
+assert_eq!(fence.character, '~');
+assert_eq!(fence.length, 4);
+assert_eq!(fence.indent, 2);
+```
+
+Indentation is measured in columns relative to the containing block. Fence metadata survives cloning, detaching nodes, and removing source positions. The helper also supports frontmatter; inline and indented code return `None`. This describes the source opening fence, while ordinary code serialization uses `MarkdownOptions` to choose its output formatting.
+
 ### Extensions
 
 The parser inherits support for CommonMark, GFM, MDX, frontmatter, and math constructs from `markdown-rs`. The fork-specific parsing options are described under [Motivation](#motivation). HTML output escapes raw HTML and omits MDX expressions by default. See the [API documentation](https://docs.rs/socketry-markdown/latest/socketry_markdown/) for parser options, renderer configuration, and AST types.
@@ -104,6 +120,12 @@ Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or
 
 See [releases.md](releases.md) for the full release history.
 
+### v0.5.0
+
+- Add `Node::code_fence()` and `mdast::CodeFence`, exposing an opening fence's character, length, and indentation in columns, following Markly's fence structure.
+- Retain fence metadata on ordinary code blocks independently of source positions, and expose existing frontmatter fences through the same helper. Inline and indented code return `None`.
+- Add `Code::fence: Option<CodeFence>`; Rust struct literals must supply this field (use `None` when no source metadata is available). Older serialized ASTs remain readable.
+
 ### v0.4.0
 
 - Add language-agnostic frontmatter through the existing `Constructs::frontmatter` option: closed, language-tagged backtick/tilde fences at document start and format hints on `---`/`+++`.
@@ -117,12 +139,6 @@ See [releases.md](releases.md) for the full release history.
 ### v0.3.2
 
 - Name renderer source files after their public types without changing public import paths.
-
-### v0.3.1
-
-- Adopt `socketry-project` 0.3.7 for shared project tasks and Markdown normalization.
-- Require the aggregate test and coverage result for pull request merges.
-- Refresh dependency examples and repository-owned agent guidance.
 
 <!-- bake-readme:releases:end -->
 

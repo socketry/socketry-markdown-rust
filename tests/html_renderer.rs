@@ -217,6 +217,7 @@ fn renders_ast_node_variants_and_custom_renderer_methods() {
                 spread: false,
             }),
             Node::Code(Code {
+                fence: None,
                 value: "code".into(),
                 position: None,
                 lang: Some("rust".into()),

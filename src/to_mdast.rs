@@ -9,7 +9,7 @@
 //! Turn events into a syntax tree.
 use crate::event::{Event, Kind, Name};
 use crate::mdast::{
-    AttributeContent, AttributeValue, AttributeValueExpression, Blockquote, Break, Code,
+    AttributeContent, AttributeValue, AttributeValueExpression, Blockquote, Break, Code, CodeFence,
     Definition, Delete, Emphasis, FootnoteDefinition, FootnoteReference, Frontmatter, Heading,
     Html, Image, ImageReference, InlineCode, InlineMath, Link, LinkReference, List, ListItem, Math,
     MdxFlowExpression, MdxJsxAttribute, MdxJsxExpressionAttribute, MdxJsxFlowElement,
@@ -498,7 +498,32 @@ fn on_enter_block_quote(context: &mut CompileContext) {
 
 /// Handle [`Enter`][Kind::Enter]:[`CodeFenced`][Name::CodeFenced].
 fn on_enter_code_fenced(context: &mut CompileContext) {
+    let fence = if context.events[context.index].name == Name::CodeFenced {
+        let index = context.events[context.index].point.index;
+        let marker = context.bytes[index];
+        // The parser emits any opening indentation immediately before CodeFenced.
+        // Measure columns so tabs (including partially consumed container tabs)
+        // count as indentation without counting the container prefix itself.
+        let indent =
+            if context.index > 0 && context.events[context.index - 1].name == Name::SpaceOrTab {
+                let prefix = SlicePosition::from_exit_event(context.events, context.index - 1);
+                prefix.end.column - prefix.start.column
+            } else {
+                0
+            };
+        Some(CodeFence {
+            character: char::from(marker),
+            length: context.bytes[index..]
+                .iter()
+                .take_while(|&&b| b == marker)
+                .count(),
+            indent,
+        })
+    } else {
+        None
+    };
     context.tail_push(Node::Code(Code {
+        fence,
         lang: None,
         meta: None,
         value: String::new(),

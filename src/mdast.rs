@@ -19,6 +19,10 @@ use alloc::{
 
 mod headings;
 pub use headings::{HeadingEntry, HeadingOptions, Headings};
+mod code;
+pub use code::Code;
+mod code_fence;
+pub use code_fence::CodeFence;
 mod frontmatter;
 pub use frontmatter::Frontmatter;
 
@@ -620,6 +624,35 @@ impl Node {
         }
     }
 
+    /// Return opening fence details for code blocks and frontmatter.
+    ///
+    /// `indent` is measured in columns relative to the containing block, not
+    /// the absolute source column. Inline code, indented code, and nodes without
+    /// retained fence metadata return `None`. Legacy YAML/TOML fences have a
+    /// fixed length of three and no indentation.
+    #[must_use]
+    pub fn code_fence(&self) -> Option<CodeFence> {
+        match self {
+            Node::Code(node) => node.fence,
+            Node::Frontmatter(node) => Some(CodeFence {
+                character: node.fence,
+                length: node.fence_length,
+                indent: 0,
+            }),
+            Node::Yaml(_) => Some(CodeFence {
+                character: '-',
+                length: 3,
+                indent: 0,
+            }),
+            Node::Toml(_) => Some(CodeFence {
+                character: '+',
+                length: 3,
+                indent: 0,
+            }),
+            _ => None,
+        }
+    }
+
     /// Return the info string for inline code, fenced code, or tagged frontmatter.
     ///
     /// Inline code metadata is its language token. Fenced code metadata is
@@ -957,34 +990,6 @@ pub struct Html {
     /// Positional info.
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub position: Option<Position>,
-}
-
-/// Code (flow).
-///
-/// ```markdown
-/// > | ~~~
-///     ^^^
-/// > | a
-///     ^
-/// > | ~~~
-///     ^^^
-/// ```
-#[derive(Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Code {
-    // Text.
-    /// Content model.
-    pub value: String,
-    /// Positional info.
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
-    pub position: Option<Position>,
-    // Extra.
-    /// The language of computer code being marked up.
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
-    pub lang: Option<String>,
-    /// Custom info relating to the node.
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
-    pub meta: Option<String>,
 }
 
 /// Math (flow).
@@ -1678,6 +1683,7 @@ mod tests {
     #[test]
     fn code() {
         let mut node = Node::Code(Code {
+            fence: None,
             value: "a".into(),
             position: None,
             lang: None,
@@ -1686,7 +1692,7 @@ mod tests {
 
         assert_eq!(
             format!("{node:?}"),
-            "Code { value: \"a\", position: None, lang: None, meta: None }",
+            "Code { value: \"a\", position: None, lang: None, meta: None, fence: None }",
             "should support `Debug`"
         );
         assert_eq!(node.to_string(), "a", "should support `ToString`");
@@ -1697,7 +1703,7 @@ mod tests {
         node.position_set(Some(Position::new(1, 1, 0, 1, 2, 1)));
         assert_eq!(
             format!("{node:?}"),
-            "Code { value: \"a\", position: Some(1:1-1:2 (0-1)), lang: None, meta: None }",
+            "Code { value: \"a\", position: Some(1:1-1:2 (0-1)), lang: None, meta: None, fence: None }",
             "should support `position_set`"
         );
     }
@@ -2702,6 +2708,7 @@ mod tests {
             (None, None, None),
         ] {
             let code = Node::Code(Code {
+                fence: None,
                 value: "code".into(),
                 position: None,
                 lang: lang.map(Into::into),
