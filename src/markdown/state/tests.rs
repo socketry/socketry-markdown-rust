@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2026, by Samuel Williams.
+
 use super::{escape_table_pipes, has_matching_ticks, render_frontmatter, Info, Join, State};
 use crate::{
     markdown::{r#unsafe::Unsafe, util::safe::SafeConfig, Options},

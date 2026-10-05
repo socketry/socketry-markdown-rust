@@ -1,3 +1,6 @@
+// Released under the MIT License.
+// Copyright, 2026, by Samuel Williams.
+
 use super::*;
 use crate::event::Kind;
 use crate::{MdxExpressionKind, MdxSignal, ParseOptions};
