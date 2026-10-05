@@ -574,7 +574,7 @@ fn serde_code() -> Result<(), Error> {
         r#"{
   "type": "root",
   "children": [
-    {"type": "code", "lang": "js", "meta": "eval", "value": "console.log(1)"}
+    {"type": "code", "lang": "js", "meta": "eval", "value": "console.log(1)", "fence": {"character": "~", "length": 3, "indent": 0}}
   ]
 }"#,
         ParseOptions::default(),
@@ -584,7 +584,7 @@ fn serde_code() -> Result<(), Error> {
         "```\nconsole.log(1)\n```",
         r#"{
   "type": "root",
-  "children": [{"type": "code", "value": "console.log(1)"}]
+  "children": [{"type": "code", "value": "console.log(1)", "fence": {"character": "`", "length": 3, "indent": 0}}]
 }"#,
         ParseOptions::default(),
     )

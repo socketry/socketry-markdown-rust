@@ -408,6 +408,7 @@ fn propagates_exit_errors_across_jsx_parent_boundaries() {
         checked: None,
     });
     let code = Node::Code(Code {
+        fence: None,
         value: String::new(),
         position: None,
         lang: None,
@@ -645,6 +646,7 @@ fn skips_checkbox_prefix_adjustment_for_nonparagraph_task_content() {
     let events = event_pair(Name::ListItem, 0, 1);
     let item = Node::ListItem(ListItem {
         children: vec![Node::Code(Code {
+            fence: None,
             value: "code".into(),
             position: Some(Position::new(1, 1, 0, 1, 2, 1)),
             lang: None,

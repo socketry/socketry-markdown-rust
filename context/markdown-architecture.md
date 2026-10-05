@@ -13,6 +13,14 @@ The Markdown serializer lives in `src/markdown/`. Keep its construct handlers an
 
 `MarkdownOptions::line_wrapping` controls soft source line breaks in text. `Preserve` is the default and keeps round-trip behavior; `Unwrap` joins those breaks with spaces. Explicit hard-break nodes, code, and block boundaries are not unwrapped. The serializer does not currently enforce a line width.
 
+## Code fences
+
+`Node::code_fence()` returns `Option<CodeFence>` with `character`, `length`, and `indent`, following Markly's `Node::Fence` structure at [436de44](https://github.com/socketry/markly/blob/436de44bebc5aeeb3684cf8ac6e625fbb3fb6e7b/ext/markly/markly.c). The corresponding regression examples are in [`test/markly/node.rb`](https://github.com/socketry/markly/blob/436de44bebc5aeeb3684cf8ac6e625fbb3fb6e7b/test/markly/node.rb).
+
+Ordinary `Code` nodes retain their opening fence in `fence: Option<CodeFence>` independently of source positions. Indented code and manually constructed or older deserialized code without metadata use `None`. Fence length describes the opening sequence even if the closer is longer or absent. Indentation is measured in columns relative to the container, excluding list and blockquote prefixes; tabs, including partially consumed container tabs, contribute their expanded width. Markdown serialization continues to choose ordinary code formatting from `MarkdownOptions`, so this metadata describes the source rather than the rendered output.
+
+The Rust helper also exposes frontmatter fences: generic nodes use their existing marker and opening length; legacy YAML/TOML use their fixed three-character, unindented delimiter. Inline code and other nodes return `None`. Keep fence information separate from language and info strings.
+
 ## Frontmatter
 
 `Constructs::frontmatter` recognizes closed fences only at the beginning of a document, outside containers and without opening indentation. Untagged `---` and `+++` retain the inherited `Yaml` and `Toml` nodes. Tagged delimiter forms (including `---yaml`) and language-tagged backtick or tilde fences use `Frontmatter`.

@@ -5,7 +5,7 @@
 
 use pretty_assertions::assert_eq;
 use socketry_markdown::{
-    mdast::{Code, Node, Root},
+    mdast::{Code, CodeFence, Node, Root},
     message, to_html, to_html_with_options, to_mdast,
     unist::Position,
     Constructs, Options, ParseOptions,
@@ -297,6 +297,11 @@ fn code_fenced() -> Result<(), message::Message> {
         )?,
         Node::Root(Root {
             children: vec![Node::Code(Code {
+                fence: Some(CodeFence {
+                    character: '`',
+                    length: 3,
+                    indent: 0
+                }),
                 lang: Some("js".into()),
                 meta: Some("extra".into()),
                 value: "console.log(1)\nconsole.log(2)".into(),
@@ -311,6 +316,11 @@ fn code_fenced() -> Result<(), message::Message> {
         to_mdast("```\nasd", &Default::default())?,
         Node::Root(Root {
             children: vec![Node::Code(Code {
+                fence: Some(CodeFence {
+                    character: '`',
+                    length: 3,
+                    indent: 0
+                }),
                 lang: None,
                 meta: None,
                 value: "asd".into(),
@@ -325,6 +335,11 @@ fn code_fenced() -> Result<(), message::Message> {
         to_mdast("```\rasd\r```", &Default::default())?,
         Node::Root(Root {
             children: vec![Node::Code(Code {
+                fence: Some(CodeFence {
+                    character: '`',
+                    length: 3,
+                    indent: 0
+                }),
                 lang: None,
                 meta: None,
                 value: "asd".into(),
@@ -339,6 +354,11 @@ fn code_fenced() -> Result<(), message::Message> {
         to_mdast("```\r\nasd\r\n```", &Default::default())?,
         Node::Root(Root {
             children: vec![Node::Code(Code {
+                fence: Some(CodeFence {
+                    character: '`',
+                    length: 3,
+                    indent: 0
+                }),
                 lang: None,
                 meta: None,
                 value: "asd".into(),

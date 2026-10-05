@@ -1,5 +1,11 @@
 # Releases
 
+## v0.5.0
+
+- Add `Node::code_fence()` and `mdast::CodeFence`, exposing an opening fence's character, length, and indentation in columns, following Markly's fence structure.
+- Retain fence metadata on ordinary code blocks independently of source positions, and expose existing frontmatter fences through the same helper. Inline and indented code return `None`.
+- Add `Code::fence: Option<CodeFence>`; Rust struct literals must supply this field (use `None` when no source metadata is available). Older serialized ASTs remain readable.
+
 ## v0.4.0
 
 - Add language-agnostic frontmatter through the existing `Constructs::frontmatter` option: closed, language-tagged backtick/tilde fences at document start and format hints on `---`/`+++`.

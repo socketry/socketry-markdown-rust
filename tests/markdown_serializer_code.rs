@@ -14,6 +14,7 @@ fn text() {
     assert_eq!(
         to_md_with_opts(
             &Node::Code(Code {
+                fence: None,
                 value: String::from("a"),
                 position: None,
                 lang: None,
@@ -31,6 +32,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::from("a"),
             position: None,
             lang: None,
@@ -43,6 +45,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("a".to_string()),
@@ -55,6 +58,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: None,
@@ -67,6 +71,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("a".to_string()),
@@ -79,6 +84,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("a b".to_string()),
@@ -91,6 +97,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("a\nb".to_string()),
@@ -103,6 +110,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("a`b".to_string()),
@@ -115,6 +123,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("a\\-b".to_string()),
@@ -127,6 +136,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("x".to_string()),
@@ -139,6 +149,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("x".to_string()),
@@ -151,6 +162,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("x".to_string()),
@@ -163,6 +175,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::new(),
             position: None,
             lang: Some("x".to_string()),
@@ -176,6 +189,7 @@ fn text() {
     assert_eq!(
         to_md_with_opts(
             &Node::Code(Code {
+                fence: None,
                 value: String::new(),
                 position: None,
                 lang: None,
@@ -194,6 +208,7 @@ fn text() {
     assert_eq!(
         to_md_with_opts(
             &Node::Code(Code {
+                fence: None,
                 value: String::new(),
                 position: None,
                 lang: Some("a`b".to_string()),
@@ -211,6 +226,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::from("```\nasd\n```"),
             position: None,
             lang: None,
@@ -224,6 +240,7 @@ fn text() {
     assert_eq!(
         to_md_with_opts(
             &Node::Code(Code {
+                fence: None,
                 value: String::from("~~~\nasd\n~~~"),
                 position: None,
                 lang: None,
@@ -241,6 +258,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::from("b"),
             position: None,
             lang: Some("a".to_string()),
@@ -253,6 +271,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::from(" "),
             position: None,
             lang: None,
@@ -265,6 +284,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::from("\na"),
             position: None,
             lang: None,
@@ -277,6 +297,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::from(" \na"),
             position: None,
             lang: None,
@@ -289,6 +310,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::from("a\n"),
             position: None,
             lang: None,
@@ -301,6 +323,7 @@ fn text() {
 
     assert_eq!(
         to(&Node::Code(Code {
+            fence: None,
             value: String::from("a\n "),
             position: None,
             lang: None,
@@ -314,6 +337,7 @@ fn text() {
     assert_eq!(
         to_md_with_opts(
             &Node::Code(Code {
+                fence: None,
                 value: String::from("  a\n\n b"),
                 position: None,
                 lang: None,

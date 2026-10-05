@@ -104,6 +104,7 @@ mod tests {
 
         for child in [
             Node::Code(Code {
+                fence: None,
                 value: literal("a\nb"),
                 position: None,
                 lang: None,

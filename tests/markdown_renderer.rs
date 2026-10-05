@@ -221,6 +221,7 @@ fn serializes_ast_variants_and_custom_markdown_options() {
             position: None,
         }),
         Node::Code(Code {
+            fence: None,
             value: "code".into(),
             position: None,
             lang: Some("rust".into()),
@@ -501,6 +502,7 @@ fn serializes_ast_variants_and_custom_markdown_options() {
                 depth: 2,
             }),
             Node::Code(Code {
+                fence: None,
                 value: "~~~\ncode".into(),
                 position: None,
                 lang: Some("rust".into()),

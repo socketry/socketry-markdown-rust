@@ -221,6 +221,7 @@ fn core() {
             &Node::Root(Root {
                 children: vec![
                     Node::Code(Code {
+                        fence: None,
                         value: String::from("a"),
                         position: None,
                         lang: None,
@@ -239,6 +240,7 @@ fn core() {
                         spread: false
                     }),
                     Node::Code(Code {
+                        fence: None,
                         value: String::from("b"),
                         position: None,
                         lang: None,
@@ -262,12 +264,14 @@ fn core() {
             &Node::Root(Root {
                 children: vec![
                     Node::Code(Code {
+                        fence: None,
                         value: String::from("a"),
                         position: None,
                         lang: None,
                         meta: None
                     }),
                     Node::Code(Code {
+                        fence: None,
                         value: String::from("b"),
                         position: None,
                         lang: None,
