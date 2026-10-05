@@ -2054,7 +2054,7 @@ dependencies = [
 
 [[package]]
 name = "socketry-markdown"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "criterion",
  "env_logger",

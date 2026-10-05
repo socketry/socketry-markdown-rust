@@ -1,6 +1,6 @@
 # Releases
 
-## Unreleased
+## v0.3.2
 
 - Name renderer source files after their public types without changing public import paths.
 
