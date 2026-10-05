@@ -19,7 +19,7 @@ fn list_item() {
             checked: None
         }))
         .unwrap(),
-        "*\n",
+        "-\n",
         "should support a list item"
     );
 
@@ -55,7 +55,7 @@ fn list_item() {
             checked: None
         }))
         .unwrap(),
-        "* a\n",
+        "- a\n",
         "should support a list item w/ a child"
     );
 
@@ -83,7 +83,7 @@ fn list_item() {
             checked: None
         }))
         .unwrap(),
-        "* a\n  ***\n  b\n",
+        "- a\n  ***\n  b\n",
         "should support a list item w/ children"
     );
 
@@ -110,7 +110,7 @@ fn list_item() {
             }
         )
         .unwrap(),
-        "* a\n  ***\n",
+        "- a\n  ***\n",
         "should use one space after the bullet for `list_item_indent: \"IndentOptions::One\"`"
     );
 
@@ -134,7 +134,7 @@ fn list_item() {
             }
         )
         .unwrap(),
-        "* a\n",
+        "- a\n",
         "should use one space after the bullet for `list_item_indent: \"IndentOptions::Mixed\"`, when the item is not spread"
     );
 
@@ -159,7 +159,7 @@ fn list_item() {
             }
         )
         .unwrap(),
-        "*   a\n\n    ***\n",
+        "-   a\n\n    ***\n",
         "should use a tab stop of spaces after the bullet for `list_item_indent: \"IndentOptions::Mixed\"`, when the item is spread"
     );
 
@@ -180,7 +180,7 @@ fn list_item() {
             checked: None
         }))
         .unwrap(),
-        "* a\n  ***\n",
+        "- a\n  ***\n",
         "should not use blank lines between child blocks for items w/ `spread: false`"
     );
 
@@ -188,6 +188,7 @@ fn list_item() {
         to_md_with_opts(
             &create_list(create_list(create_list::<Option<Node>>(None))),
             &Options {
+                bullet: '*',
                 bullet_other: '+',
                 ..Default::default()
             }
@@ -257,13 +258,13 @@ fn list_item() {
 
     assert_eq!(
         to(&create_list(create_list::<Option<Node>>(None))).unwrap(),
-        "* *\n",
+        "- -\n",
         "should *not* use a different bullet for an empty list item in two lists"
     );
 
     assert_eq!(
         to(&create_list(create_list(create_list::<Option<Node>>(None)))).unwrap(),
-        "* * -\n",
+        "- - *\n",
         "should use a different bullet for an empty list item in three lists (1)"
     );
 
@@ -289,7 +290,7 @@ fn list_item() {
             spread: false
         }))
         .unwrap(),
-        "*\n* * -\n",
+        "-\n- - *\n",
         "should use a different bullet for an empty list item in three lists (2)"
     );
 
@@ -311,7 +312,7 @@ fn list_item() {
             Option<Node>,
         >(None)))))
         .unwrap(),
-        "* * * -\n",
+        "- - - *\n",
         "should use a different bullet for an empty list item in four lists"
     );
 
@@ -320,7 +321,7 @@ fn list_item() {
             create_list::<Option<Node>>(None)
         )))))
         .unwrap(),
-        "* * * * -\n",
+        "- - - - *\n",
         "should use a different bullet for an empty list item in five lists"
     );
 
@@ -336,7 +337,7 @@ fn list_item() {
             create_list::<Option<Node>>(None)
         ])))
         .unwrap(),
-        "* * * a\n    -\n",
+        "- - - a\n    *\n",
         "should not use a different bullet for an empty list item at non-head in two lists"
     );
 
@@ -423,8 +424,8 @@ fn serializes_checked_and_unchecked_task_list_items() {
         })
     };
 
-    assert_eq!(to(&item(true)).unwrap(), "* [x] a task\n");
-    assert_eq!(to(&item(false)).unwrap(), "* [ ] a task\n");
+    assert_eq!(to(&item(true)).unwrap(), "- [x] a task\n");
+    assert_eq!(to(&item(false)).unwrap(), "- [ ] a task\n");
 }
 
 #[test]

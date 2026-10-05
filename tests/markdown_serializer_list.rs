@@ -38,7 +38,7 @@ fn list() {
             spread: false
         }))
         .unwrap(),
-        "*\n",
+        "-\n",
         "should support a list w/ an item"
     );
 
@@ -393,7 +393,7 @@ fn list() {
             }
         )
         .unwrap(),
-        "* a\n  b\n* c\n  d\n",
+        "- a\n  b\n- c\n  d\n",
         "should support a correct prefix and indent `list_item_indent: IndentOptions::Mixed` and a tight list"
     );
 
@@ -437,7 +437,7 @@ fn list() {
                }
            )
            .unwrap(),
-           "*   a\n    b\n\n*   c\n    d\n",
+           "-   a\n    b\n\n-   c\n    d\n",
            "should support a correct prefix and indent `list_item_indent: IndentOptions::Mixed` and a tight list"
        );
 

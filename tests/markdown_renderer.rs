@@ -121,7 +121,7 @@ fn exposes_default_options_and_fallible_rendering() {
     });
     let mut renderer = MarkdownRenderer::new();
 
-    assert_eq!(renderer.options().bullet, '*');
+    assert_eq!(renderer.options().bullet, '-');
     assert_eq!(renderer.try_render(&node).unwrap(), "hello\n");
 }
 
@@ -157,6 +157,7 @@ fn fallible_rendering_reports_invalid_markers() {
         (
             "- item",
             MarkdownOptions {
+                bullet: '*',
                 bullet_other: 'x',
                 ..Default::default()
             },

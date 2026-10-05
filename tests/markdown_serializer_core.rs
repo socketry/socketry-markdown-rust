@@ -212,7 +212,7 @@ fn core() {
             position: None
         }))
         .unwrap(),
-        "a\n\n*\n\n-\n\n1.\n\n1)\n\nd\n",
+        "a\n\n-\n\n*\n\n1.\n\n1)\n\nd\n",
         "should use a different marker for adjacent lists"
     );
 
@@ -253,7 +253,7 @@ fn core() {
             }
         )
         .unwrap(),
-        "    a\n\n*\n\n<!---->\n\n    b\n",
+        "    a\n\n-\n\n<!---->\n\n    b\n",
         "should inject HTML comments between lists and an indented code"
     );
 
@@ -309,7 +309,7 @@ fn core() {
             checked: None
         }))
         .unwrap(),
-        "* a\n\n  b\n",
+        "- a\n\n  b\n",
         "should not honour `spread: false` for two paragraphs"
     );
 
@@ -336,7 +336,7 @@ fn core() {
             checked: None
         }))
         .unwrap(),
-        "* a\n\n  [c]: d\n",
+        "- a\n\n  [c]: d\n",
         "should not honour `spread: false` for a paragraph and a definition"
     );
 
@@ -364,7 +364,7 @@ fn core() {
             checked: None
         }))
         .unwrap(),
-        "* a\n  # b\n",
+        "- a\n  # b\n",
         "should honour `spread: false` for a paragraph and a heading"
     );
 
@@ -398,7 +398,7 @@ fn core() {
             }
         )
         .unwrap(),
-        "* a\n\n  b\n  =\n",
+        "- a\n\n  b\n  =\n",
         "should not honour `spread: false` for a paragraph and a setext heading"
     );
 }

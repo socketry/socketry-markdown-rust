@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+- Use hyphens as the default marker for unordered lists in Markdown serialization.
+
 ## v0.2.0
 
 - Add an option to unwrap soft line breaks when serializing Markdown.
