@@ -5,7 +5,7 @@ edition = "2024"
 publish = false
 
 [dependencies]
-bake = "0.18.0"
+bake = "0.19"
 bake-cargo = "0.4.0"
 bake-test-rust = "0.3"
-socketry-project = ">=0.3.3"
+socketry-project = ">=0.3.7"

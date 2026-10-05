@@ -30,3 +30,15 @@ jobs:
         run: cargo bake --locked test:coverage --package socketry-markdown --all-targets true --all-features true
       - name: Test the full workspace
         run: cargo bake --locked test
+
+  test-result:
+    if: always()
+    needs: [test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful tests and coverage
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$JOB_RESULTS" | jq -e 'all(.[]; .result == "success")'
