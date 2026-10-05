@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+- Name renderer source files after their public types without changing public import paths.
+
 ## v0.3.1
 
 - Adopt `socketry-project` 0.3.7 for shared project tasks and Markdown normalization.

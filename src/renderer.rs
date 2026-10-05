@@ -2,11 +2,11 @@
 // Copyright, 2026, by Samuel Williams.
 
 //! Traits for rendering Markdown AST nodes.
-mod html;
-mod markdown;
+mod html_renderer;
+mod markdown_renderer;
 
-pub use html::HTMLRenderer;
-pub use markdown::MarkdownRenderer;
+pub use html_renderer::HTMLRenderer;
+pub use markdown_renderer::MarkdownRenderer;
 
 use crate::mdast::Node;
 use alloc::string::String;
