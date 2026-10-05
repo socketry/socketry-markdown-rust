@@ -267,23 +267,19 @@ impl<'a> State<'a> {
             return String::from(first_cap.as_str());
         }
 
-        if let Some(head) = &caps[2].chars().nth(0) {
-            if *head == '#' {
-                let radix = match caps[2].chars().nth(1) {
-                    Some('x') | Some('X') => 16,
-                    _ => 10,
-                };
-                let capture = &caps[2];
-                let numeric_encoded = if radix == 16 {
-                    &capture[2..]
-                } else {
-                    &capture[1..]
-                };
-                return crate::decode_numeric(numeric_encoded, radix);
-            }
+        let capture = &caps[2];
+        if let Some(numeric_capture) = capture.strip_prefix('#') {
+            let (radix, numeric_encoded) = match numeric_capture
+                .strip_prefix('x')
+                .or_else(|| numeric_capture.strip_prefix('X'))
+            {
+                Some(value) => (16, value),
+                None => (10, numeric_capture),
+            };
+            return crate::decode_numeric(numeric_encoded, radix);
         }
 
-        crate::decode_named(&caps[2], true).unwrap_or(caps[0].to_string())
+        crate::decode_named(capture, true).unwrap_or(caps[0].to_string())
     }
 
     /// No real JS equivalent, it’s written inline.
@@ -481,16 +477,14 @@ impl<'a> State<'a> {
     /// No real JS equivalent, but see:
     /// <https://github.com/syntax-tree/mdast-util-to-markdown/blob/main/lib/join.js>.
     fn join_defaults(&self, left: &Node, right: &Node, parent: &Node) -> Join {
-        if let Node::Code(code) = right {
-            if format_code_as_indented(code, self) && matches!(left, Node::List(_)) {
-                return Join::HtmlComment;
-            }
+        let indented_code_needs_separator = matches!(
+            right,
+            Node::Code(code) if format_code_as_indented(code, self)
+        ) && (matches!(left, Node::List(_))
+            || matches!(left, Node::Code(code) if format_code_as_indented(code, self)));
 
-            if let Node::Code(code) = left {
-                if format_code_as_indented(code, self) {
-                    return Join::HtmlComment;
-                }
-            }
+        if indented_code_needs_separator {
+            return Join::HtmlComment;
         }
 
         if matches!(parent, Node::ListItem(_) | Node::List(_)) {
@@ -510,13 +504,8 @@ impl<'a> State<'a> {
                 }
             }
 
-            let spread = if let Node::List(list) = parent {
-                list.spread
-            } else if let Node::ListItem(list_item) = parent {
-                list_item.spread
-            } else {
-                false
-            };
+            let spread = matches!(parent, Node::List(list) if list.spread)
+                || matches!(parent, Node::ListItem(list_item) if list_item.spread);
 
             if spread {
                 return Join::Lines(1);
@@ -570,30 +559,33 @@ impl<'a> State<'a> {
 
             Self::compile_pattern(pattern);
 
-            if let Some(regex) = &pattern.compiled {
-                for m in regex.captures_iter(&value) {
-                    let full_match = m.get(0).expect("Guaranteed to have a match");
-                    let captured_group_len = m
-                        .get(1)
-                        .map(|captured_group| captured_group.len())
-                        .unwrap_or(0);
-                    let before = pattern.before.is_some() || pattern.at_break;
-                    let after = pattern.after.is_some();
-                    let position = full_match.start() + if before { captured_group_len } else { 0 };
+            let regex = pattern
+                .compiled
+                .as_ref()
+                .expect("compiling an unsafe pattern sets its regex");
+            for m in regex.captures_iter(&value) {
+                let full_match = m.get(0).expect("Guaranteed to have a match");
+                let captured_group_len = m
+                    .get(1)
+                    .map(|captured_group| captured_group.len())
+                    .unwrap_or(0);
+                let before = pattern.before.is_some() || pattern.at_break;
+                let after = pattern.after.is_some();
+                let position = full_match.start() + if before { captured_group_len } else { 0 };
 
-                    if positions.contains(&position) {
-                        if let Some(entry) = infos.get_mut(&position) {
-                            if entry.before && !before {
-                                entry.before = false;
-                            }
-                            if entry.after && !after {
-                                entry.after = false;
-                            }
-                        }
-                    } else {
-                        infos.insert(position, EscapeInfos { after, before });
-                        positions.push(position);
+                if positions.contains(&position) {
+                    let entry = infos
+                        .get_mut(&position)
+                        .expect("every escaped position has matching escape info");
+                    if entry.before && !before {
+                        entry.before = false;
                     }
+                    if entry.after && !after {
+                        entry.after = false;
+                    }
+                } else {
+                    infos.insert(position, EscapeInfos { after, before });
+                    positions.push(position);
                 }
             }
         }
@@ -634,11 +626,13 @@ impl<'a> State<'a> {
             }
             start = *position;
 
-            let char_at_pos = value.chars().nth(*position);
-            match char_at_pos {
-                Some('!'..='/') | Some(':'..='@') | Some('['..='`') | Some('{'..='~') => {
+            let character = value[*position..]
+                .chars()
+                .next()
+                .expect("escape position must identify a character");
+            match character {
+                '!'..='/' | ':'..='@' | '['..='`' | '{'..='~' => {
                     if let Some(encode) = &config.encode {
-                        let character = char_at_pos.expect("To be a valid char");
                         if *encode != character {
                             result.push('\\');
                         } else {
@@ -650,21 +644,14 @@ impl<'a> State<'a> {
                         result.push('\\');
                     }
                 }
-                Some(character) => {
+                character => {
                     let encoded_char = Self::encode_char(character);
                     result.push_str(&encoded_char);
                     start += character.len_utf8();
                 }
-                _ => (),
             };
         }
 
-        // Some of the operations above seem to end up right in a utf8 boundary
-        // (see GH-170 for more info).
-        // Move back.
-        while !value.is_char_boundary(start) {
-            start -= 1;
-        }
         result.push_str(&escape_backslashes(&value[start..end], config.after));
 
         result
@@ -673,16 +660,11 @@ impl<'a> State<'a> {
     /// No real JS equivalent, but see:
     /// <https://github.com/syntax-tree/mdast-util-to-markdown/blob/fd6a508/lib/util/container-flow.js#L66>.
     fn set_between(join: &Join, results: &mut String) {
-        if let Join::Break = join {
-            results.push_str("\n\n");
-        } else if let Join::Lines(n) = join {
-            if *n == 1 {
-                results.push_str("\n\n");
-                return;
-            }
-            results.push_str("\n".repeat(1 + n).as_ref());
-        } else if let Join::HtmlComment = join {
-            results.push_str("\n\n<!---->\n\n");
+        match join {
+            Join::Break => results.push_str("\n\n"),
+            Join::Lines(1) => results.push_str("\n\n"),
+            Join::Lines(n) => results.push_str("\n".repeat(1 + n).as_ref()),
+            Join::HtmlComment => results.push_str("\n\n<!---->\n\n"),
         }
     }
 
@@ -800,3 +782,7 @@ fn has_matching_ticks(bytes: &[u8], mut index: usize, ticks: usize) -> bool {
     }
     false
 }
+
+#[cfg(test)]
+#[path = "state/tests.rs"]
+mod tests;

@@ -658,7 +658,7 @@ impl<'a> Tokenizer<'a> {
             let defs = &mut value.definitions;
             let fn_defs = &mut value.gfm_footnote_definitions;
             while index < resolvers.len() {
-                if let Some(mut result) = call_resolve(self, resolvers[index])? {
+                if let Some(mut result) = call_resolve(self, resolvers[index]) {
                     fn_defs.append(&mut result.gfm_footnote_definitions);
                     defs.append(&mut result.definitions);
                 }
@@ -784,10 +784,19 @@ fn push_impl(
     tokenizer.consumed = true;
 
     if flush {
-        debug_assert!(matches!(state, State::Ok | State::Error(_)), "must be ok");
+        debug_assert!(
+            match state {
+                State::Ok | State::Error(_) => true,
+                _ => unreachable!("flushing a tokenizer must produce a terminal state"),
+            },
+            "must be ok"
+        );
     } else {
         debug_assert!(
-            matches!(state, State::Next(_) | State::Error(_)),
+            match state {
+                State::Next(_) | State::Error(_) => true,
+                _ => unreachable!("continuing a tokenizer must produce a next state"),
+            },
             "must have a next state"
         );
     }
@@ -834,5 +843,150 @@ fn byte_action(bytes: &[u8], point: &Point) -> ByteAction {
         }
     } else {
         unreachable!("out of bounds")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{byte_action, Tokenizer};
+    use crate::{
+        construct::frontmatter,
+        construct::html_flow::{blank_line_before, blank_lines_end_data, blank_lines_end_start},
+        event::{Name, Point},
+        parser::{parse, ParseState},
+        state::{Name as StateName, State},
+        ParseOptions,
+    };
+    fn make_tokenizer<'a>(parse_state: &'a ParseState<'a>) -> Tokenizer<'a> {
+        Tokenizer::new(
+            Point {
+                line: 1,
+                column: 1,
+                index: 0,
+                vs: 0,
+            },
+            parse_state,
+        )
+    }
+
+    #[cfg(feature = "log")]
+    #[test]
+    fn emits_trace_records_for_tokenizer_transitions() {
+        env_logger::Builder::new()
+            .filter_level(log::LevelFilter::Trace)
+            .is_test(true)
+            .try_init()
+            .expect("install test logger");
+
+        let options = ParseOptions::default();
+        let (events, parse_state) = parse("first paragraph\nsecond line", &options)
+            .expect("parse Markdown with trace logging enabled");
+
+        assert!(!events.is_empty());
+        assert_eq!(parse_state.bytes, b"first paragraph\nsecond line");
+    }
+
+    #[test]
+    fn blank_line_end_states_consume_whitespace_and_finish_retained_lines() {
+        let options = ParseOptions {
+            html_block_blank_lines: true,
+            ..ParseOptions::default()
+        };
+
+        let (_events, parse_state) = parse(" \n", &options).expect("parse test input");
+        let mut tokenizer = make_tokenizer(&parse_state);
+        tokenizer.enter(Name::HtmlFlowData);
+        tokenizer.current = Some(b' ');
+        tokenizer.consumed = false;
+        tokenizer.consume();
+        tokenizer.current = Some(b'\n');
+        tokenizer.consumed = false;
+        tokenizer.tokenize_state.html_flow_blank_lines = 1;
+
+        assert_eq!(
+            blank_lines_end_data(&mut tokenizer),
+            State::Next(StateName::HtmlFlowBlankLinesEndStart)
+        );
+        assert_eq!(tokenizer.tokenize_state.html_flow_blank_lines, 0);
+
+        let (_events, parse_state) = parse(" x", &options).expect("parse test input");
+        let mut tokenizer = make_tokenizer(&parse_state);
+        tokenizer.enter(Name::HtmlFlowData);
+        tokenizer.current = Some(b' ');
+        tokenizer.consumed = false;
+        tokenizer.consume();
+        tokenizer.current = Some(b'x');
+        tokenizer.consumed = false;
+        tokenizer.tokenize_state.html_flow_blank_lines = 1;
+
+        assert_eq!(
+            blank_lines_end_data(&mut tokenizer),
+            State::Retry(StateName::HtmlFlowContinuationAfter)
+        );
+        assert_eq!(tokenizer.tokenize_state.html_flow_blank_lines, 0);
+
+        let (_events, parse_state) = parse("x", &options).expect("parse test input");
+        let mut tokenizer = make_tokenizer(&parse_state);
+        tokenizer.current = Some(b'x');
+        tokenizer.tokenize_state.html_flow_blank_lines = 1;
+
+        assert_eq!(
+            blank_lines_end_start(&mut tokenizer),
+            State::Retry(StateName::HtmlFlowContinuationAfter)
+        );
+        assert_eq!(tokenizer.tokenize_state.html_flow_blank_lines, 0);
+    }
+
+    #[test]
+    fn blank_line_before_handles_html_marker_kinds() {
+        const COMMENT: u8 = 2;
+        const BASIC: u8 = 6;
+        const COMPLETE: u8 = 7;
+
+        let options = ParseOptions {
+            html_block_blank_lines: true,
+            ..ParseOptions::default()
+        };
+
+        for (marker, expected) in [
+            (BASIC, State::Next(StateName::HtmlFlowBlankLinesCheck)),
+            (COMPLETE, State::Next(StateName::HtmlFlowBlankLinesCheck)),
+            (COMMENT, State::Next(StateName::BlankLineStart)),
+        ] {
+            let (_events, parse_state) = parse("\n", &options).expect("parse test input");
+            let mut tokenizer = make_tokenizer(&parse_state);
+            tokenizer.current = Some(b'\n');
+            tokenizer.consumed = false;
+            tokenizer.tokenize_state.marker = marker;
+
+            assert_eq!(blank_line_before(&mut tokenizer), expected);
+        }
+    }
+
+    #[test]
+    fn frontmatter_after_accepts_eof() {
+        let options = ParseOptions::default();
+        let (_events, parse_state) = parse("\n", &options).expect("parse test input");
+        let mut tokenizer = make_tokenizer(&parse_state);
+        tokenizer.current = Some(b'\n');
+        tokenizer.expect(Some(b'\n'));
+        tokenizer.enter(Name::Frontmatter);
+        tokenizer.consume();
+
+        assert_eq!(frontmatter::after(&mut tokenizer), State::Ok);
+    }
+
+    #[test]
+    #[should_panic(expected = "out of bounds")]
+    fn byte_action_rejects_points_past_the_input() {
+        byte_action(
+            b"",
+            &Point {
+                line: 1,
+                column: 1,
+                index: 0,
+                vs: 0,
+            },
+        );
     }
 }

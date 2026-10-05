@@ -279,6 +279,6 @@ pub fn after(tokenizer: &mut Tokenizer) -> State {
             tokenizer.exit(Name::LineEnding);
             State::Next(StateName::FlowStart)
         }
-        _ => unreachable!("expected eol/eof"),
+        _ => State::Retry(StateName::FlowStart),
     }
 }

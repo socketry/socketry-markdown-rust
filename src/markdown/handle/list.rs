@@ -75,15 +75,17 @@ impl Handle for List {
             }
 
             if check_rule(state)? == bullet {
-                for child in self.children.iter() {
-                    if let Some(child_children) = child.children() {
-                        if !child_children.is_empty()
-                            && matches!(child, Node::ListItem(_))
-                            && matches!(child_children[0], Node::ThematicBreak(_))
-                        {
-                            use_different_marker = true;
-                            break;
-                        }
+                for child in &self.children {
+                    let child_children = child
+                        .children()
+                        .map(|children| children.as_slice())
+                        .unwrap_or(&[]);
+                    if !child_children.is_empty()
+                        && matches!(child, Node::ListItem(_))
+                        && matches!(child_children[0], Node::ThematicBreak(_))
+                    {
+                        use_different_marker = true;
+                        break;
                     }
                 }
             }
@@ -99,5 +101,135 @@ impl Handle for List {
         state.bullet_current = bullet_current;
         state.exit();
         Ok(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Handle;
+    use crate::{
+        markdown::{
+            state::{Info, State},
+            Options,
+        },
+        mdast::{List, ListItem, Node, Paragraph, Text},
+    };
+    use alloc::vec;
+
+    #[test]
+    fn keeps_the_rule_marker_when_no_item_starts_with_a_thematic_break() {
+        let options = Options::default();
+        let mut state = State::new(&options);
+        let list = List {
+            children: vec![Node::ListItem(ListItem {
+                children: vec![Node::Paragraph(Paragraph {
+                    children: vec![Node::Text(Text {
+                        value: "ordinary item".into(),
+                        position: None,
+                    })],
+                    position: None,
+                })],
+                position: None,
+                spread: false,
+                checked: None,
+            })],
+            position: None,
+            ordered: false,
+            start: None,
+            spread: false,
+        };
+        let node = Node::List(list.clone());
+
+        assert_eq!(
+            list.handle(&mut state, &Info::new("", ""), None, &node)
+                .unwrap(),
+            "* ordinary item"
+        );
+    }
+
+    #[test]
+    fn ignores_non_list_item_children_when_avoiding_rule_markers() {
+        let options = Options::default();
+        let mut state = State::new(&options);
+        let list = List {
+            children: vec![Node::Heading(crate::mdast::Heading {
+                children: vec![Node::Text(Text {
+                    value: "heading".into(),
+                    position: None,
+                })],
+                depth: 1,
+                position: None,
+            })],
+            position: None,
+            ordered: false,
+            start: None,
+            spread: false,
+        };
+        let node = Node::List(list.clone());
+
+        assert_eq!(
+            list.handle(&mut state, &Info::new("", ""), None, &node)
+                .unwrap(),
+            "# heading"
+        );
+    }
+
+    #[test]
+    fn changes_the_list_marker_when_an_item_starts_with_a_thematic_break() {
+        use crate::mdast::ThematicBreak;
+
+        let options = Options::default();
+        let mut state = State::new(&options);
+        let list = List {
+            children: vec![Node::ListItem(ListItem {
+                children: vec![
+                    Node::ThematicBreak(ThematicBreak { position: None }),
+                    Node::Paragraph(Paragraph {
+                        children: vec![Node::Text(Text {
+                            value: "following content".into(),
+                            position: None,
+                        })],
+                        position: None,
+                    }),
+                ],
+                position: None,
+                spread: false,
+                checked: None,
+            })],
+            position: None,
+            ordered: false,
+            start: None,
+            spread: false,
+        };
+        let node = Node::List(list.clone());
+
+        let markdown = list
+            .handle(&mut state, &Info::new("", ""), None, &node)
+            .unwrap();
+
+        assert!(markdown.starts_with("- "), "{:?}", markdown);
+    }
+
+    #[test]
+    fn handles_empty_list_items_when_avoiding_rule_markers() {
+        let options = Options::default();
+        let mut state = State::new(&options);
+        let list = List {
+            children: vec![Node::ListItem(ListItem {
+                children: vec![],
+                position: None,
+                spread: false,
+                checked: None,
+            })],
+            position: None,
+            ordered: false,
+            start: None,
+            spread: false,
+        };
+        let node = Node::List(list.clone());
+
+        assert!(list
+            .handle(&mut state, &Info::new("", ""), None, &node)
+            .is_ok());
     }
 }

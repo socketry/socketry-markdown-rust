@@ -246,3 +246,61 @@ fn code_text() -> Result<(), message::Message> {
 
     Ok(())
 }
+
+#[test]
+fn parses_inline_code_info_and_removes_its_prefix() -> Result<(), message::Message> {
+    let options = Options {
+        parse: ParseOptions {
+            inline_code_info: true,
+            ..ParseOptions::default()
+        },
+        ..Options::default()
+    };
+    assert_eq!(
+        to_html_with_options("`plain code`", &options)?,
+        "<p><code>plain code</code></p>"
+    );
+
+    let tree = to_mdast(
+        "rust:`code`",
+        &ParseOptions {
+            inline_code_info: true,
+            ..ParseOptions::default()
+        },
+    )?;
+
+    let Node::Root(root) = tree else {
+        panic!("expected root");
+    };
+    let Node::Paragraph(paragraph) = &root.children[0] else {
+        panic!("expected paragraph");
+    };
+    assert!(matches!(
+        paragraph.children.as_slice(),
+        [Node::InlineCode(InlineCode { value, lang: Some(lang), .. })]
+            if value == "code" && lang == "rust"
+    ));
+
+    let tree = to_mdast(
+        "before rust:`code`",
+        &ParseOptions {
+            inline_code_info: true,
+            ..ParseOptions::default()
+        },
+    )?;
+    let Node::Root(root) = tree else {
+        panic!("expected root");
+    };
+    let Node::Paragraph(paragraph) = &root.children[0] else {
+        panic!("expected paragraph");
+    };
+    assert!(matches!(
+        paragraph.children.as_slice(),
+        [
+            Node::Text(Text { value, .. }),
+            Node::InlineCode(InlineCode { value: code, lang: Some(lang), .. })
+        ] if value == "before " && code == "code" && lang == "rust"
+    ));
+
+    Ok(())
+}

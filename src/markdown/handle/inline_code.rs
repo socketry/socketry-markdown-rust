@@ -50,21 +50,22 @@ impl Handle for InlineCode {
 
             State::compile_pattern(pattern);
 
-            if let Some(regex) = &pattern.compiled {
-                while let Some(m) = regex.find(&value) {
-                    let position = m.start();
+            let regex = pattern
+                .compiled
+                .as_ref()
+                .expect("compiling an unsafe pattern sets its regex");
+            while let Some(m) = regex.find(&value) {
+                let match_start = m.start();
+                let (start, end) = if match_start > 0
+                    && value.as_bytes()[match_start - 1] == b'\r'
+                    && value.as_bytes()[match_start] == b'\n'
+                {
+                    (match_start - 1, match_start + 1)
+                } else {
+                    (match_start, match_start + 1)
+                };
 
-                    let position = if position > 0
-                        && value.as_bytes().get(position) == Some(&b'\n')
-                        && value.as_bytes().get(position - 1) == Some(&b'\r')
-                    {
-                        position - 1
-                    } else {
-                        position
-                    };
-
-                    value.replace_range(position..m.start() + 1, " ");
-                }
+                value.replace_range(start..end, " ");
             }
         }
 
@@ -80,4 +81,61 @@ impl Handle for InlineCode {
 
 pub fn peek_inline_code() -> char {
     '`'
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Handle;
+    use crate::{
+        markdown::{
+            r#unsafe::Unsafe,
+            state::{Info, State},
+            Options,
+        },
+        mdast::{InlineCode, Node},
+    };
+    use alloc::{string::String, vec};
+    use regex::Regex;
+
+    #[test]
+    fn replaces_a_crlf_line_ending_with_one_space() {
+        let options = Options::default();
+        let mut state = State::new(&options);
+        let mut line_ending = Unsafe::new('\n', None, None, vec![], vec![], true);
+        line_ending.set_compiled(Regex::new("\\n").unwrap());
+        state.r#unsafe = vec![line_ending];
+        let inline_code = InlineCode {
+            value: String::from("one\r\ntwo"),
+            position: None,
+            lang: None,
+        };
+        let node = Node::InlineCode(inline_code.clone());
+
+        assert_eq!(
+            inline_code
+                .handle(&mut state, &Info::new("", ""), None, &node)
+                .unwrap(),
+            "`one two`"
+        );
+    }
+
+    #[test]
+    fn preserves_inline_code_when_no_unsafe_break_pattern_matches() {
+        let options = Options::default();
+        let mut state = State::new(&options);
+        state.r#unsafe = vec![Unsafe::new('#', None, None, vec![], vec![], true)];
+        let inline_code = InlineCode {
+            value: String::from("ordinary code"),
+            position: None,
+            lang: None,
+        };
+        let node = Node::InlineCode(inline_code.clone());
+
+        assert_eq!(
+            inline_code
+                .handle(&mut state, &Info::new("", ""), None, &node)
+                .unwrap(),
+            "`ordinary code`"
+        );
+    }
 }

@@ -668,3 +668,26 @@ pub fn line_ending_after_prefix(tokenizer: &mut Tokenizer) -> State {
     tokenizer.enter(Name::HtmlTextData);
     State::Ok
 }
+
+#[cfg(test)]
+mod tests {
+    use super::cdata;
+    use crate::{event::Point, parser::parse, state::State, tokenizer::Tokenizer, ParseOptions};
+
+    #[test]
+    fn unterminated_cdata_is_rejected_at_eof() {
+        let options = ParseOptions::default();
+        let (_, parse_state) = parse("", &options).expect("valid empty input");
+        let mut tokenizer = Tokenizer::new(
+            Point {
+                line: 1,
+                column: 1,
+                index: 0,
+                vs: 0,
+            },
+            &parse_state,
+        );
+
+        assert_eq!(cdata(&mut tokenizer), State::Nok);
+    }
+}

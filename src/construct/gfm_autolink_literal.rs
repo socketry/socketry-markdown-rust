@@ -168,10 +168,10 @@ pub fn protocol_start(tokenizer: &mut Tokenizer) -> State {
         .parse_state
         .options
         .constructs
-        .gfm_autolink_literal &&
-        matches!(tokenizer.current, Some(b'H' | b'h'))
-            // Source: <https://github.com/github/cmark-gfm/blob/ef1cfcb/extensions/autolink.c#L214>.
-            && !matches!(tokenizer.previous, Some(b'A'..=b'Z' | b'a'..=b'z'))
+        .gfm_autolink_literal
+        // `text::before` dispatches here only for `H` and `h`.
+        // Source: <https://github.com/github/cmark-gfm/blob/ef1cfcb/extensions/autolink.c#L214>.
+        && !matches!(tokenizer.previous, Some(b'A'..=b'Z' | b'a'..=b'z'))
     {
         tokenizer.enter(Name::GfmAutolinkLiteralProtocol);
         tokenizer.attempt(
@@ -272,10 +272,10 @@ pub fn www_start(tokenizer: &mut Tokenizer) -> State {
         .parse_state
         .options
         .constructs
-        .gfm_autolink_literal &&
-        matches!(tokenizer.current, Some(b'W' | b'w'))
-            // Source: <https://github.com/github/cmark-gfm/blob/ef1cfcb/extensions/autolink.c#L156>.
-            && matches!(tokenizer.previous, None | Some(b'\t' | b'\n' | b' ' | b'(' | b'*' | b'_' | b'[' | b']' | b'~'))
+        .gfm_autolink_literal
+        // `text::before` dispatches here only for `W` and `w`.
+        // Source: <https://github.com/github/cmark-gfm/blob/ef1cfcb/extensions/autolink.c#L156>.
+        && matches!(tokenizer.previous, None | Some(b'\t' | b'\n' | b' ' | b'(' | b'*' | b'_' | b'[' | b']' | b'~'))
     {
         tokenizer.enter(Name::GfmAutolinkLiteralWww);
         tokenizer.attempt(

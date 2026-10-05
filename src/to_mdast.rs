@@ -523,18 +523,19 @@ fn on_enter_code_text(context: &mut CompileContext) {
     if let Some((start, info)) = prefix {
         let suffix = alloc::format!("{info}:");
         let parent = context.tail_mut();
-        if let Some(children) = parent.children_mut() {
-            if let Some(Node::Text(text)) = children.last_mut() {
-                if text.value.ends_with(&suffix) {
-                    text.value.truncate(text.value.len() - suffix.len());
-                    if text.value.is_empty() {
-                        children.pop();
-                    } else if let Some(position) = text.position.as_mut() {
-                        position.end.offset = start;
-                        position.end.column -= suffix.len();
-                    }
-                    lang = Some(info);
+        let children = parent
+            .children_mut()
+            .expect("inline code must have a phrasing parent");
+        if let Some(Node::Text(text)) = children.last_mut() {
+            if text.value.ends_with(&suffix) {
+                text.value.truncate(text.value.len() - suffix.len());
+                if text.value.is_empty() {
+                    children.pop();
+                } else if let Some(position) = text.position.as_mut() {
+                    position.end.offset = start;
+                    position.end.column -= suffix.len();
                 }
+                lang = Some(info);
             }
         }
     }
@@ -1250,9 +1251,7 @@ fn on_exit_gfm_autolink_literal(context: &mut CompileContext) -> Result<(), mess
         unreachable!("expected link on stack");
     }
 
-    on_exit(context)?;
-
-    Ok(())
+    on_exit(context)
 }
 
 /// Handle [`Exit`][Kind::Exit]:[`GfmTable`][Name::GfmTable].
@@ -1410,41 +1409,31 @@ fn on_exit_media(context: &mut CompileContext) -> Result<(), message::Message> {
     if let Some(kind) = reference.reference_kind {
         let parent = context.tail_mut();
         let siblings = parent.children_mut().unwrap();
-
-        match siblings.last_mut().unwrap() {
+        let replacement = match siblings.last_mut().unwrap() {
             Node::FootnoteReference(node) => {
                 node.identifier = reference.identifier;
                 node.label = Some(reference.label);
+                None
             }
-            Node::Image(_) => {
-                // Need to swap it with a reference version of the node.
-                if let Some(Node::Image(node)) = siblings.pop() {
-                    siblings.push(Node::ImageReference(ImageReference {
-                        reference_kind: kind,
-                        identifier: reference.identifier,
-                        label: Some(reference.label),
-                        alt: node.alt,
-                        position: node.position,
-                    }));
-                } else {
-                    unreachable!("impossible: it’s an image")
-                }
-            }
-            Node::Link(_) => {
-                // Need to swap it with a reference version of the node.
-                if let Some(Node::Link(node)) = siblings.pop() {
-                    siblings.push(Node::LinkReference(LinkReference {
-                        reference_kind: kind,
-                        identifier: reference.identifier,
-                        label: Some(reference.label),
-                        children: node.children,
-                        position: node.position,
-                    }));
-                } else {
-                    unreachable!("impossible: it’s a link")
-                }
-            }
+            Node::Image(node) => Some(Node::ImageReference(ImageReference {
+                reference_kind: kind,
+                identifier: reference.identifier,
+                label: Some(reference.label),
+                alt: core::mem::take(&mut node.alt),
+                position: node.position.take(),
+            })),
+            Node::Link(node) => Some(Node::LinkReference(LinkReference {
+                reference_kind: kind,
+                identifier: reference.identifier,
+                label: Some(reference.label),
+                children: core::mem::take(&mut node.children),
+                position: node.position.take(),
+            })),
             _ => unreachable!("expected footnote reference, image, or link on stack"),
+        };
+
+        if let Some(replacement) = replacement {
+            *siblings.last_mut().unwrap() = replacement;
         }
     }
 
@@ -1841,12 +1830,12 @@ fn on_mismatch_error(
         });
     }
 
-    if let Some(left) = left {
-        if left.name == Name::MdxJsxFlowTag || left.name == Name::MdxJsxTextTag {
-            let tag = context.jsx_tag.as_ref().unwrap();
+    match left {
+        Some(left) => match left.name {
+            Name::MdxJsxFlowTag | Name::MdxJsxTextTag => {
+                let tag = context.jsx_tag.as_ref().unwrap();
 
-            return Err(
-                message::Message {
+                Err(message::Message {
                     place: Some(Box::new(message::Place::Point(tag.start.clone()))),
                     reason: format!(
                         "Expected the closing tag `{}` either before the start of `{:?}` ({}:{}), or another opening tag after that start",
@@ -1857,13 +1846,12 @@ fn on_mismatch_error(
                     ),
                     rule_id: Box::new("end-tag-mismatch".into()),
                     source: Box::new("markdown-rs".into()),
-                }
-            );
-        }
-        unreachable!("mismatched (non-jsx): {:?} / {:?}", left.name, right.name);
+                })
+            }
+            _ => unreachable!("mismatched (non-jsx): {:?} / {:?}", left.name, right.name),
+        },
+        None => unreachable!("mismatched (non-jsx): document / {:?}", right.name),
     }
-
-    unreachable!("mismatched (non-jsx): document / {:?}", right.name);
 }
 
 /// Format a JSX tag, ignoring its attributes.
@@ -1874,3 +1862,7 @@ fn serialize_abbreviated_tag(tag: &JsxTag) -> String {
         if let Some(name) = &tag.name { name } else { "" },
     )
 }
+
+#[cfg(test)]
+#[path = "to_mdast/tests.rs"]
+mod tests;

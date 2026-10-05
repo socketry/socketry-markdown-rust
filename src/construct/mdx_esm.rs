@@ -56,7 +56,7 @@ pub fn start(tokenizer: &mut Tokenizer) -> State {
         && !tokenizer.interrupt
         // Only at the start of a line, not at whitespace or in a container.
         && tokenizer.point.column == 1
-        && matches!(tokenizer.current, Some(b'e' | b'i'))
+    // `flow::start` dispatches here only for `e` and `i`.
     {
         // Place where keyword starts.
         tokenizer.tokenize_state.start = tokenizer.point.index;

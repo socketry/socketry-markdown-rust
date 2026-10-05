@@ -182,6 +182,12 @@ fn code_fenced() -> Result<(), message::Message> {
     );
 
     assert_eq!(
+        to_html("~~~lang~suffix\ncode\n~~~"),
+        "<pre><code class=\"language-lang~suffix\">code\n</code></pre>",
+        "should allow tildes inside a tilde fence info string"
+    );
+
+    assert_eq!(
         to_html("```\n``` aaa\n```"),
         "<pre><code>``` aaa\n</code></pre>",
         "should not support info string on closing sequences"

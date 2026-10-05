@@ -58,24 +58,26 @@ impl Location {
     #[must_use]
     pub fn to_point(&self, offset: usize) -> Option<Point> {
         let mut index = 0;
+        let end = *self
+            .indices
+            .last()
+            .expect("location index includes an end offset");
 
-        if let Some(end) = self.indices.last() {
-            if offset < *end {
-                while index < self.indices.len() {
-                    if self.indices[index] > offset {
-                        break;
-                    }
-
-                    index += 1;
+        if offset < end {
+            while index < self.indices.len() {
+                if self.indices[index] > offset {
+                    break;
                 }
 
-                let previous = if index > 0 {
-                    self.indices[index - 1]
-                } else {
-                    0
-                };
-                return Some(Point::new(index + 1, offset + 1 - previous, offset));
+                index += 1;
             }
+
+            let previous = if index > 0 {
+                self.indices[index - 1]
+            } else {
+                0
+            };
+            return Some(Point::new(index + 1, offset + 1 - previous, offset));
         }
 
         None
@@ -169,6 +171,11 @@ mod tests {
             Some(Point::new(2, 1, 2)),
             "should support some points (3)"
         );
+    }
+
+    #[test]
+    fn returns_none_for_offsets_past_the_document() {
+        assert_eq!(Location::new(b"abc").to_point(4), None);
     }
 
     #[test]

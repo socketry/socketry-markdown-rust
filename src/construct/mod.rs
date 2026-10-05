@@ -199,3 +199,6 @@ pub mod raw_text;
 pub mod string;
 pub mod text;
 pub mod thematic_break;
+
+#[cfg(test)]
+mod tests;

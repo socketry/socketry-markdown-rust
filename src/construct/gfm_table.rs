@@ -867,7 +867,10 @@ pub fn resolve(tokenizer: &mut Tokenizer) -> Option<Subresult> {
             if last_cell.1 != 0 {
                 cell.0 = cell.1;
                 flush_cell(tokenizer, last_cell, in_delimiter_row, Some(index));
-            } else if cell.1 != 0 {
+            } else {
+                // Every resolved row has a current cell, initialized when its
+                // row entry is encountered.
+                debug_assert_ne!(cell.1, 0, "every table row starts with a cell");
                 flush_cell(tokenizer, cell, in_delimiter_row, Some(index));
             }
         } else if in_row
@@ -882,9 +885,10 @@ pub fn resolve(tokenizer: &mut Tokenizer) -> Option<Subresult> {
         index += 1;
     }
 
-    if last_table_end != 0 {
-        flush_table_end(tokenizer, last_table_end, last_table_has_body);
-    }
+    // This resolver is registered only after a complete table head and
+    // delimiter row have been parsed.
+    debug_assert_ne!(last_table_end, 0, "a table always has an end event");
+    flush_table_end(tokenizer, last_table_end, last_table_has_body);
 
     tokenizer.map.consume(&mut tokenizer.events);
     None

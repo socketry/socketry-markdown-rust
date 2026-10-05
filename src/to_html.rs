@@ -1828,3 +1828,153 @@ fn generate_autolink(
         context.push("</a>");
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{
+        on_enter_gfm_strikethrough, on_enter_gfm_task_list_item_check, on_enter_raw_text,
+        on_enter_strong, on_exit_break, on_exit_gfm_strikethrough,
+        on_exit_gfm_task_list_item_check, on_exit_gfm_task_list_item_value_checked, on_exit_strong,
+        CompileContext,
+    };
+    use crate::event::{Event, Kind, Name, Point};
+    use crate::{util::line_ending::LineEnding, CompileOptions, Options, ParseOptions};
+    use alloc::{string::String, vec};
+
+    #[test]
+    fn suppresses_task_checkbox_markup_inside_image_alt_text() {
+        let options = CompileOptions::default();
+        let mut context =
+            CompileContext::new(&[], &[], &options, LineEnding::default(), false, vec![]);
+        context.image_alt_inside = true;
+
+        on_enter_gfm_task_list_item_check(&mut context);
+
+        assert_eq!(context.buffers, vec![String::new()]);
+    }
+
+    #[test]
+    fn suppresses_gfm_markup_inside_image_alt_text() {
+        let options = CompileOptions::gfm();
+        let mut context =
+            CompileContext::new(&[], &[], &options, LineEnding::default(), false, vec![]);
+        context.image_alt_inside = true;
+
+        on_enter_gfm_strikethrough(&mut context);
+        on_enter_strong(&mut context);
+        on_exit_break(&mut context);
+        on_exit_gfm_strikethrough(&mut context);
+        on_exit_gfm_task_list_item_check(&mut context);
+        on_exit_gfm_task_list_item_value_checked(&mut context);
+        on_exit_strong(&mut context);
+
+        assert_eq!(context.buffers, vec![String::new()]);
+    }
+
+    #[test]
+    fn reports_html_compilation_errors_when_generating_heading_ids() {
+        let options = Options {
+            parse: ParseOptions::mdx(),
+            compile: CompileOptions {
+                heading_ids: true,
+                ..CompileOptions::default()
+            },
+        };
+
+        let error = crate::to_html_with_options("<a><b></a>", &options)
+            .expect_err("mismatched JSX tags cannot be compiled");
+        assert_eq!(*error.rule_id, "end-tag-mismatch");
+    }
+
+    #[test]
+    fn emits_language_classes_for_inline_code_info() {
+        let options = Options {
+            parse: ParseOptions {
+                inline_code_info: true,
+                ..ParseOptions::default()
+            },
+            ..Options::default()
+        };
+
+        assert_eq!(
+            crate::to_html_with_options("before rust:`code`", &options).unwrap(),
+            "<p>before <code class=\"language-rust\">code</code></p>"
+        );
+    }
+
+    #[test]
+    fn renders_inline_code_info_inside_image_alt_text() {
+        let options = Options {
+            parse: ParseOptions {
+                inline_code_info: true,
+                ..ParseOptions::default()
+            },
+            ..Options::default()
+        };
+
+        let output = crate::to_html_with_options("![rust:`code`](image.png)", &options)
+            .expect("render inline code in image alt text");
+
+        assert!(output.contains("alt=\"code\""), "{:?}", output);
+    }
+
+    #[test]
+    fn preserves_autolink_before_inline_code_info() {
+        let options = Options {
+            parse: ParseOptions {
+                inline_code_info: true,
+                constructs: crate::Constructs {
+                    gfm_autolink_literal: true,
+                    ..crate::Constructs::default()
+                },
+                ..ParseOptions::default()
+            },
+            ..Options::default()
+        };
+
+        let output = crate::to_html_with_options("alice@example.com:`code`", &options)
+            .expect("render inline code after an autolink");
+
+        assert!(
+            output.contains("<a href=\"mailto:alice@example.com\">"),
+            "{:?}",
+            output
+        );
+        assert!(output.contains("</a>:"), "{:?}", output);
+        assert!(
+            output.contains("<code class=\"language-example.com\">code</code>"),
+            "{:?}",
+            output
+        );
+    }
+
+    #[test]
+    fn removes_inline_code_info_already_written_to_the_output_buffer() {
+        let options = CompileOptions::default();
+        let events = [Event {
+            kind: Kind::Enter,
+            name: Name::CodeText,
+            point: Point {
+                line: 1,
+                column: 13,
+                index: 12,
+                vs: 0,
+            },
+            link: None,
+        }];
+        let bytes = b"before rust:`code`";
+        let mut context = CompileContext::new(
+            &events,
+            bytes,
+            &options,
+            LineEnding::default(),
+            true,
+            vec![],
+        );
+        context.buffers[0].push_str("before rust:");
+
+        on_enter_raw_text(&mut context);
+
+        assert_eq!(context.buffers[0], "before <code class=\"language-rust\">");
+    }
+}

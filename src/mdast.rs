@@ -2561,4 +2561,282 @@ mod tests {
             "should support `position_set`"
         );
     }
+
+    #[test]
+    fn fragment_node_methods() {
+        let text = Node::Text(Text {
+            value: "fragment".into(),
+            position: None,
+        });
+        let mut node = Node::Fragment(Fragment {
+            children: vec![text],
+        });
+
+        assert_eq!(
+            format!("{node:?}"),
+            "Fragment { children: [Text { value: \"fragment\", position: None }] }"
+        );
+        assert_eq!(node.to_string(), "fragment");
+        assert_eq!(node.children().map(Vec::len), Some(1));
+        assert_eq!(node.position(), None);
+        assert_eq!(node.position_mut(), None);
+        node.position_set(Some(Position::new(1, 1, 0, 1, 2, 1)));
+        assert_eq!(node.position(), None);
+
+        let extracted = node.extract_children().expect("extract fragment children");
+        assert_eq!(extracted.to_string(), "fragment");
+        assert_eq!(node.children().unwrap(), &[]);
+        assert!(node.extract_children().is_some());
+    }
+
+    #[test]
+    fn walks_and_mutates_nested_children() {
+        let mut node = Node::Root(Root {
+            position: None,
+            children: vec![Node::Paragraph(Paragraph {
+                position: None,
+                children: vec![Node::Text(Text {
+                    value: "before".into(),
+                    position: None,
+                })],
+            })],
+        });
+
+        let mut visited = Vec::new();
+        node.walk(|node| visited.push(node.to_string()));
+        assert_eq!(visited, ["before", "before", "before"]);
+
+        node.walk_mut(|node| {
+            if let Node::Text(text) = node {
+                text.value.push_str(" after");
+            }
+        });
+        assert_eq!(node.text_content(), "before after");
+    }
+
+    #[test]
+    fn node_text_and_heading_helpers() {
+        let image = Node::Image(Image {
+            position: None,
+            alt: "image alt".into(),
+            url: "image.png".into(),
+            title: None,
+        });
+        let image_reference = Node::ImageReference(ImageReference {
+            position: None,
+            alt: "reference alt".into(),
+            reference_kind: ReferenceKind::Full,
+            identifier: "image".into(),
+            label: None,
+        });
+        let heading = Node::Heading(Heading {
+            position: None,
+            depth: 2,
+            children: vec![Node::Text(Text {
+                value: "Target".into(),
+                position: None,
+            })],
+        });
+        let root = Node::Root(Root {
+            position: None,
+            children: vec![image.clone(), image_reference.clone(), heading.clone()],
+        });
+
+        assert_eq!(image.text_content(), "image alt");
+        assert_eq!(image_reference.text_content(), "reference alt");
+        assert_eq!(Node::Break(Break { position: None }).text_content(), "\n");
+        assert_eq!(
+            Node::ThematicBreak(ThematicBreak { position: None }).text_content(),
+            ""
+        );
+        assert_eq!(
+            Node::Definition(Definition {
+                position: None,
+                identifier: "x".into(),
+                label: None,
+                url: "x".into(),
+                title: None
+            })
+            .text_content(),
+            ""
+        );
+        assert_eq!(root.find_heading("Target"), Some(&heading));
+        assert_eq!(root.find_heading("missing"), None);
+        assert_eq!(image.find_heading("Target"), None);
+        assert_eq!(
+            Node::Text(Text {
+                value: "x".into(),
+                position: None
+            })
+            .code_language(),
+            None
+        );
+    }
+
+    #[test]
+    fn code_accessors_cover_optional_metadata() {
+        let inline = Node::InlineCode(InlineCode {
+            value: "code".into(),
+            position: None,
+            lang: Some("rust".into()),
+        });
+        assert_eq!(inline.code_language(), Some("rust"));
+        assert_eq!(inline.code_info().as_deref(), Some("rust"));
+
+        for (lang, meta, expected) in [
+            (Some("rust"), Some("ignore"), Some("rust ignore")),
+            (Some("rust"), None, Some("rust")),
+            (None, Some("ignore"), Some("ignore")),
+            (None, None, None),
+        ] {
+            let code = Node::Code(Code {
+                value: "code".into(),
+                position: None,
+                lang: lang.map(Into::into),
+                meta: meta.map(Into::into),
+            });
+            assert_eq!(code.code_language(), lang);
+            assert_eq!(code.code_info().as_deref(), expected);
+        }
+
+        assert_eq!(
+            Node::Text(Text {
+                value: "plain".into(),
+                position: None,
+            })
+            .code_info(),
+            None
+        );
+    }
+
+    #[test]
+    fn node_serializes_markdown_with_custom_options() {
+        let node = Node::Text(Text {
+            value: "text".into(),
+            position: None,
+        });
+        let options = crate::markdown::Options::default();
+
+        assert_eq!(node.to_markdown_with_options(&options).unwrap(), "text\n");
+    }
+
+    #[test]
+    fn replaces_heading_sections_with_all_options() {
+        let heading = |depth, title: &str| {
+            Node::Heading(Heading {
+                position: None,
+                depth,
+                children: vec![Node::Text(Text {
+                    value: title.into(),
+                    position: None,
+                })],
+            })
+        };
+        let text = |value: &str| {
+            Node::Text(Text {
+                value: value.into(),
+                position: None,
+            })
+        };
+        let replacement = || vec![text("replacement")];
+
+        let mut root = Node::Root(Root {
+            position: None,
+            children: vec![
+                heading(1, "one"),
+                text("body"),
+                heading(2, "nested"),
+                text("nested body"),
+                heading(1, "two"),
+            ],
+        });
+        assert!(!root.replace_heading_section(1, replacement(), true, false));
+        assert!(!text("not a parent").replace_heading_section(0, replacement(), true, false));
+        assert!(root.replace_heading_section(0, replacement(), false, true));
+        assert_eq!(root.to_string(), "onereplacementtwo");
+
+        let mut root = Node::Root(Root {
+            position: None,
+            children: vec![
+                heading(1, "one"),
+                text("body"),
+                heading(2, "nested"),
+                text("nested body"),
+                heading(1, "two"),
+            ],
+        });
+        assert!(root.replace_heading_section(0, replacement(), true, false));
+        assert_eq!(root.to_string(), "replacementnestednested bodytwo");
+
+        let mut root = Node::Root(Root {
+            position: None,
+            children: vec![
+                heading(1, "one"),
+                text("body"),
+                heading(2, "nested"),
+                text("nested body"),
+                heading(1, "two"),
+            ],
+        });
+        assert!(root.replace_heading_section(0, replacement(), true, true));
+        assert_eq!(root.to_string(), "replacementtwo");
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn align_kind_serialization_and_visitors() {
+        use serde::de::Visitor;
+
+        assert_eq!(serde_json::to_string(&AlignKind::Left).unwrap(), "\"left\"");
+        assert_eq!(
+            serde_json::to_string(&AlignKind::Right).unwrap(),
+            "\"right\""
+        );
+        assert_eq!(
+            serde_json::to_string(&AlignKind::Center).unwrap(),
+            "\"center\""
+        );
+        assert_eq!(serde_json::to_string(&AlignKind::None).unwrap(), "null");
+        assert_eq!(
+            serde_json::from_str::<AlignKind>("\"left\"").unwrap(),
+            AlignKind::Left
+        );
+        assert_eq!(
+            serde_json::from_str::<AlignKind>("null").unwrap(),
+            AlignKind::None
+        );
+
+        assert_eq!(
+            AlignKindVisitor
+                .visit_bytes::<serde_json::Error>(b"right")
+                .unwrap(),
+            AlignKind::Right
+        );
+        assert_eq!(
+            AlignKindVisitor
+                .visit_bytes::<serde_json::Error>(b"left")
+                .unwrap(),
+            AlignKind::Left
+        );
+        assert_eq!(
+            AlignKindVisitor
+                .visit_bytes::<serde_json::Error>(b"center")
+                .unwrap(),
+            AlignKind::Center
+        );
+        assert_eq!(
+            AlignKindVisitor.visit_none::<serde_json::Error>().unwrap(),
+            AlignKind::None
+        );
+        assert_eq!(
+            AlignKindVisitor.visit_unit::<serde_json::Error>().unwrap(),
+            AlignKind::None
+        );
+        assert!(AlignKindVisitor
+            .visit_str::<serde_json::Error>("invalid")
+            .is_err());
+        assert!(AlignKindVisitor
+            .visit_bytes::<serde_json::Error>(b"invalid")
+            .is_err());
+    }
 }

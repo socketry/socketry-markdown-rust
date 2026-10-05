@@ -76,3 +76,48 @@ pub trait Renderer {
         output
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Renderer;
+    use crate::mdast::{Node, Root, Text};
+    use alloc::string::String;
+    use alloc::vec;
+
+    struct PlainTextRenderer;
+
+    impl Renderer for PlainTextRenderer {
+        fn render_node(&mut self, node: &Node) -> String {
+            match node {
+                Node::Text(text) => text.value.clone(),
+                _ => self.render_children(node),
+            }
+        }
+    }
+
+    #[test]
+    fn renders_nodes_and_their_children_by_default() {
+        let node = Node::Root(Root {
+            position: None,
+            children: vec![
+                Node::Text(Text {
+                    value: "one".into(),
+                    position: None,
+                }),
+                Node::Text(Text {
+                    value: "two".into(),
+                    position: None,
+                }),
+            ],
+        });
+        let mut renderer = PlainTextRenderer;
+
+        assert_eq!(renderer.render(&node), "onetwo");
+        assert_eq!(
+            renderer.render_children(&Node::ThematicBreak(crate::mdast::ThematicBreak {
+                position: None,
+            })),
+            ""
+        );
+    }
+}

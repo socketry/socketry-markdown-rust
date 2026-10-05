@@ -17,7 +17,10 @@ pub fn list_loose(events: &[Event], mut index: usize, include_items: bool) -> bo
     let mut balance = 0;
     let name = &events[index].name;
     debug_assert!(
-        matches!(name, Name::ListOrdered | Name::ListUnordered),
+        match name {
+            Name::ListOrdered | Name::ListUnordered => true,
+            _ => unreachable!("list inference starts at a list event"),
+        },
         "expected list"
     );
 
@@ -94,7 +97,10 @@ pub fn list_loose(events: &[Event], mut index: usize, include_items: bool) -> bo
 /// Figure out if an item is spread or not.
 pub fn list_item_loose(events: &[Event], mut index: usize) -> bool {
     debug_assert!(
-        matches!(events[index].name, Name::ListItem),
+        match events[index].name {
+            Name::ListItem => true,
+            _ => unreachable!("list item inference starts at a list item event"),
+        },
         "expected list item"
     );
     let mut balance = 0;
@@ -148,7 +154,10 @@ pub fn list_item_loose(events: &[Event], mut index: usize) -> bool {
 /// Figure out the alignment of a GFM table.
 pub fn gfm_table_align(events: &[Event], mut index: usize) -> Vec<AlignKind> {
     debug_assert!(
-        matches!(events[index].name, Name::GfmTable),
+        match events[index].name {
+            Name::GfmTable => true,
+            _ => unreachable!("table alignment inference starts at a table event"),
+        },
         "expected table"
     );
     let mut in_delimiter_row = false;

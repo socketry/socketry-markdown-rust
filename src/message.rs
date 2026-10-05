@@ -48,3 +48,66 @@ impl fmt::Display for Place {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{Message, Place};
+    use crate::unist::{Point, Position};
+    use alloc::boxed::Box;
+    use alloc::string::ToString;
+    use core::fmt::Write as _;
+
+    struct FailingWriter;
+
+    impl core::fmt::Write for FailingWriter {
+        fn write_str(&mut self, _value: &str) -> core::fmt::Result {
+            Err(core::fmt::Error)
+        }
+    }
+
+    #[test]
+    fn displays_a_message_with_its_place() {
+        let message = Message {
+            place: Some(Box::new(Place::Point(Point::new(2, 3, 4)))),
+            reason: "invalid value".into(),
+            rule_id: Box::new("example".into()),
+            source: Box::new("parser".into()),
+        };
+
+        assert_eq!(message.to_string(), "2:3: invalid value (parser:example)");
+
+        let message = Message {
+            place: Some(Box::new(Place::Position(Position::new(1, 2, 3, 4, 5, 6)))),
+            reason: "invalid range".into(),
+            rule_id: Box::new("example".into()),
+            source: Box::new("parser".into()),
+        };
+
+        assert_eq!(
+            message.to_string(),
+            "1:2-4:5: invalid range (parser:example)"
+        );
+
+        let message = Message {
+            place: None,
+            reason: "invalid without a location".into(),
+            rule_id: Box::new("example".into()),
+            source: Box::new("parser".into()),
+        };
+        assert_eq!(
+            message.to_string(),
+            "invalid without a location (parser:example)"
+        );
+
+        let mut writer = FailingWriter;
+        assert!(write!(&mut writer, "{message}").is_err());
+
+        let message = Message {
+            place: Some(Box::new(Place::Point(Point::new(2, 3, 4)))),
+            reason: "invalid value".into(),
+            rule_id: Box::new("example".into()),
+            source: Box::new("parser".into()),
+        };
+        assert!(write!(&mut writer, "{message}").is_err());
+    }
+}

@@ -39,9 +39,19 @@ fn gfm_autolink_literal() -> Result<(), message::Message> {
         "should support protocol urls if enabled"
     );
     assert_eq!(
+        to_html_with_options("HTTPS://example.com", &Options::gfm())?,
+        "<p><a href=\"HTTPS://example.com\">HTTPS://example.com</a></p>",
+        "should recognize uppercase protocol prefixes"
+    );
+    assert_eq!(
         to_html_with_options("www.example.com", &Options::gfm())?,
         "<p><a href=\"http://www.example.com\">www.example.com</a></p>",
         "should support www urls if enabled"
+    );
+    assert_eq!(
+        to_html_with_options("WWW.EXAMPLE.COM", &Options::gfm())?,
+        "<p><a href=\"http://WWW.EXAMPLE.COM\">WWW.EXAMPLE.COM</a></p>",
+        "should recognize uppercase www prefixes"
     );
     assert_eq!(
         to_html_with_options("user@example.com", &Options::gfm())?,

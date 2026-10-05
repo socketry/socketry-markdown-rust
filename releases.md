@@ -5,6 +5,8 @@
 - Fix a panic when serializing long inline code or math values containing CRLF
   before unsafe Markdown characters.
 
+- Fix parsing and serialization edge cases for HTML blocks, inline code, and Unicode escapes.
+
 ## v0.1.1
 
 - Update agent guidance to install dependency context and skills without

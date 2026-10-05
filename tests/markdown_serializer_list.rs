@@ -705,3 +705,33 @@ fn list() {
         "should support a correct prefix and indent for items 999 and 1000 when `list_item_indent: IndentOptions::Tab`"
     );
 }
+
+#[test]
+fn increments_ordered_list_markers() {
+    let item = |value: &str| {
+        Node::ListItem(ListItem {
+            children: vec![Node::Paragraph(Paragraph {
+                children: vec![Node::Text(Text {
+                    value: value.into(),
+                    position: None,
+                })],
+                position: None,
+            })],
+            position: None,
+            spread: false,
+            checked: None,
+        })
+    };
+
+    assert_eq!(
+        to(&Node::List(List {
+            children: vec![item("first"), item("second")],
+            position: None,
+            ordered: true,
+            start: Some(3),
+            spread: false,
+        }))
+        .unwrap(),
+        "3. first\n4. second\n"
+    );
+}

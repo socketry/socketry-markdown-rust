@@ -268,3 +268,61 @@ fn parse_expression(tokenizer: &mut Tokenizer, parse: &MdxExpressionParse) -> St
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::parse_expression;
+    use crate::{
+        event::{Name, Point},
+        parser::parse,
+        tokenizer::Tokenizer,
+        util::mdx::Signal,
+        ParseOptions,
+    };
+    use alloc::boxed::Box;
+
+    #[test]
+    #[should_panic(expected = "cannot handle unknown expression name")]
+    fn rejects_unknown_expression_token_names() {
+        let options = ParseOptions {
+            mdx_expression_parse: Some(Box::new(|_, _| Signal::Ok)),
+            ..ParseOptions::default()
+        };
+        let (_events, parse_state) = parse("", &options).expect("parse test input");
+        let mut tokenizer = Tokenizer::new(
+            Point {
+                line: 1,
+                column: 1,
+                index: 0,
+                vs: 0,
+            },
+            &parse_state,
+        );
+        tokenizer.tokenize_state.token_1 = Name::Data;
+
+        parse_expression(
+            &mut tokenizer,
+            options.mdx_expression_parse.as_deref().unwrap(),
+        );
+    }
+
+    #[test]
+    fn records_mdx_expression_parser_eof() {
+        let options = ParseOptions {
+            constructs: crate::Constructs {
+                mdx_expression_text: true,
+                ..crate::Constructs::default()
+            },
+            mdx_expression_parse: Some(Box::new(|_, _| {
+                Signal::Eof(
+                    "incomplete expression".into(),
+                    Box::new("test".into()),
+                    Box::new("eof".into()),
+                )
+            })),
+            ..ParseOptions::default()
+        };
+
+        assert!(crate::parser::parse("{value}", &options).is_err());
+    }
+}
