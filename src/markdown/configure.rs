@@ -18,9 +18,23 @@ pub enum IndentOptions {
     Tab,
 }
 
+/// Configuration for soft line breaks in phrasing content.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum LineWrapping {
+    /// Preserve soft line breaks from the syntax tree (the default).
+    #[default]
+    Preserve,
+    /// Replace soft line breaks with spaces.
+    ///
+    /// Explicit Markdown hard breaks, code, and block boundaries are preserved.
+    Unwrap,
+}
+
 /// Configuration.
 #[derive(Clone, Debug)]
 pub struct Options {
+    /// How to handle soft line breaks in text (default: `LineWrapping::Preserve`).
+    pub line_wrapping: LineWrapping,
     /// Marker to use for bullets of items in unordered lists (`'*'`, `'+'`, or
     /// `'-'`, default: `'*'`).
     pub bullet: char,
@@ -85,6 +99,7 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Self {
+            line_wrapping: LineWrapping::default(),
             bullet: '*',
             bullet_ordered: '.',
             bullet_other: '-',

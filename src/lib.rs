@@ -84,7 +84,7 @@ pub use util::mdx::{
 
 pub use configuration::{CompileOptions, Constructs, Options, ParseOptions};
 pub use markdown::{to_markdown, to_markdown_with_options};
-pub use markdown::{IndentOptions, Options as MarkdownOptions};
+pub use markdown::{IndentOptions, LineWrapping, Options as MarkdownOptions};
 pub use renderer::{HTMLRenderer, MarkdownRenderer, Renderer};
 
 use alloc::string::String;

@@ -11,7 +11,7 @@
 // implementation while keeping the parser's stricter lints on the surrounding API.
 #![allow(clippy::pedantic)]
 
-pub use self::configure::{IndentOptions, Options};
+pub use self::configure::{IndentOptions, LineWrapping, Options};
 use self::state::{Info, State};
 use crate::{mdast::Node, message::Message};
 use alloc::string::String;

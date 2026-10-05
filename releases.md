@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add an option to unwrap soft line breaks when serializing Markdown.
 - Fix a panic when serializing long inline code or math values containing CRLF
   before unsafe Markdown characters.
 
