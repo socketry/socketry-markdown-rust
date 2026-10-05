@@ -7,7 +7,9 @@ and adds Socketry's AST helpers and renderer APIs.
 [![Build][badge-build-image]][badge-build-url]
 [![Coverage][badge-coverage-image]][badge-coverage-url]
 
-## Install
+## Usage
+
+### Install
 
 ```sh
 cargo add socketry-markdown
@@ -15,7 +17,7 @@ cargo add socketry-markdown
 
 The library supports Rust 1.73 and later.
 
-## Render HTML
+### Render HTML
 
 For direct conversion from Markdown source to HTML:
 
@@ -32,7 +34,7 @@ use socketry_markdown::{to_html_with_options, Options};
 let html = to_html_with_options("* [x] done", &Options::gfm()).unwrap();
 ```
 
-## Work with the AST
+### Work with the AST
 
 Parse to a syntax tree when you need to inspect or transform Markdown:
 
@@ -55,12 +57,21 @@ let markdown = document.to_markdown();
 assert!(markdown.starts_with("# Introduction"));
 ```
 
-## Extensions
+### Extensions
 
 The parser supports CommonMark, GFM, MDX, frontmatter, and math constructs.
 HTML output escapes raw HTML and omits MDX expressions by default. See the
 [API documentation](https://docs.rs/socketry-markdown/latest/socketry_markdown/)
 for parser options, renderer configuration, and AST types.
+
+## Releasing
+
+Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`,
+or `bump --version X.Y.Z`), then run `cargo bake cargo:release` and open a
+pull request. After review and merge, GitHub Actions publishes the release
+when the configured `crates-io` environment approves it. Follow the shared
+[Releasing skill](https://github.com/socketry/socketry-project-rust/blob/main/context/releasing.md)
+for the standard process.
 
 ## Releases
 
@@ -94,9 +105,9 @@ Please open an issue or pull request on [GitHub](https://github.com/socketry/soc
 
 ### Agent Context
 
-Run `cargo bake agent:context:install` to install shared context and skills
-from Cargo dependencies. Read `.agents/context/index.md` and the skills that
-apply to your task.
+Before contributing, read `agents.md` and the relevant context files it links.
+If `agents.md` is missing or out of date, run `cargo bake agent:context:install`
+to install context from dependencies and update the index.
 
 [badge-build-image]: https://github.com/socketry/socketry-markdown-rust/actions/workflows/test.yml/badge.svg
 [badge-build-url]: https://github.com/socketry/socketry-markdown-rust/actions
