@@ -407,6 +407,27 @@ fn list_item() {
 }
 
 #[test]
+fn serializes_checked_and_unchecked_task_list_items() {
+    let item = |checked| {
+        Node::ListItem(ListItem {
+            children: vec![Node::Paragraph(Paragraph {
+                children: vec![Node::Text(Text {
+                    value: String::from("a task"),
+                    position: None,
+                })],
+                position: None,
+            })],
+            position: None,
+            spread: false,
+            checked: Some(checked),
+        })
+    };
+
+    assert_eq!(to(&item(true)).unwrap(), "* [x] a task\n");
+    assert_eq!(to(&item(false)).unwrap(), "* [ ] a task\n");
+}
+
+#[test]
 fn rejects_an_invalid_bullet_marker() {
     let item = Node::ListItem(ListItem {
         children: vec![],
