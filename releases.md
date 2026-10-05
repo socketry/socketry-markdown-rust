@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+- Document the fork's motivation, optional parsing extensions, and AST and rendering additions.
+
 ## v0.3.2
 
 - Name renderer source files after their public types without changing public import paths.
