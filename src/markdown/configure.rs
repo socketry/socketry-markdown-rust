@@ -36,7 +36,7 @@ pub struct Options {
     /// How to handle soft line breaks in text (default: `LineWrapping::Preserve`).
     pub line_wrapping: LineWrapping,
     /// Marker to use for bullets of items in unordered lists (`'*'`, `'+'`, or
-    /// `'-'`, default: `'*'`).
+    /// `'-'`, default: `'-'`).
     pub bullet: char,
     /// Marker to use for bullets of items in ordered lists (`'.'` or `')'`,
     /// default: `'.'`).
@@ -100,7 +100,7 @@ impl Default for Options {
     fn default() -> Self {
         Self {
             line_wrapping: LineWrapping::default(),
-            bullet: '*',
+            bullet: '-',
             bullet_ordered: '.',
             bullet_other: '-',
             close_atx: false,

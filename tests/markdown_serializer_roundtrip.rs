@@ -10,18 +10,26 @@ use socketry_markdown::markdown::{
 use socketry_markdown::{mdast::Node, to_mdast as from};
 
 #[test]
+fn normalizes_unordered_list_markers_by_default() {
+    let document = "* first\n* second\n";
+    let tree = from(document, &Default::default()).unwrap();
+
+    assert_eq!(to(&tree).unwrap(), "- first\n- second\n");
+}
+
+#[test]
 fn roundtrip() {
     let doc: String = document(vec![
-        "> * Lorem ipsum dolor sit amet",
+        "> - Lorem ipsum dolor sit amet",
         ">",
-        "> * consectetur adipisicing elit",
+        "> - consectetur adipisicing elit",
         "",
     ]);
 
     assert_eq!(to(&from(&doc, &Default::default()).unwrap()).unwrap(), doc);
 
     let doc: String = document(vec![
-        "* Lorem ipsum dolor sit amet",
+        "- Lorem ipsum dolor sit amet",
         "",
         "  1. consectetur adipisicing elit",
         "",
@@ -32,7 +40,7 @@ fn roundtrip() {
     assert_eq!(to(&from(&doc, &Default::default()).unwrap()).unwrap(), doc);
 
     let doc: String = document(vec![
-        "* 1. Lorem ipsum dolor sit amet",
+        "- 1. Lorem ipsum dolor sit amet",
         "",
         "  2. consectetur adipisicing elit",
         "",
@@ -41,15 +49,15 @@ fn roundtrip() {
     assert_eq!(to(&from(&doc, &Default::default()).unwrap()).unwrap(), doc);
 
     let doc: String = document(vec![
-        "* hello",
-        "  * world",
+        "- hello",
+        "  - world",
         "    how",
         "",
         "    are",
         "    you",
         "",
-        "  * today",
-        "* hi",
+        "  - today",
+        "- hi",
         "",
     ]);
 
@@ -73,23 +81,23 @@ fn roundtrip() {
     assert_eq!(to(&from(&doc, &Default::default()).unwrap()).unwrap(), doc);
 
     let doc: String = document(vec![
-        "* foo",
+        "- foo",
         "",
-        "*",
+        "-",
         "",
-        "* bar",
+        "- bar",
         "",
-        "* baz",
+        "- baz",
         "",
-        "*",
+        "-",
         "",
-        "* qux quux",
+        "- qux quux",
         "",
     ]);
 
     assert_eq!(to(&from(&doc, &Default::default()).unwrap()).unwrap(), doc);
 
-    let doc: String = "* a\n\n<!---->\n\n* b\n".to_string();
+    let doc: String = "- a\n\n<!---->\n\n- b\n".to_string();
     assert_eq!(to(&from(&doc, &Default::default()).unwrap()).unwrap(), doc);
 
     let doc: String = document(vec![
@@ -152,7 +160,7 @@ fn roundtrip() {
     let doc = "```\n	\n```\n";
     assert_eq!(to(&from(doc, &Default::default()).unwrap()).unwrap(), doc);
 
-    let doc = "* * -\n";
+    let doc = "- - *\n";
     assert_eq!(to(&from(doc, &Default::default()).unwrap()).unwrap(), doc);
 
     let doc = "- ***\n";

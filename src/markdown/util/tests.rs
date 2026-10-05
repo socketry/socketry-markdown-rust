@@ -13,9 +13,9 @@ use crate::markdown::{state::State, Options};
 fn validates_markdown_serialization_markers() {
     let options = Options::default();
     let mut state = State::new(&options);
-    assert_eq!(check_bullet(&mut state).unwrap(), '*');
+    assert_eq!(check_bullet(&mut state).unwrap(), '-');
     assert_eq!(check_bullet_ordered(&mut state).unwrap(), '.');
-    assert_eq!(check_bullet_other(&mut state).unwrap(), '-');
+    assert_eq!(check_bullet_other(&mut state).unwrap(), '*');
     assert_eq!(check_emphasis(&state).unwrap(), '*');
     assert_eq!(check_fence(&mut state).unwrap(), '`');
     assert_eq!(check_quote(&state).unwrap(), '"');

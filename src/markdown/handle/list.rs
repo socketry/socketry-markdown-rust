@@ -118,7 +118,10 @@ mod tests {
 
     #[test]
     fn keeps_the_rule_marker_when_no_item_starts_with_a_thematic_break() {
-        let options = Options::default();
+        let options = Options {
+            rule: '-',
+            ..Options::default()
+        };
         let mut state = State::new(&options);
         let list = List {
             children: vec![Node::ListItem(ListItem {
@@ -143,13 +146,16 @@ mod tests {
         assert_eq!(
             list.handle(&mut state, &Info::new("", ""), None, &node)
                 .unwrap(),
-            "* ordinary item"
+            "- ordinary item"
         );
     }
 
     #[test]
     fn ignores_non_list_item_children_when_avoiding_rule_markers() {
-        let options = Options::default();
+        let options = Options {
+            rule: '-',
+            ..Options::default()
+        };
         let mut state = State::new(&options);
         let list = List {
             children: vec![Node::Heading(crate::mdast::Heading {
@@ -178,7 +184,10 @@ mod tests {
     fn changes_the_list_marker_when_an_item_starts_with_a_thematic_break() {
         use crate::mdast::ThematicBreak;
 
-        let options = Options::default();
+        let options = Options {
+            rule: '-',
+            ..Options::default()
+        };
         let mut state = State::new(&options);
         let list = List {
             children: vec![Node::ListItem(ListItem {
@@ -207,12 +216,15 @@ mod tests {
             .handle(&mut state, &Info::new("", ""), None, &node)
             .unwrap();
 
-        assert!(markdown.starts_with("- "), "{:?}", markdown);
+        assert!(markdown.starts_with("* "), "{:?}", markdown);
     }
 
     #[test]
     fn handles_empty_list_items_when_avoiding_rule_markers() {
-        let options = Options::default();
+        let options = Options {
+            rule: '-',
+            ..Options::default()
+        };
         let mut state = State::new(&options);
         let list = List {
             children: vec![Node::ListItem(ListItem {
