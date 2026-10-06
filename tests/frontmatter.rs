@@ -356,7 +356,7 @@ fn both_html_paths_omit_generic_frontmatter_and_keep_later_code() {
     assert_eq!(to_html_with_options(source, &options).unwrap(), expected);
     let document = to_mdast(source, &options.parse).unwrap();
     assert_eq!(
-        document.render_with(&mut socketry_markdown::HTMLRenderer::new()),
+        document.render_with(&mut socketry_markdown::HtmlRenderer::new()),
         expected
     );
     assert_eq!(document.children().unwrap().len(), 3);

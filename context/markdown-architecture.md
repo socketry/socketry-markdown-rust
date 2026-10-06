@@ -6,7 +6,7 @@ This crate implements a Markdown state machine that tokenizes source, resolves c
 
 - `to_html` and `to_html_with_options` stream parser events into the built-in HTML compiler. This path does not construct an AST.
 - `to_mdast` builds a `mdast::Node` tree. The `Node` enum includes a transparent `Fragment` variant for detached child lists.
-- `Renderer` is the AST-to-output interface. `HTMLRenderer` and `MarkdownRenderer` are built in; a custom renderer controls its own output and escaping behavior.
+- `Renderer` is the AST-to-output interface. `HtmlRenderer` and `MarkdownRenderer` are built in; a custom renderer controls its own output and escaping behavior.
 - AST helpers include traversal, `text_content`, code-fence metadata, `extract_children`, and heading lookup and section operations. Keep these helpers working for fragments as well as document nodes.
 
 The Markdown serializer lives in `src/markdown/`. Keep its construct handlers and safety logic separate from the parser's event-to-HTML compiler. Serializer changes should preserve references, extensions, and formatting options when possible.

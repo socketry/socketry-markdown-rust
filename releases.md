@@ -1,5 +1,9 @@
 # Releases
 
+## v0.6.0
+
+- Rename `HTMLRenderer` to `HtmlRenderer` to follow Rust acronym casing. Update imports and type references.
+
 ## v0.5.0
 
 - Add `Node::code_fence()` and `mdast::CodeFence`, exposing an opening fence's character, length, and indentation in columns, following Markly's fence structure.

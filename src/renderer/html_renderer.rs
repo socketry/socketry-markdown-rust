@@ -28,16 +28,15 @@ use alloc::{
 /// # Example
 ///
 /// ```ignore
-/// use socketry_markdown::{mdast::Headings, renderer::HTMLRenderer, to_mdast, ParseOptions};
+/// use socketry_markdown::{mdast::Headings, renderer::HtmlRenderer, to_mdast, ParseOptions};
 ///
 /// let tree = to_mdast("# Hello *world*!", &ParseOptions::default())?;
-/// let mut renderer = HTMLRenderer::default();
+/// let mut renderer = HtmlRenderer::default();
 /// let html = tree.render_with(&mut renderer);
 /// # Ok::<(), socketry_markdown::message::Message>(())
 /// ```
 #[derive(Clone, Debug, Default)]
-#[allow(clippy::upper_case_acronyms)]
-pub struct HTMLRenderer {
+pub struct HtmlRenderer {
     options: CompileOptions,
     heading_anchors: Vec<String>,
     heading_index: usize,
@@ -49,7 +48,7 @@ pub struct HTMLRenderer {
     tight_list: bool,
 }
 
-impl HTMLRenderer {
+impl HtmlRenderer {
     /// Create a safe HTML renderer with default options.
     #[must_use]
     pub fn new() -> Self {
@@ -674,7 +673,7 @@ impl HTMLRenderer {
     }
 }
 
-impl Renderer for HTMLRenderer {
+impl Renderer for HtmlRenderer {
     fn render(&mut self, node: &Node) -> String {
         self.prepare(node);
         self.render_node_inner(node)
@@ -722,13 +721,13 @@ fn with_surrounding_line_endings(value: &str, line_ending: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::HTMLRenderer;
+    use super::HtmlRenderer;
     use crate::mdast::{Node, Paragraph, Text};
     use alloc::vec;
 
     #[test]
     fn skips_footnote_entries_without_definitions() {
-        let mut renderer = HTMLRenderer::new();
+        let mut renderer = HtmlRenderer::new();
         renderer.footnote_order.push("missing".into());
 
         let output = renderer.render_footnote_section();
@@ -739,7 +738,7 @@ mod tests {
 
     #[test]
     fn renders_footnotes_without_preceding_root_content() {
-        let mut renderer = HTMLRenderer::new();
+        let mut renderer = HtmlRenderer::new();
         renderer.footnote_order.push("note".into());
         renderer.footnote_definitions.insert(
             "note".into(),
@@ -760,7 +759,7 @@ mod tests {
 
     #[test]
     fn omits_empty_nodes_from_lists_and_only_terminates_code_when_needed() {
-        let mut renderer = HTMLRenderer::new();
+        let mut renderer = HtmlRenderer::new();
         let list = crate::mdast::List {
             children: vec![Node::MdxFlowExpression(crate::mdast::MdxFlowExpression {
                 value: "value".into(),
