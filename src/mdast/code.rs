@@ -1,4 +1,10 @@
 // Released under the MIT License.
+// Copyright, 2022, by Bernhard Berger.
+// Copyright, 2022-2025, by Titus Wormer.
+// Copyright, 2023, by Kyle McCarthy.
+// Copyright, 2023, by Mia.
+// Copyright, 2023, by Rafael Bachmann.
+// Copyright, 2024, by Harsha Teja Kanna.
 // Copyright, 2026, by Samuel Williams.
 
 use super::CodeFence;
