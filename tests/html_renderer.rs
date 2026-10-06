@@ -13,7 +13,7 @@ use socketry_markdown::{
     },
     message,
     renderer::Renderer,
-    to_html_with_options, to_mdast, CompileOptions, HTMLRenderer, Options, ParseOptions,
+    to_html_with_options, to_mdast, CompileOptions, HtmlRenderer, Options, ParseOptions,
 };
 
 fn text(value: &str) -> Node {
@@ -36,7 +36,7 @@ fn render(
     compile_options: CompileOptions,
 ) -> Result<String, message::Message> {
     let tree = to_mdast(source, parse_options)?;
-    let mut renderer = HTMLRenderer::with_options(compile_options);
+    let mut renderer = HtmlRenderer::with_options(compile_options);
     Ok(tree.render_with(&mut renderer))
 }
 
@@ -500,7 +500,7 @@ fn renders_ast_node_variants_and_custom_renderer_methods() {
         gfm_footnote_label_tag_name: Some("h3".into()),
         ..CompileOptions::default()
     };
-    let mut renderer = HTMLRenderer::with_options(options);
+    let mut renderer = HtmlRenderer::with_options(options);
     assert!(renderer.options().heading_ids);
 
     let output = tree.render_with(&mut renderer);
@@ -529,7 +529,7 @@ fn renders_ast_node_variants_and_custom_renderer_methods() {
         );
     }
 
-    let mut renderer = HTMLRenderer::new();
+    let mut renderer = HtmlRenderer::new();
     let paragraph = paragraph(vec![text("child")]);
     assert_eq!(renderer.render_node(&text("direct")), "direct");
     assert_eq!(renderer.render_children(&paragraph), "child");
@@ -551,7 +551,7 @@ fn renders_ast_node_variants_and_custom_renderer_methods() {
         url: "javascript:bad()".into(),
         title: None,
     });
-    let mut safe_renderer = HTMLRenderer::default();
+    let mut safe_renderer = HtmlRenderer::default();
     assert_eq!(
         safe_renderer.render_node(&image),
         "<img src=\"\" alt=\"image\" />"
@@ -611,7 +611,7 @@ fn renders_unchecked_items_and_header_only_tables() {
             }),
         ],
     });
-    let mut renderer = HTMLRenderer::new();
+    let mut renderer = HtmlRenderer::new();
     let output = tree.render_with(&mut renderer);
 
     assert!(output.contains("<li><p>ordinary item</p></li>"));

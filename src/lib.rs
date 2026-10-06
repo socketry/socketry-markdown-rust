@@ -19,7 +19,7 @@
 //!   — turn markdown into a syntax tree
 //! * [`Renderer`][]
 //!   — render AST nodes and fragments with a user-defined renderer
-//! * [`HTMLRenderer`][]
+//! * [`HtmlRenderer`][]
 //!   — render an AST node or fragment directly as HTML
 //! * [`MarkdownRenderer`][]
 //!   — render an AST node or fragment back to Markdown
@@ -85,7 +85,7 @@ pub use util::mdx::{
 pub use configuration::{CompileOptions, Constructs, Options, ParseOptions};
 pub use markdown::{to_markdown, to_markdown_with_options};
 pub use markdown::{IndentOptions, LineWrapping, Options as MarkdownOptions};
-pub use renderer::{HTMLRenderer, MarkdownRenderer, Renderer};
+pub use renderer::{HtmlRenderer, MarkdownRenderer, Renderer};
 
 use alloc::string::String;
 

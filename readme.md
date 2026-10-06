@@ -18,7 +18,7 @@ The existing `Constructs::frontmatter` option also supports language-agnostic fr
 
 For tools that inspect code blocks and frontmatter, `Node::code_fence()` exposes the source opening fence's character, length, and indentation, following Markly's fence structure. This metadata remains available when nodes are cloned or detached, even after source positions are removed.
 
-Beyond parsing, the fork adds AST traversal, text extraction, heading and section editing, and `Fragment` nodes for working with detached content. `HTMLRenderer`, `MarkdownRenderer`, and the custom `Renderer` interface render edited trees; Markdown serialization preserves language metadata and can unwrap soft line breaks. Optional `CompileOptions::heading_ids` generates unique heading anchors for in-page links and tables of contents.
+Beyond parsing, the fork adds AST traversal, text extraction, heading and section editing, and `Fragment` nodes for working with detached content. `HtmlRenderer`, `MarkdownRenderer`, and the custom `Renderer` interface render edited trees; Markdown serialization preserves language metadata and can unwrap soft line breaks. Optional `CompileOptions::heading_ids` generates unique heading anchors for in-page links and tables of contents.
 
 The fork also includes fixes for stale MDX parser errors and parsing and serialization edge cases, including CRLF handling in inline code and math. See [releases.md](releases.md) for changes and the [API documentation](https://docs.rs/socketry-markdown/latest/socketry_markdown/) for configuration details.
 
@@ -62,7 +62,7 @@ assert_eq!(document.text_content(), "IntroductionHello, world!");
 
 Nodes provide traversal, text extraction, code-fence information, heading lookup, and child or section editing. `extract_children()` returns a `Fragment` that can be cloned, rendered, or serialized on its own.
 
-Use `HTMLRenderer` or a custom `Renderer` to render an AST. Serialize nodes and fragments back to Markdown with `Node::to_markdown()`:
+Use `HtmlRenderer` or a custom `Renderer` to render an AST. Serialize nodes and fragments back to Markdown with `Node::to_markdown()`:
 
 ```rust
 let markdown = document.to_markdown();
@@ -122,6 +122,10 @@ Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or
 
 See [releases.md](releases.md) for the full release history.
 
+### v0.6.0
+
+- Rename `HTMLRenderer` to `HtmlRenderer` throughout the public API, examples, and documentation to follow Rust acronym casing. Update imports and type references; the old spelling is removed without a compatibility alias.
+
 ### v0.5.0
 
 - Add `Node::code_fence()` and `mdast::CodeFence`, exposing an opening fence's character, length, and indentation in columns, following Markly's fence structure.
@@ -137,10 +141,6 @@ See [releases.md](releases.md) for the full release history.
 - Preserve generic frontmatter during Markdown serialization, protect edited bodies with safe fences, and omit it from HTML.
 
 - Document the fork's motivation, optional parsing extensions, and AST and rendering additions.
-
-### v0.3.2
-
-- Name renderer source files after their public types without changing public import paths.
 
 <!-- bake-readme:releases:end -->
 

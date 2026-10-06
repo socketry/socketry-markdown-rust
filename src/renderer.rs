@@ -5,7 +5,7 @@
 mod html_renderer;
 mod markdown_renderer;
 
-pub use html_renderer::HTMLRenderer;
+pub use html_renderer::HtmlRenderer;
 pub use markdown_renderer::MarkdownRenderer;
 
 use crate::mdast::Node;
