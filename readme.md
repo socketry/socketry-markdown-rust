@@ -16,6 +16,8 @@ The fork adds three parsing options to `ParseOptions`, all disabled by default s
 
 The existing `Constructs::frontmatter` option also supports language-agnostic frontmatter, following [Markly](https://github.com/socketry/markly) and [cmarkly](https://github.com/socketry/cmarkly). A closed, language-tagged backtick or tilde fence at the start of a document becomes frontmatter; format hints on `---` or `+++` do too. The AST preserves the full info string and raw body without parsing the named format, and HTML output omits it.
 
+For tools that inspect code blocks and frontmatter, `Node::code_fence()` exposes the source opening fence's character, length, and indentation, following Markly's fence structure. This metadata remains available when nodes are cloned or detached, even after source positions are removed.
+
 Beyond parsing, the fork adds AST traversal, text extraction, heading and section editing, and `Fragment` nodes for working with detached content. `HTMLRenderer`, `MarkdownRenderer`, and the custom `Renderer` interface render edited trees; Markdown serialization preserves language metadata and can unwrap soft line breaks. Optional `CompileOptions::heading_ids` generates unique heading anchors for in-page links and tables of contents.
 
 The fork also includes fixes for stale MDX parser errors and parsing and serialization edge cases, including CRLF handling in inline code and math. See [releases.md](releases.md) for changes and the [API documentation](https://docs.rs/socketry-markdown/latest/socketry_markdown/) for configuration details.
