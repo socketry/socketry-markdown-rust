@@ -14,12 +14,17 @@ use alloc::string::String;
 ///
 /// # Example
 ///
-/// ```ignore
-/// use socketry_markdown::{mdast::Node, renderer::MarkdownRenderer};
+/// ```
+/// use socketry_markdown::{mdast::Node, to_mdast, MarkdownRenderer, ParseOptions};
 ///
-/// let node: Node = /* an mdast tree */;
+/// let mut tree = to_mdast("# Hello *world*!", &ParseOptions::default()).unwrap();
+/// if let Node::Heading(heading) = &mut tree.children_mut().unwrap()[0] {
+///     heading.depth = 2;
+/// }
+///
 /// let mut renderer = MarkdownRenderer::new();
-/// let markdown = node.render_with(&mut renderer);
+/// let markdown = tree.render_with(&mut renderer);
+/// assert_eq!(markdown, "## Hello *world*!\n");
 /// ```
 #[derive(Clone, Debug, Default)]
 pub struct MarkdownRenderer {

@@ -9,6 +9,11 @@ use alloc::string::String;
 /// The contents are raw text: the Markdown parser does not interpret the
 /// named language. Untagged `---` and `+++` forms retain their legacy `Yaml`
 /// and `Toml` nodes; tagged forms and language-tagged code fences use this node.
+///
+/// Markdown serialization retains the stored info string and body while
+/// normalizing spacing around the info string. Edited content can require a
+/// longer fence, a different marker, or a trailing body line ending to keep
+/// the frontmatter valid.
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(
     feature = "serde",

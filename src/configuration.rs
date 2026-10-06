@@ -111,7 +111,8 @@ pub struct Constructs {
     ///     ^^^^^^^^^^
     /// ```
     pub definition: bool,
-    /// Frontmatter at the start of the document, requiring a closing fence.
+    /// Frontmatter with an unindented opening fence on the first document line,
+    /// outside list items and blockquotes, and a matching closing fence.
     ///
     /// Untagged `---` and `+++` produce YAML and TOML nodes. A format hint after
     /// either delimiter, or a language-tagged backtick/tilde code fence, produces

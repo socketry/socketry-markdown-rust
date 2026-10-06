@@ -23,8 +23,8 @@ use alloc::string::String;
 ///
 /// # Example
 ///
-/// ```ignore
-/// use socketry_markdown::{mdast::Node, renderer::Renderer};
+/// ```
+/// use socketry_markdown::{mdast::Node, Renderer};
 ///
 /// struct PlainText;
 ///
@@ -53,6 +53,7 @@ use alloc::string::String;
 /// });
 /// let mut renderer = PlainText;
 /// let plain_text = node.render_with(&mut renderer);
+/// assert_eq!(plain_text, "hello");
 /// ```
 pub trait Renderer {
     /// Render one AST node into this renderer's output.
