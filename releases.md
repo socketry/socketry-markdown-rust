@@ -2,7 +2,7 @@
 
 ## v0.6.0
 
-- Rename `HTMLRenderer` to `HtmlRenderer` throughout the public API, examples, and documentation to follow Rust acronym casing. Update imports and type references; the old spelling is removed without a compatibility alias.
+- Rename `HTMLRenderer` to `HtmlRenderer` to follow Rust acronym casing. Update imports and type references.
 
 ## v0.5.0
 

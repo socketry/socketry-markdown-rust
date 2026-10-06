@@ -119,12 +119,11 @@ Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or
 ## Releases
 
 <!-- bake-readme:releases:start -->
-
 See [releases.md](releases.md) for the full release history.
 
 ### v0.6.0
 
-- Rename `HTMLRenderer` to `HtmlRenderer` throughout the public API, examples, and documentation to follow Rust acronym casing. Update imports and type references; the old spelling is removed without a compatibility alias.
+- Rename `HTMLRenderer` to `HtmlRenderer` to follow Rust acronym casing. Update imports and type references.
 
 ### v0.5.0
 
@@ -141,7 +140,6 @@ See [releases.md](releases.md) for the full release history.
 - Preserve generic frontmatter during Markdown serialization, protect edited bodies with safe fences, and omit it from HTML.
 
 - Document the fork's motivation, optional parsing extensions, and AST and rendering additions.
-
 <!-- bake-readme:releases:end -->
 
 ## See Also
