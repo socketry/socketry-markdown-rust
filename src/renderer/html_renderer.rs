@@ -27,13 +27,17 @@ use alloc::{
 ///
 /// # Example
 ///
-/// ```ignore
-/// use socketry_markdown::{mdast::Headings, renderer::HtmlRenderer, to_mdast, ParseOptions};
+/// ```
+/// use socketry_markdown::{mdast::Node, to_mdast, HtmlRenderer, ParseOptions};
 ///
-/// let tree = to_mdast("# Hello *world*!", &ParseOptions::default())?;
-/// let mut renderer = HtmlRenderer::default();
+/// let mut tree = to_mdast("# Hello *world*!", &ParseOptions::default()).unwrap();
+/// if let Node::Heading(heading) = &mut tree.children_mut().unwrap()[0] {
+///     heading.depth = 2;
+/// }
+///
+/// let mut renderer = HtmlRenderer::new();
 /// let html = tree.render_with(&mut renderer);
-/// # Ok::<(), socketry_markdown::message::Message>(())
+/// assert_eq!(html, "<h2>Hello <em>world</em>!</h2>");
 /// ```
 #[derive(Clone, Debug, Default)]
 pub struct HtmlRenderer {

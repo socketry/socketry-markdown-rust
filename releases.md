@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+- Clarify frontmatter placement and serialization, and provide runnable AST renderer examples.
+
 ## v0.6.0
 
 - Rename `HTMLRenderer` to `HtmlRenderer` to follow Rust acronym casing. Update imports and type references.

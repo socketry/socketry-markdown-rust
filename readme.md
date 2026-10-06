@@ -93,7 +93,7 @@ The parser inherits support for CommonMark, GFM, MDX, frontmatter, and math cons
 
 ### Language-agnostic frontmatter
 
-Enable the existing frontmatter construct to accept any format:
+Enable the existing frontmatter construct to accept any format. The opening fence must be unindented on the first line of the document, outside list items and blockquotes, and have a matching closing fence:
 
 ````rust
 use socketry_markdown::{mdast::Node, to_mdast, Constructs, ParseOptions};
@@ -110,7 +110,9 @@ if let Node::Frontmatter(frontmatter) = &document.children().unwrap()[0] {
 }
 ````
 
-Tagged forms such as `--- json` and `---yaml` use the same node. Untagged `---` and `+++` keep their existing `Yaml` and `Toml` nodes. Fences without a language, fences later in a document, and unclosed fences remain ordinary Markdown. Markdown serialization retains the info string and body, and adjusts fences when edited content would close them prematurely.
+Tagged forms such as `--- json` and `---yaml` use the same node. Untagged `---` and `+++` keep their existing `Yaml` and `Toml` nodes. Fences without a language, fences later in a document, and unclosed fences remain ordinary Markdown.
+
+Markdown serialization retains the stored info string and body while normalizing spacing around the info string. It can lengthen fences or change their marker when edited content would close them prematurely, and adds a line ending before the closing fence when an edited body needs one. Round trips preserve content and metadata while allowing these formatting adjustments.
 
 ## Releasing
 
@@ -119,6 +121,7 @@ Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or
 ## Releases
 
 <!-- bake-readme:releases:start -->
+
 See [releases.md](releases.md) for the full release history.
 
 ### v0.6.0
@@ -140,6 +143,7 @@ See [releases.md](releases.md) for the full release history.
 - Preserve generic frontmatter during Markdown serialization, protect edited bodies with safe fences, and omit it from HTML.
 
 - Document the fork's motivation, optional parsing extensions, and AST and rendering additions.
+
 <!-- bake-readme:releases:end -->
 
 ## See Also
